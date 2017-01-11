@@ -1389,25 +1389,34 @@ get_rel_oids(List *relids, VacuumStmt *vacstmt, const char *stmttype)
 		List	   *prels = NIL;
 
 		relid = RangeVarGetRelid(vacstmt->relation, false);
+		PartStatus ps = rel_part_status(relid);
 
-		if (rel_is_partitioned(relid))
+		if (ps != PART_STATUS_ROOT && vacstmt->rootonly)
+		{
+			ereport(WARNING,
+					(errmsg("skipping \"%s\" --- cannot analyze a non-root partition using ANALYZE ROOTPARTITION",
+							get_rel_name(relid))));
+		}
+		else if (rel_is_partitioned(relid))
 		{
 			PartitionNode *pn;
 
-			pn = get_parts(relid, 0, 0, false, true /*includesubparts*/);
+			pn = get_parts(relid, 0 /*level*/ , 0 /*parent*/, false /* inctemplate */, true /*includesubparts*/);
+			Assert(pn);
 
-			prels = all_partition_relids(pn);
+			if (!vacstmt->rootonly)
+			{
+				oid_list = all_leaf_partition_relids(pn); /* all leaves */
+			}
+			oid_list = lappend_oid(oid_list, relid); /* root partition */
 		}
-		else if (rel_is_child_partition(relid))
+		else
 		{
-			/* get my children */
-			prels = find_all_inheritors(relid);
+			oid_list = list_make1_oid(relid);
 		}
 
 		/* Make a relation list entry for this guy */
 		oldcontext = MemoryContextSwitchTo(vac_context);
-		oid_list = lappend_oid(oid_list, relid);
-		oid_list = list_concat_unique_oid(oid_list, prels);
 		MemoryContextSwitchTo(oldcontext);
 	}
 	else
