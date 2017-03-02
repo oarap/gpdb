@@ -50,8 +50,6 @@
 #include "utils/syscache.h"
 #include "utils/tuplesort.h"
 
-#define COLUMN_WIDTH_THRESHOLD  1024
-
 /* Data structure for Algorithm S from Knuth 3.4.2 */
 typedef struct
 {
@@ -808,7 +806,7 @@ analyzeComputeAverageWidth(Relation onerel, int attr_cnt, bool **excludeAttr)
 
 		width = DatumGetFloat4(heap_getattr(SPI_tuptable->vals[0], i + 1, SPI_tuptable->tupdesc, &isNull));
 
-		if (width > COLUMN_WIDTH_THRESHOLD)
+		if (width > analyze_column_width_threshold)
 			*flag = true;
 
 		excludeAttr[i] = flag;
