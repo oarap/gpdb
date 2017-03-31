@@ -70,6 +70,8 @@
 
 #include "gpopt/gpdbwrappers.h"
 
+#include "naucrates/md/IMDIdIndexTblType.h"
+
 using namespace gpdxl;
 using namespace gpopt;
 
@@ -264,7 +266,7 @@ CTranslatorRelcacheToDXL::PdrgpmdidRelIndexes
 	else  
 	{
 		// interior or leaf partition: do not consider indexes
-		return pdrgpmdidIndexes;
+		plIndexOids = gpdb::PlRelationIndexes(rel);
 	}
 	
 	ListCell *plc = NULL;
@@ -952,6 +954,7 @@ CTranslatorRelcacheToDXL::Pmdindex
 	)
 {
 	OID oidIndex = CMDIdGPDB::PmdidConvert(pmdidIndex)->OidObjectId();
+	IMDIdIndexTblType *pmdidRequest = static_cast<IMDIdIndexTblType *>(pmdidIndex);
 	GPOS_ASSERT(0 != oidIndex);
 	Relation relIndex = gpdb::RelGetRelation(oidIndex);
 
@@ -977,8 +980,7 @@ CTranslatorRelcacheToDXL::Pmdindex
 		GPOS_ASSERT (NULL != pgIndex);
 
 		OID oidRel = pgIndex->indrelid;
-
-		if (gpdb::FLeafPartition(oidRel))
+		if (gpdb::FLeafPartition(oidRel) && pmdidRequest->FIndexTblType()!=IMDIdIndexTblType::ENonPartitioned)
 		{
 			oidRel = gpdb::OidRootPartition(oidRel);
 		}
