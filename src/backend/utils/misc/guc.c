@@ -4518,7 +4518,7 @@ set_config_option(const char *name, const char *value,
         /*
          * Check if option can be set by the user.
          */
-        if (record->flags & GUC_DISALLOW_USER_SET)
+	if (record->flags & GUC_DISALLOW_USER_SET)
  	{
               /* Only print a warning in the dispatch or utility mode */
           if (changeVal)

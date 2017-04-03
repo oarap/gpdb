@@ -361,6 +361,13 @@ CConfigParamMapping::SConfigMappingElem CConfigParamMapping::m_elem[] =
 		&optimizer_array_constraints,
 		false, // m_fNegate
 		GPOS_WSZ_LIT("Allows the constraint framework to derive array constraints in the optimizer.")
+		},
+	
+		{
+		EopttraceEnableIndexOnLeafPart,
+		&optimizer_index_leaf_partition,
+		false, // m_fNegate
+		GPOS_WSZ_LIT("Allows the optimizer to use indexes on leaf partitions.")
 		}
 };
 

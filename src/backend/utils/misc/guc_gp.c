@@ -81,6 +81,8 @@ static const char *assign_optimizer_log_failure(const char *newval,
 static const char *assign_optimizer_minidump(const char *newval,
 						  bool doit, GucSource source);
 static bool assign_optimizer(bool newval, bool doit, GucSource source);
+static bool reset_md_cache(bool newval, bool doit, GucSource source);
+
 static bool assign_codegen(bool newval, bool doit, GucSource source);
 static const char *assign_codegen_optimization_level(const char *newval,
                                                      bool doit, GucSource source);
@@ -129,6 +131,9 @@ static bool assign_pljava_classpath_insecure(bool newval, bool doit, GucSource s
 extern struct config_generic *find_option(const char *name, bool create_placeholders, int elevel);
 
 extern bool enable_partition_rules;
+
+/* Helper function for shutdown Orca cache */
+extern void ShutdownMDCache ();
 
 /* GUC lists for gp_guc_list_show().  (List of struct config_generic) */
 List	   *gp_guc_list_for_explain;
@@ -556,6 +561,7 @@ bool		optimizer_explain_show_status;
 bool		optimizer_prefer_scalar_dqa_multistage_agg;
 bool 		optimizer_parallel_union;
 bool		optimizer_array_constraints;
+bool		optimizer_index_leaf_partition;
 
 /**
  * GUCs related to code generation.
@@ -3125,6 +3131,16 @@ struct config_bool ConfigureNamesBool_gp[] =
 		&optimizer_array_constraints,
 		false, NULL, NULL
 	},
+	
+	{
+		{"optimizer_index_leaf_partition", PGC_USERSET, DEVELOPER_OPTIONS,
+			gettext_noop("Allows the optimizer's to use indexes on leaf partitions."),
+			NULL,
+			GUC_NO_SHOW_ALL | GUC_NOT_IN_SAMPLE
+		},
+		&optimizer_index_leaf_partition,
+		true, reset_md_cache, NULL
+	},
 
 	{
 		{"init_codegen", PGC_POSTMASTER, DEVELOPER_OPTIONS,
@@ -4631,6 +4647,7 @@ struct config_int ConfigureNamesInt_gp[] =
 		&gp_server_version_num,
 		GP_VERSION_NUM, GP_VERSION_NUM, GP_VERSION_NUM, NULL, NULL
 	},
+	
 
 	/* End-of-list marker */
 	{
@@ -5786,6 +5803,19 @@ assign_gp_workfile_type_hashjoin(const char *newval, bool doit, GucSource source
 		gp_workfile_type_hashjoin = newtype;
 
 	return newval;
+}
+
+static bool
+reset_md_cache(bool newval, bool doit, GucSource source)
+{
+#ifdef USE_ORCA
+	if (newval != optimizer_index_leaf_partition)
+	{
+		ShutdownMDCache();
+	}
+#endif
+
+	return true;
 }
 
 static bool

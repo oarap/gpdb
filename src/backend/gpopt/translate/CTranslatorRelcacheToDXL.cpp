@@ -265,8 +265,18 @@ CTranslatorRelcacheToDXL::PdrgpmdidRelIndexes
 	}
 	else  
 	{
-		// interior or leaf partition: do not consider indexes
-		plIndexOids = gpdb::PlRelationIndexes(rel);
+		if (optimizer_index_leaf_partition)
+		{
+			// consider indexes on leaf partitions
+			plIndexOids = gpdb::PlRelationIndexes(rel);
+		}
+		else
+		{
+			// interior or leaf partition: do not consider indexes
+			return pdrgpmdidIndexes;
+		}
+
+		
 	}
 	
 	ListCell *plc = NULL;
@@ -980,10 +990,21 @@ CTranslatorRelcacheToDXL::Pmdindex
 		GPOS_ASSERT (NULL != pgIndex);
 
 		OID oidRel = pgIndex->indrelid;
-		if (gpdb::FLeafPartition(oidRel) && pmdidRequest->FIndexTblType()!=IMDIdIndexTblType::ENonPartitioned)
+		if (optimizer_index_leaf_partition)
 		{
-			oidRel = gpdb::OidRootPartition(oidRel);
+			if (gpdb::FLeafPartition(oidRel) && pmdidRequest->FIndexTblType()!=IMDIdIndexTblType::ENonPartitioned)
+			{
+				oidRel = gpdb::OidRootPartition(oidRel);
+			}
 		}
+		else
+		{
+			if (gpdb::FLeafPartition(oidRel))
+			{
+				oidRel = gpdb::OidRootPartition(oidRel);
+			}
+		}
+
 #ifdef FAULT_INJECTOR
 		gpdb::OptTasksFaultInjector(OptRelcacheTranslatorCatalogAccess);
 #endif // FAULT_INJECTOR

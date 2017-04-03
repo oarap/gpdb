@@ -42,6 +42,9 @@ class CGPOptimizer
 
     static
     void TerminateGPOPT();
+
+	static
+    void ShutdownMDCache();
 };
 
 #endif // CGPOptimizer_H

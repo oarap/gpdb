@@ -472,6 +472,7 @@ extern bool optimizer_explain_show_status;
 extern bool optimizer_prefer_scalar_dqa_multistage_agg;
 extern bool optimizer_parallel_union;
 extern bool optimizer_array_constraints;
+extern bool optimizer_index_leaf_partition;
 
 /**
  * GUCs related to code generation.

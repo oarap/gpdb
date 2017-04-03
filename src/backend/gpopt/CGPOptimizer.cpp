@@ -20,7 +20,7 @@
 #include "naucrates/init.h"
 #include "gpopt/init.h"
 #include "gpos/_api.h"
-
+#include "gpopt/mdcache/CMDCache.h"
 #include "naucrates/exception.h"
 
 extern MemoryContext MessageContext;
@@ -150,6 +150,23 @@ CGPOptimizer::TerminateGPOPT ()
 
 //---------------------------------------------------------------------------
 //	@function:
+//		ShutdownMDCache()
+//
+//	@doc:
+//		Shutdown Metadata Cache 
+//
+//---------------------------------------------------------------------------
+void
+CGPOptimizer::ShutdownMDCache ()
+{
+	if (CMDCache::FInitialized())
+	{
+		CMDCache::Shutdown();
+	}
+}
+
+//---------------------------------------------------------------------------
+//	@function:
 //		PplstmtOptimize
 //
 //	@doc:
@@ -219,4 +236,19 @@ void TerminateGPOPT ()
 }
 }
 
+//---------------------------------------------------------------------------
+//	@function:
+//		ShutdownMDCache()
+//
+//	@doc:
+//		Shutdown Metadata Cache
+//
+//---------------------------------------------------------------------------
+extern "C"
+{
+void ShutdownMDCache ()
+{
+	return CGPOptimizer::ShutdownMDCache();
+}
+}
 // EOF
