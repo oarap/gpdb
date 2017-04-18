@@ -469,9 +469,9 @@ bool		gp_enable_relsize_collection = false;
 /* ORCA related gucs */
 bool		optimizer_control = true;
 bool		optimizer;
+#ifdef USE_ORCA
 bool		optimizer_log;
 bool		optimizer_trace_fallback;
-bool		optimizer_partition_selection_log;
 bool		optimizer_minidump;
 int			optimizer_cost_model;
 bool		optimizer_print_query;
@@ -493,7 +493,6 @@ int			optimizer_retries;
 /* array of xforms disable flags */
 bool		optimizer_xforms[OPTIMIZER_XFORMS_COUNT] = {[0 ... OPTIMIZER_XFORMS_COUNT - 1] = false};
 char	   *optimizer_search_strategy_path = NULL;
-char	   *gp_idf_deduplicate_str;
 bool		optimizer_extract_dxl_stats;
 bool		optimizer_extract_dxl_stats_all_nodes;
 bool		optimizer_disable_missing_stats_collection;
@@ -538,8 +537,6 @@ int			optimizer_join_arity_for_associativity_commutativity;
 int			optimizer_penalize_broadcast_threshold;
 int         optimizer_array_expansion_threshold;
 int         optimizer_join_order_threshold;
-bool		optimizer_analyze_root_partition;
-bool		optimizer_analyze_midlevel_partition;
 bool		optimizer_enable_constant_expression_evaluation;
 bool		optimizer_use_external_constant_expression_evaluation_for_ints;
 bool		optimizer_enable_bitmapscan;
@@ -557,6 +554,12 @@ bool		optimizer_explain_show_status;
 bool		optimizer_prefer_scalar_dqa_multistage_agg;
 bool 		optimizer_parallel_union;
 bool		optimizer_array_constraints;
+#endif
+bool		optimizer_partition_selection_log;
+bool		optimizer_analyze_root_partition;
+bool		optimizer_analyze_midlevel_partition;
+
+char	   *gp_idf_deduplicate_str;
 
 /**
  * GUCs related to code generation.
@@ -2447,7 +2450,7 @@ struct config_bool ConfigureNamesBool_gp[] =
 		&optimizer,
 		false, assign_optimizer, NULL
 	},
-
+#ifdef USE_ORCA
 	{
 		{"optimizer_log", PGC_USERSET, LOGGING_WHAT,
 			gettext_noop("Log optimizer messages."),
@@ -2465,16 +2468,6 @@ struct config_bool ConfigureNamesBool_gp[] =
 			GUC_NO_SHOW_ALL | GUC_NOT_IN_SAMPLE
 		},
 		&optimizer_trace_fallback,
-		false, NULL, NULL
-	},
-
-	{
-		{"optimizer_partition_selection_log", PGC_USERSET, LOGGING_WHAT,
-			gettext_noop("Log optimizer partition selection."),
-			NULL,
-			GUC_NO_SHOW_ALL | GUC_NOT_IN_SAMPLE | GUC_GPDB_ADDOPT
-		},
-		&optimizer_partition_selection_log,
 		false, NULL, NULL
 	},
 
@@ -2927,25 +2920,6 @@ struct config_bool ConfigureNamesBool_gp[] =
 	},
 
 	{
-		{"optimizer_analyze_root_partition", PGC_USERSET, STATS_ANALYZE,
-			gettext_noop("Enable statistics collection on root partitions during ANALYZE"),
-			NULL
-		},
-		&optimizer_analyze_root_partition,
-		false, NULL, NULL
-	},
-
-	{
-		{"optimizer_analyze_midlevel_partition", PGC_USERSET, STATS_ANALYZE,
-			gettext_noop("Enable statistics collection on intermediate partitions during ANALYZE"),
-			NULL,
-			GUC_NO_SHOW_ALL | GUC_NOT_IN_SAMPLE
-		},
-		&optimizer_analyze_midlevel_partition,
-		false, NULL, NULL
-	},
-
-	{
 		{"optimizer_enable_constant_expression_evaluation", PGC_USERSET, DEVELOPER_OPTIONS,
 			gettext_noop("Enable constant expression evaluation in the optimizer"),
 			NULL,
@@ -3046,6 +3020,65 @@ struct config_bool ConfigureNamesBool_gp[] =
 	},
 
 	{
+		{"optimizer_prefer_scalar_dqa_multistage_agg", PGC_USERSET, DEVELOPER_OPTIONS,
+			gettext_noop("Prefer multistage aggregates for scalar distinct qualified aggregate in the optimizer."),
+			NULL,
+			GUC_NO_SHOW_ALL | GUC_NOT_IN_SAMPLE
+		},
+		&optimizer_prefer_scalar_dqa_multistage_agg,
+		true, NULL, NULL
+	},
+
+	{
+		{"optimizer_parallel_union", PGC_USERSET, DEVELOPER_OPTIONS,
+			gettext_noop("Enable parallel execution for UNION/UNION ALL queries."),
+			NULL,
+			GUC_NOT_IN_SAMPLE
+		},
+		&optimizer_parallel_union,
+		false, NULL, NULL
+	},
+
+	{
+		{"optimizer_array_constraints", PGC_USERSET, DEVELOPER_OPTIONS,
+			gettext_noop("Allows the optimizer's constraint framework to derive array constraints."),
+			NULL,
+			GUC_NO_SHOW_ALL | GUC_NOT_IN_SAMPLE
+		},
+		&optimizer_array_constraints,
+		false, NULL, NULL
+	},
+#endif
+	{
+		{"optimizer_analyze_root_partition", PGC_USERSET, STATS_ANALYZE,
+			gettext_noop("Enable statistics collection on root partitions during ANALYZE"),
+			NULL
+		},
+		&optimizer_analyze_root_partition,
+		false, NULL, NULL
+	},
+
+	{
+		{"optimizer_analyze_midlevel_partition", PGC_USERSET, STATS_ANALYZE,
+			gettext_noop("Enable statistics collection on intermediate partitions during ANALYZE"),
+			NULL,
+			GUC_NO_SHOW_ALL | GUC_NOT_IN_SAMPLE
+		},
+		&optimizer_analyze_midlevel_partition,
+		false, NULL, NULL
+	},
+
+	{
+		{"optimizer_partition_selection_log", PGC_USERSET, LOGGING_WHAT,
+			gettext_noop("Log optimizer partition selection."),
+			NULL,
+			GUC_NO_SHOW_ALL | GUC_NOT_IN_SAMPLE | GUC_GPDB_ADDOPT
+		},
+		&optimizer_partition_selection_log,
+		false, NULL, NULL
+	},
+
+	{
 		{"gp_log_optimization_time", PGC_USERSET, LOGGING_WHAT,
 			gettext_noop("Writes time spent producing a plan to the server log"),
 			NULL,
@@ -3083,36 +3116,6 @@ struct config_bool ConfigureNamesBool_gp[] =
 			GUC_NO_SHOW_ALL | GUC_NOT_IN_SAMPLE | GUC_GPDB_ADDOPT
 		},
 		&dml_ignore_target_partition_check,
-		false, NULL, NULL
-	},
-
-	{
-		{"optimizer_prefer_scalar_dqa_multistage_agg", PGC_USERSET, DEVELOPER_OPTIONS,
-			gettext_noop("Prefer multistage aggregates for scalar distinct qualified aggregate in the optimizer."),
-			NULL,
-			GUC_NO_SHOW_ALL | GUC_NOT_IN_SAMPLE
-		},
-		&optimizer_prefer_scalar_dqa_multistage_agg,
-		true, NULL, NULL
-	},
-
-	{
-		{"optimizer_parallel_union", PGC_USERSET, DEVELOPER_OPTIONS,
-			gettext_noop("Enable parallel execution for UNION/UNION ALL queries."),
-			NULL,
-			GUC_NOT_IN_SAMPLE
-		},
-		&optimizer_parallel_union,
-		false, NULL, NULL
-	},
-
-	{
-		{"optimizer_array_constraints", PGC_USERSET, DEVELOPER_OPTIONS,
-			gettext_noop("Allows the optimizer's constraint framework to derive array constraints."),
-			NULL,
-			GUC_NO_SHOW_ALL | GUC_NOT_IN_SAMPLE
-		},
-		&optimizer_array_constraints,
 		false, NULL, NULL
 	},
 
@@ -4445,7 +4448,7 @@ struct config_int ConfigureNamesInt_gp[] =
 		&gp_email_connect_avoid_duration,
 		7200, 300, 86400, NULL, NULL
 	},
-
+#ifdef USE_ORCA
 	{
 		{"optimizer_plan_id", PGC_USERSET, DEVELOPER_OPTIONS,
 			gettext_noop("Choose a plan alternative"),
@@ -4534,7 +4537,7 @@ struct config_int ConfigureNamesInt_gp[] =
 		&optimizer_mdcache_size,
 		0, 0, INT_MAX, NULL, NULL
 	},
-
+#endif
 	{
 		{"memory_profiler_dataset_size", PGC_USERSET, DEVELOPER_OPTIONS,
 			gettext_noop("Set the size in GB"),
@@ -4737,7 +4740,7 @@ struct config_real ConfigureNamesReal_gp[] =
 		&gp_simex_rand,
 		100.0, 0.001, 100.0, NULL, NULL
 	},
-
+#ifdef USE_ORCA
 	{
 		{"optimizer_damping_factor_filter", PGC_USERSET, QUERY_TUNING_METHOD,
 			gettext_noop("select predicate damping factor in optimizer, 1.0 means no damping"),
@@ -4796,7 +4799,7 @@ struct config_real ConfigureNamesReal_gp[] =
 		&optimizer_sort_factor,
 		1.0, 0.0, DBL_MAX, NULL, NULL
 	},
-
+#endif
 	/* End-of-list marker */
 	{
 		{NULL, 0, 0, NULL, NULL}, NULL, 0.0, 0.0, 0.0, NULL, NULL
@@ -4873,7 +4876,7 @@ struct config_string ConfigureNamesString_gp[] =
 		&memory_profiler_query_id,
 		"none", NULL, NULL
 	},
-
+#ifdef USE_ORCA
 	{
 		{"optimizer_log_failure", PGC_USERSET, LOGGING_WHEN,
 			gettext_noop("Sets which optimizer failures are logged."),
@@ -4902,6 +4905,17 @@ struct config_string ConfigureNamesString_gp[] =
 		&optimizer_cost_model_str,
 		"calibrated", assign_optimizer_cost_model, NULL
 	},
+
+	{
+		{"optimizer_search_strategy_path", PGC_USERSET, QUERY_TUNING_METHOD,
+			gettext_noop("Sets the search strategy used by gp optimizer."),
+			NULL,
+			GUC_NO_SHOW_ALL | GUC_NOT_IN_SAMPLE
+		},
+		&optimizer_search_strategy_path,
+		"default", NULL, NULL
+	},
+#endif
 	{
 		{"gp_workfile_caching_loglevel", PGC_SUSET, DEVELOPER_OPTIONS,
 			gettext_noop("Sets the logging level for workfile caching debugging messages"),
@@ -5353,16 +5367,6 @@ struct config_string ConfigureNamesString_gp[] =
 		},
 		&gp_idf_deduplicate_str,
 		"auto", assign_gp_idf_deduplicate, NULL
-	},
-
-	{
-		{"optimizer_search_strategy_path", PGC_USERSET, QUERY_TUNING_METHOD,
-			gettext_noop("Sets the search strategy used by gp optimizer."),
-			NULL,
-			GUC_NO_SHOW_ALL | GUC_NOT_IN_SAMPLE
-		},
-		&optimizer_search_strategy_path,
-		"default", NULL, NULL
 	},
 
 	{
