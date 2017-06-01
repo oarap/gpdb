@@ -120,15 +120,16 @@ building, see the README at the following repositories:
 1. https://github.com/greenplum-db/gp-xerces
 1. https://github.com/greenplum-db/gporca
 
-
+<a name="buildOrca"></a>
 ### Build the optimizer
 
 1. Install our patched version of Xerces-C
 
     ```
     git clone https://github.com/greenplum-db/gp-xerces
-    cd gp-xerces
-    ./configure
+    mkdir gp-xerces/build
+    cd gp-xerces/build
+    ../configure
     make install
     ```
 
@@ -140,12 +141,16 @@ building, see the README at the following repositories:
 
     ```
     git clone https://github.com/greenplum-db/gporca
-    cd gporca
-    mkdir build
-    cd build
+    mkdir gporca/build
+    cd gporca/build
     cmake -GNinja ..
     ninja install
     ```
+    **Note**: Get the latest ORCA `git pull --ff-only` if you see an error message like below:
+    ```
+    checking Checking ORCA version... configure: error: Your ORCA version is expected to be 2.33.XXX
+    ```
+    
 ### Build the database
 ```
 # Clean environment
@@ -200,10 +205,10 @@ set optimizer=off;
 
 
 ### Build GPDB without GPORCA
-Currently, GPDB is built with ORCA by default if ORCA libraries and headers are
-available in the enviroment.
+Currently, GPDB is built with ORCA by default so latest ORCA libraries and headers need
+to be available in the environment. [Build and Install](#buildOrca) the latest ORCA.
 
-If ORCA is not present in the system, configure requires `--disable-orca` flag to be set.
+If you want to build GPDB without ORCA, configure requires `--disable-orca` flag to be set.
 
 ```
 # Clean environment
