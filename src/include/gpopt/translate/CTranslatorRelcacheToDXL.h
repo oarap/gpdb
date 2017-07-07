@@ -215,7 +215,7 @@ namespace gpdxl
 								(
 								IMemoryPool *mp,
 								const IMDType *md_type,
-								const Datum *mcv_values,
+								Datum *mcv_values,
 								const float4 *mcv_frequencies,
 								ULONG num_mcv_values
 								);
@@ -249,7 +249,7 @@ namespace gpdxl
 								OID att_type,
 								CDouble num_distinct,
 								CDouble null_freq,
-								const Datum *mcv_values,
+								Datum *mcv_values,
 								const float4 *mcv_frequencies,
 								ULONG num_mcv_values,
 								const Datum *hist_values,
@@ -407,6 +407,11 @@ namespace gpdxl
                               CDXLBucketArray *dxl_stats_bucket_array,
                               CDouble rows
                               );
+
+			// if the text related column's sorted MCVs create sorted double values
+			static
+			BOOL IsSortedMCVGenerateSortedDValues(const IMDType *pmdtype, Datum *pdrgdatumMCVValues, const ULONG ulNumMCVValues);
+
 		public:
 			// retrieve a metadata object from the relcache
 			static

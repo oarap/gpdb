@@ -439,6 +439,9 @@ namespace gpdb {
 	// convert network-related datums to double for stats purpose
 	double ConvertNetworkToScalar(Datum datum, Oid typid);
 
+	// convert text-related datums to double for stats purpose
+	double ConvertTextToScalar(Datum datum, Oid typid);
+
 	// is the given operator hash-joinable
 	bool IsOpHashJoinable(Oid opno);
 
@@ -634,6 +637,11 @@ namespace gpdb {
 	void *OptimizerAlloc(size_t size);
 
 	void OptimizerFree(void *ptr);
+	// quicksort that accepts an arg and passes to comperator function
+	void Qsort_arg(void *a, size_t n, size_t es, qsort_arg_comparator cmp, void *arg);
+
+	// compares two datums of text related types which is used for sorting
+	int textType_comparator(const void *a, const void *b, void *arg);
 
 	// returns true if a query cancel is requested in GPDB
 	bool IsAbortRequested(void);

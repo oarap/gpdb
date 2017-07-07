@@ -2378,6 +2378,10 @@ CTranslatorScalarToDXL::ExtractDoubleValueFromDatum
 			d = GPOS_FP_ABS_MAX;
 		}
 	}
+	else if (CMDTypeGenericGPDB::IsTextRelatedType(mdid))
+	{
+		d = gpdb::ConvertTextToScalar(datum, CMDIdGPDB::CastMdid(mdid)->Oid());
+	}
 	else if (CMDTypeGenericGPDB::IsTimeRelatedType(mdid))
 	{
 		d = gpdb::ConvertTimeValueToScalar(datum, CMDIdGPDB::CastMdid(mdid)->Oid());
