@@ -2335,6 +2335,11 @@ CTranslatorScalarToDXL::DValue
 			d = GPOS_FP_ABS_MAX;
 		}
 	}
+	else if (CMDTypeGenericGPDB::FTextRelatedType(pmdid))
+	{
+		d = gpdb::DConvertTextToScalar(datum, CMDIdGPDB::PmdidConvert(pmdid)->OidObjectId());
+
+	}
 	else if (CMDTypeGenericGPDB::FTimeRelatedType(pmdid))
 	{
 		d = gpdb::DConvertTimeValueToScalar(datum, CMDIdGPDB::PmdidConvert(pmdid)->OidObjectId());
