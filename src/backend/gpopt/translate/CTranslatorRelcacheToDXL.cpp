@@ -2840,7 +2840,7 @@ CTranslatorRelcacheToDXL::PdrgpdxlbucketTransformStats
 	OID oidAttType,
 	CDouble dDistinct,
 	CDouble dNullFreq,
-	const Datum *pdrgdatumMCVValues,
+	Datum *pdrgdatumMCVValues,
 	const float4 *pdrgfMCVFrequencies,
 	ULONG ulNumMCVValues,
 	const Datum *pdrgdatumHistValues,
@@ -2932,6 +2932,36 @@ CTranslatorRelcacheToDXL::PdrgpdxlbucketTransformStats
 	return pdrgpdxlbucket;
 }
 
+BOOL
+CTranslatorRelcacheToDXL::FsortedMCVGenerateSortedDValues
+	(
+	const IMDType *pmdtype,
+	Datum *pdrgdatumMCVValues,
+	const ULONG ulNumMCVValues
+	)
+{
+	if (!CMDTypeGenericGPDB::FTextRelatedType(pmdtype->Pmdid()))
+	{
+		return true;
+	}
+
+	Oid typid = CMDIdGPDB::PmdidConvert(pmdtype->Pmdid())->OidObjectId();
+	gpdb::Qsort_arg(pdrgdatumMCVValues, ulNumMCVValues, sizeof(Datum), gpdb::textType_comparator, &typid);
+
+	double prevDvalue = 0.0;
+	for (ULONG ul = 0; ul < ulNumMCVValues; ul++)
+	{
+		Datum datumMCV = pdrgdatumMCVValues[ul];
+		double currDValue = gpdb::DConvertTextToScalar(datumMCV, typid);
+		if(currDValue < prevDvalue)
+		{
+			return false;
+		}
+	}
+
+	return true;
+}
+
 //---------------------------------------------------------------------------
 //	@function:
 //		CTranslatorRelcacheToDXL::PhistTransformGPDBMCV
@@ -2945,11 +2975,16 @@ CTranslatorRelcacheToDXL::PhistTransformGPDBMCV
 	(
 	IMemoryPool *pmp,
 	const IMDType *pmdtype,
-	const Datum *pdrgdatumMCVValues,
+	Datum *pdrgdatumMCVValues,
 	const float4 *pdrgfMCVFrequencies,
 	ULONG ulNumMCVValues
 	)
 {
+	if(!FsortedMCVGenerateSortedDValues(pmdtype, pdrgdatumMCVValues, ulNumMCVValues))
+	{
+		return GPOS_NEW(pmp) CHistogram(GPOS_NEW(pmp) DrgPbucket(pmp));
+	}
+
 	DrgPdatum *pdrgpdatum = GPOS_NEW(pmp) DrgPdatum(pmp);
 	DrgPdouble *pdrgpdFreq = GPOS_NEW(pmp) DrgPdouble(pmp);
 

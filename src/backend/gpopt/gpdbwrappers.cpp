@@ -3200,5 +3200,72 @@ gpdb::OptimizerFree
 	}
 	GP_WRAP_END;
 }
+			
+int
+gpdb::textType_comparator(const void *a, const void *b, void *arg)
+{
+	GP_WRAP_START;
+	{
+		const int N = 32;
+		Oid typid = *((Oid *)arg);
+		unsigned char *avalue, *bvalue, *aptr, *bptr;
+		int avaluelen, bvaluelen;
 
+		switch(typid)
+		{
+			case BPCHAROID:
+				aptr = (unsigned char *) DatumGetBpCharP(*((Datum *)a));
+				bptr = (unsigned char *) DatumGetBpCharP(*((Datum *)b));
+				break;
+			case VARCHAROID:
+				aptr = (unsigned char *) DatumGetVarCharP(*((Datum *)a));
+				bptr = (unsigned char *) DatumGetVarCharP(*((Datum *)b));
+				break;
+			case TEXTOID:
+				aptr = (unsigned char *) DatumGetTextP(*((Datum *)a));
+				bptr = (unsigned char *) DatumGetTextP(*((Datum *)b));
+				break;
+			default:
+				elog(ERROR, "unsupported type: %u", typid);
+		}
+
+		// We already de-toasted the datum above
+		avalue = (unsigned char *) VARDATA(aptr);
+		bvalue = (unsigned char *) VARDATA(bptr);
+
+		if(avalue == NULL || bvalue == NULL)
+			return 0;
+
+		avaluelen = VARSIZE(avalue) - VARHDRSZ;
+		bvaluelen = VARSIZE(bvalue) - VARHDRSZ;
+
+		// Consider only the first N bytes
+		if (avaluelen > N)
+			avalue[N] = '\0';
+
+		if (bvaluelen > N)
+			bvalue[N] = '\0';
+
+		return strcoll((char *)avalue, (char *)bvalue);
+	}
+	GP_WRAP_END;
+	return 0;
+}
+
+void
+gpdb::Qsort_arg
+		(
+		void *a,
+		size_t n,
+		size_t es,
+		qsort_arg_comparator cmp,
+		void *arg
+		)
+{
+	GP_WRAP_START;
+	{
+		qsort_arg(a, n, es, cmp, arg);
+	}
+	GP_WRAP_END;
+}
 // EOF
