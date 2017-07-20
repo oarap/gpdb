@@ -3246,7 +3246,10 @@ gpdb::textType_comparator(const void *a, const void *b, void *arg)
 		if (bvaluelen > N)
 			bvalue[N] = '\0';
 
-		return strcoll((char *)avalue, (char *)bvalue);
+		setlocale(LC_COLLATE, "");
+		int status = strcoll((char *)avalue, (char *)bvalue);
+
+		return status;
 	}
 	GP_WRAP_END;
 	return 0;
