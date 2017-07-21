@@ -2796,6 +2796,7 @@ CTranslatorRelcacheToDXL::FsortedMCVGenerateSortedDValues
 		{
 			return false;
 		}
+		prevDvalue = currDValue;
 	}
 
 	return true;

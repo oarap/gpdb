@@ -3124,9 +3124,7 @@ gpdb::textType_comparator(const void *a, const void *b, void *arg)
 		Oid typid = *((Oid *)arg);
 		unsigned char *avalue, *bvalue, *aptr, *bptr;
 		int avaluelen, bvaluelen;
-		setlocale(LC_COLLATE, "en_US.UTF-8");
-		setlocale(LC_COLLATE, "");
-		setlocale(LC_CTYPE, "");
+
 		switch(typid)
 		{
 			case BPCHAROID:
@@ -3162,6 +3160,7 @@ gpdb::textType_comparator(const void *a, const void *b, void *arg)
 		if (bvaluelen > N)
 			bvalue[N] = '\0';
 
+		setlocale(LC_COLLATE, "");
 		int status = strcoll((char *)avalue, (char *)bvalue);
 
 		return status;
