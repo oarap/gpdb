@@ -64,6 +64,7 @@
 #define tuplesort_gettupleslot tuplesort_gettupleslot_pg
 #define tuplesort_getindextuple tuplesort_getindextuple_pg
 #define tuplesort_getdatum tuplesort_getdatum_pg
+#define tuplesort_skiptuples tuplesort_skiptuples_pg
 #define tuplesort_end tuplesort_end_pg
 /* tuplesort_merge_order not switched */
 #define tuplesort_rescan tuplesort_rescan_pg
@@ -144,6 +145,8 @@ extern IndexTuple tuplesort_getindextuple(Tuplesortstate *state, bool forward,
 extern bool tuplesort_getdatum(Tuplesortstate *state, bool forward,
 				   Datum *val, bool *isNull);
 
+extern bool tuplesort_skiptuples(Tuplesortstate *state, int64 ntuples,
+					 bool forward);
 
 extern void tuplesort_end(Tuplesortstate *state);
 
@@ -200,6 +203,7 @@ extern int32 ApplySortFunction(FmgrInfo *sortFunction, int sortFlags,
 #undef tuplesort_gettupleslot
 #undef tuplesort_getindextuple
 #undef tuplesort_getdatum
+#undef tuplesort_skiptuples
 #undef tuplesort_end
 #undef tuplesort_rescan
 #undef tuplesort_markpos
@@ -387,6 +391,15 @@ switcheroo_tuplesort_getdatum(switcheroo_Tuplesortstate *state, bool forward, Da
 		return tuplesort_getdatum_pg((Tuplesortstate_pg *) state, forward, val, isNull);
 }
 
+static inline bool
+switcheroo_tuplesort_skiptuples(switcheroo_Tuplesortstate *state, int64 ntuples, bool forward)
+{
+	if (state->is_mk_tuplesortstate)
+		return tuplesort_skiptuples_mk((Tuplesortstate_mk *) state, ntuples, forward);
+	else
+		return tuplesort_skiptuples_pg((Tuplesortstate_pg *) state, ntuples, forward);
+}
+
 static inline void
 switcheroo_tuplesort_end(switcheroo_Tuplesortstate *state)
 {
@@ -568,6 +581,7 @@ switcheroo_tuplesort_set_gpmon(switcheroo_Tuplesortstate *state,
 #define tuplesort_gettupleslot switcheroo_tuplesort_gettupleslot
 #define tuplesort_getindextuple switcheroo_tuplesort_getindextuple
 #define tuplesort_getdatum switcheroo_tuplesort_getdatum
+#define tuplesort_skiptuples switcheroo_tuplesort_skiptuples
 #define tuplesort_end switcheroo_tuplesort_end
 #define tuplesort_rescan switcheroo_tuplesort_rescan
 #define tuplesort_markpos switcheroo_tuplesort_markpos
