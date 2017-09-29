@@ -4805,7 +4805,8 @@ get_part_rule1(Relation rel,
 				char	   *idval = NULL;
 
 				pval = (Node *) transformExpressionList(pstate,
-														(List *) pval);
+														(List *) pval,
+														EXPR_KIND_PARTITION_EXPRESSION);
 
 				free_parsestate(pstate);
 
@@ -5665,7 +5666,8 @@ atpxPartAddList(Relation rel,
 
 					n1 = (Node *) copyObject(ri->partRangeVal);
 					n1 = (Node *) transformExpressionList(pstate,
-														  (List *) n1);
+														  (List *) n1,
+														  EXPR_KIND_PARTITION_EXPRESSION);
 
 					d_end =
 						magic_expr_to_datum(rel, pNode,
@@ -5830,7 +5832,8 @@ atpxPartAddList(Relation rel,
 					PartitionRangeItemIsValid(NULL, ri);
 					n1 = (Node *) copyObject(ri->partRangeVal);
 					n1 = (Node *) transformExpressionList(pstate,
-														  (List *) n1);
+														  (List *) n1,
+														  EXPR_KIND_PARTITION_EXPRESSION);
 
 					d_start =
 						magic_expr_to_datum(rel, pNode,
@@ -5972,7 +5975,8 @@ atpxPartAddList(Relation rel,
 				pid.partiddef = (Node *) copyObject(ri->partRangeVal);
 				pid.partiddef =
 					(Node *) transformExpressionList(pstate,
-													 (List *) pid.partiddef);
+													 (List *) pid.partiddef,
+													 EXPR_KIND_PARTITION_EXPRESSION);
 
 				prule = get_part_rule1(rel, &pid, false, false,
 									   &startSearchpoint,
@@ -6216,7 +6220,8 @@ atpxPartAddList(Relation rel,
 				pid.partiddef = (Node *) copyObject(ri->partRangeVal);
 				pid.partiddef =
 					(Node *) transformExpressionList(pstate,
-													 (List *) pid.partiddef);
+													 (List *) pid.partiddef,
+													 EXPR_KIND_PARTITION_EXPRESSION);
 
 				prule = get_part_rule1(rel, &pid, false, false,
 									   &endSearchpoint,
@@ -7593,7 +7598,8 @@ atpxModifyRangeOverlap(Relation rel,
 		pstate = make_parsestate(NULL);
 		pRangeValList = (Node *) copyObject(ri->partRangeVal);
 		pRangeValList = (Node *)
-			transformExpressionList(pstate, (List *) pRangeValList);
+			transformExpressionList(pstate, (List *) pRangeValList,
+									EXPR_KIND_PARTITION_EXPRESSION);
 		free_parsestate(pstate);
 		pid2.partiddef = pRangeValList;
 		pid2.location = -1;
