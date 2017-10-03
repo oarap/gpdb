@@ -2053,8 +2053,9 @@ ExecInitAgg(Agg *node, EState *estate, int eflags)
 		if (aggref->aggdistinct)
 		{
 			TargetEntry *tle;
-			SortClause *sc;
-			Oid			eq_function;
+			SortGroupClause *sc;
+			Oid			lt_opr;
+			Oid			eq_opr;
 
 			/*
 			 * GPDB 4 doesh't implement DISTINCT aggs for aggs having more
@@ -2078,15 +2079,18 @@ ExecInitAgg(Agg *node, EState *estate, int eflags)
 			 * record it in the Aggref node ... or at latest, do it in the
 			 * planner.
 			 */
-			eq_function = equality_oper_funcid(inputTypes[0]);
-			fmgr_info(eq_function, &(peraggstate->equalfn));
+			get_sort_group_operators(inputTypes[0],
+									 true, true, false,
+									 &lt_opr, &eq_opr, NULL);
+			fmgr_info(get_opcode(eq_opr), &(peraggstate->equalfn));
 
 			tle = (TargetEntry *) linitial(inputTargets);
 			tle->ressortgroupref = 1;
 
-			sc = makeNode(SortClause);
+			sc = makeNode(SortGroupClause);
 			sc->tleSortGroupRef = tle->ressortgroupref;
-			sc->sortop = ordering_oper_opid(inputTypes[0]);
+			sc->eqop = eq_opr;
+			sc->sortop = lt_opr;
 
 			sortlist = list_make1(sc);
 			numSortCols = 1;
@@ -2132,7 +2136,7 @@ ExecInitAgg(Agg *node, EState *estate, int eflags)
 			i = 0;
 			foreach(lc, sortlist)
 			{
-				SortClause *sortcl = (SortClause *) lfirst(lc);
+				SortGroupClause *sortcl = (SortGroupClause *) lfirst(lc);
 				TargetEntry *tle = get_sortgroupclause_tle(sortcl,
 														   inputTargets);
 
@@ -2149,7 +2153,7 @@ ExecInitAgg(Agg *node, EState *estate, int eflags)
 
 		if (aggref->aggdistinct)
 		{
-			Oid			eqfunc;
+			Oid			eq_opr;
 
 			Assert(numArguments == 1);
 			Assert(numSortCols == 1);
@@ -2158,8 +2162,10 @@ ExecInitAgg(Agg *node, EState *estate, int eflags)
 			 * We need the equal function for the DISTINCT comparison we will
 			 * make.
 			 */
-			eqfunc = equality_oper_funcid(inputTypes[0]);
-			fmgr_info(eqfunc, &peraggstate->equalfn);
+			get_sort_group_operators(inputTypes[0],
+									 false, true, false,
+									 NULL, &eq_opr, NULL);
+			fmgr_info(get_opcode(eq_opr), &peraggstate->equalfn);
 		}
 
 		ReleaseSysCache(aggTuple);
@@ -2679,7 +2685,7 @@ combineAggrefArgs(Aggref *aggref, List **sort_clauses)
 
 		foreach(lc, inputSorts)
 		{
-			SortClause *sc = (SortClause *) lfirst(lc);
+			SortGroupClause *sc = (SortGroupClause *) lfirst(lc);
 			TargetEntry *newtle;
 
 			tle = get_sortgroupclause_tle(sc, aggref->aggorder->sortTargets);
@@ -2699,7 +2705,7 @@ combineAggrefArgs(Aggref *aggref, List **sort_clauses)
 	}
 	else if (aggref->aggdistinct)
 	{
-		SortClause *sc;
+		SortGroupClause *sc;
 
 		/* In GPDB, DISTINCT implies single argument. */
 		Assert(list_length(inputTargets) == 1);
@@ -2711,7 +2717,7 @@ combineAggrefArgs(Aggref *aggref, List **sort_clauses)
 
 		if (sort_clauses != NULL)
 		{
-			sc = makeNode(SortClause);
+			sc = makeNode(SortGroupClause);
 			sc->tleSortGroupRef = tle->ressortgroupref;
 			inputSorts = list_make1(sc);
 		}
@@ -2756,7 +2762,7 @@ combinePercentileArgs(PercentileExpr *p)
 	 */
 	foreach(l, p->sortClause)
 	{
-		SortClause *sc = lfirst(l);
+		SortGroupClause *sc = lfirst(l);
 		TargetEntry *sc_tle;
 
 		sc_tle = get_sortgroupclause_tle(sc, p->sortTargets);
