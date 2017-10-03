@@ -1011,6 +1011,7 @@ _copyWindowAgg(WindowAgg *from)
 
 	CopyPlanFields((Plan *) from, (Plan *) newnode);
 
+	COPY_SCALAR_FIELD(winref);
 	COPY_SCALAR_FIELD(partNumCols);
 	if (from->partNumCols > 0)
 	{
@@ -1023,6 +1024,9 @@ _copyWindowAgg(WindowAgg *from)
 		COPY_POINTER_FIELD(ordColIdx, from->ordNumCols * sizeof(AttrNumber));
 		COPY_POINTER_FIELD(ordOperators, from->ordNumCols * sizeof(Oid));
 	}
+	COPY_SCALAR_FIELD(firstOrderCol);
+	COPY_SCALAR_FIELD(firstOrderCmpOperator);
+	COPY_SCALAR_FIELD(firstOrderNullsFirst);
 	COPY_SCALAR_FIELD(frameOptions);
 	COPY_NODE_FIELD(startOffset);
 	COPY_NODE_FIELD(endOffset);
@@ -1445,29 +1449,17 @@ _copyAggref(Aggref *from)
 
 	COPY_SCALAR_FIELD(aggfnoid);
 	COPY_SCALAR_FIELD(aggtype);
+	COPY_NODE_FIELD(aggdirectargs);
 	COPY_NODE_FIELD(args);
 	COPY_NODE_FIELD(aggorder);
-	COPY_SCALAR_FIELD(aggdistinct);
+	COPY_NODE_FIELD(aggdistinct);
 	COPY_NODE_FIELD(aggfilter);
 	COPY_SCALAR_FIELD(aggstar);
+	COPY_SCALAR_FIELD(aggvariadic);
+	COPY_SCALAR_FIELD(aggkind);
 	COPY_SCALAR_FIELD(aggstage);
 	COPY_SCALAR_FIELD(agglevelsup);
 	COPY_LOCATION_FIELD(location);
-
-	return newnode;
-}
-
-/*
- * _copyAggOrder
- */
-static AggOrder *
-_copyAggOrder(AggOrder *from)
-{
-	AggOrder   *newnode = makeNode(AggOrder);
-
-    COPY_SCALAR_FIELD(sortImplicit);
-	COPY_NODE_FIELD(sortTargets);
-    COPY_NODE_FIELD(sortClause);
 
 	return newnode;
 }
@@ -1525,6 +1517,7 @@ _copyFuncExpr(FuncExpr *from)
 	COPY_SCALAR_FIELD(funcid);
 	COPY_SCALAR_FIELD(funcresulttype);
 	COPY_SCALAR_FIELD(funcretset);
+	COPY_SCALAR_FIELD(funcvariadic);
 	COPY_SCALAR_FIELD(funcformat);
 	COPY_NODE_FIELD(args);
 	COPY_LOCATION_FIELD(location);
@@ -2377,23 +2370,6 @@ _copyGroupId(GroupId *from)
 	return newnode;
 }
 
-static PercentileExpr *
-_copyPercentileExpr(PercentileExpr *from)
-{
-	PercentileExpr *newnode = makeNode(PercentileExpr);
-
-	COPY_SCALAR_FIELD(perctype);
-	COPY_NODE_FIELD(args);
-	COPY_SCALAR_FIELD(perckind);
-	COPY_NODE_FIELD(sortClause);
-	COPY_NODE_FIELD(sortTargets);
-	COPY_NODE_FIELD(pcExpr);
-	COPY_NODE_FIELD(tcExpr);
-	COPY_LOCATION_FIELD(location);
-
-	return newnode;
-}
-
 static WindowClause *
 _copyWindowClause(WindowClause *from)
 {
@@ -2530,6 +2506,7 @@ _copyFuncCall(FuncCall *from)
 	COPY_NODE_FIELD(args);
 	COPY_NODE_FIELD(agg_order);
 	COPY_NODE_FIELD(agg_filter);
+	COPY_SCALAR_FIELD(agg_within_group);
 	COPY_SCALAR_FIELD(agg_star);
 	COPY_SCALAR_FIELD(agg_distinct);
 	COPY_SCALAR_FIELD(func_variadic);
@@ -3436,7 +3413,6 @@ _copyDefineStmt(DefineStmt *from)
 	COPY_NODE_FIELD(defnames);
 	COPY_NODE_FIELD(args);
 	COPY_NODE_FIELD(definition);
-	COPY_SCALAR_FIELD(ordered);  /* CDB */
 	COPY_SCALAR_FIELD(trusted);  /* CDB */
 
 	return newnode;
@@ -4797,9 +4773,6 @@ copyObject(void *from)
 		case T_Aggref:
 			retval = _copyAggref(from);
 			break;
-		case T_AggOrder:
-			retval = _copyAggOrder(from);
-			break;
 		case T_WindowFunc:
 			retval = _copyWindowFunc(from);
 			break;
@@ -5410,9 +5383,6 @@ copyObject(void *from)
 			break;
 		case T_GroupId:
 			retval = _copyGroupId(from);
-			break;
-		case T_PercentileExpr:
-			retval = _copyPercentileExpr(from);
 			break;
 		case T_WindowClause:
 			retval = _copyWindowClause(from);

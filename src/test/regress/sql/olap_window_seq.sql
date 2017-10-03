@@ -638,7 +638,6 @@ SELECT sale.pn,sale.cn,sale.prc,
 
 -- Check LEAD()
 -- sanity tests
-select p.proname, p.proargtypes from pg_window w, pg_proc p, pg_proc p2 where w.winfunc = p.oid and w.winfnoid = p2.oid and p2.proname = 'lead' order by 1,2;
 
 select lead(cn) from sale;
 
@@ -659,8 +658,6 @@ select cn, vn, pn, qty * prc,
 order by 1, 2, 3;
 
 -- Check LAG()
--- sanity tests
-select p.proname, p.proargtypes from pg_window w, pg_proc p, pg_proc p2 where w.winfunc = p.oid and w.winfnoid = p2.oid and p2.proname = 'lag' order by 1,2;
 
 -- actual LAG tests
 select cn, cname, lag(cname, 2, 'undefined') over (order by cn) from customer;
@@ -1347,11 +1344,11 @@ select cn,vn, sum, 1+rank() over (partition by cn order by vn) as rank
 from (select cn,vn,sum(qty) as sum from sale group by cn, vn) sale order by rank; --mvd 1->3
 -- end equivalent
 
-select cn, first_value(NULL) over (partition by cn order by case when 1=1 then pn || ' ' else 'test' end)
-	from sale order by first_value(NULL) over (
+select cn, first_value(NULL::text) over (partition by cn order by case when 1=1 then pn || ' ' else 'test' end)
+	from sale order by first_value(NULL::text) over (
 	partition by cn order by case when 1=1 then (pn || ' ') else 'test'::character varying(15) end); --mvd 1->2
-select cn, first_value(NULL) over (partition by cn order by case when 1=1 then pn || ' ' else 'test' end)
-	from sale order by first_value(NULL) over (
+select cn, first_value(NULL::text) over (partition by cn order by case when 1=1 then pn || ' ' else 'test' end)
+	from sale order by first_value(NULL::text) over (
 	partition by cn order by case when 1=1 then (pn || ' ') else 'test' end); --mvd 1->2
 
 -- MPP-4836

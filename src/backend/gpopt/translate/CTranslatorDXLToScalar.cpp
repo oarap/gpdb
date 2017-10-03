@@ -441,9 +441,13 @@ CTranslatorDXLToScalar::PaggrefFromDXLNodeScAggref
 
 	Aggref *paggref = MakeNode(Aggref);
 	paggref->aggfnoid = CMDIdGPDB::PmdidConvert(pdxlop->PmdidAgg())->OidObjectId();
-	paggref->aggdistinct = pdxlop->FDistinct();
+	// FIXME: How to translate the new kind of aggdistinct? It used to be a bool,
+	// but now it's a List of SortClauses.
+	//paggref->aggdistinct = pdxlop->FDistinct();
+	paggref->aggdistinct = NIL;
 	paggref->agglevelsup = 0;
 	paggref->location = -1;
+	paggref->aggkind = 'n';
 
 	CMDIdGPDB *pmdidAgg = GPOS_NEW(m_pmp) CMDIdGPDB(paggref->aggfnoid);
 	const IMDAggregate *pmdagg = m_pmda->Pmdagg(pmdidAgg);
@@ -488,7 +492,16 @@ CTranslatorDXLToScalar::PaggrefFromDXLNodeScAggref
 	}
 
 	// translate each DXL argument
-	paggref->args = PlistTranslateScalarChildren(paggref->args, pdxlnAggref, pmapcidvar);
+	List *argExprs = PlistTranslateScalarChildren(paggref->args, pdxlnAggref, pmapcidvar);
+
+	int attno;
+	paggref->args = NIL;
+	ListCell *plc;
+	ForEachWithCount (plc, argExprs, attno)
+	{
+		TargetEntry *pteNew = gpdb::PteMakeTargetEntry((Expr *) lfirst(plc), attno + 1, NULL, false);
+		paggref->args = gpdb::PlAppendElement(paggref->args, pteNew);
+	}
 
 	return (Expr *)paggref;
 }

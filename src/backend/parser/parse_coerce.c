@@ -1103,6 +1103,7 @@ build_coercion_expression(Node *node,
 		/* Assert(targetTypeId == procstruct->prorettype); */
 		Assert(!procstruct->proretset);
 		Assert(!procstruct->proisagg);
+		Assert(!procstruct->proiswindow);
 		nargs = procstruct->pronargs;
 		Assert(nargs >= 1 && nargs <= 3);
 		/* Assert(procstruct->proargtypes.values[0] == exprType(node)); */
@@ -2093,6 +2094,10 @@ IsBinaryCoercible(Oid srctype, Oid targettype)
 
 	/* Fast path if same type */
 	if (srctype == targettype)
+		return true;
+
+	/* Anything is coercible to ANY or ANYELEMENT */
+	if (targettype == ANYOID || targettype == ANYELEMENTOID)
 		return true;
 
 	/* If srctype is a domain, reduce to its base type */

@@ -422,6 +422,7 @@ SubqueryToJoinWalker(Node *node, ConvertSubqueryToJoinContext *context)
 			{
 				SortGroupClause *gc = makeNode(SortGroupClause);
 
+				gc->eqop = eqOp;
 				gc->sortop = sortOp;
 				gc->eqop = eqOp;
 				gc->tleSortGroupRef = list_length(context->groupClause) + 1;
@@ -581,7 +582,7 @@ convert_EXPR_to_join(PlannerInfo *root, OpExpr *opexp)
 
 		List	   *subselectTargetList = (List *) copyObject(ctx1.targetList);
 
-		subselectTargetList = add_to_flat_tlist(subselectTargetList, list_make1(origSubqueryTLE->expr), false);
+		subselectTargetList = add_to_flat_tlist(subselectTargetList, list_make1(origSubqueryTLE->expr));
 		subselect->targetList = subselectTargetList;
 		subselect->groupClause = ctx1.groupClause;
 

@@ -2262,6 +2262,19 @@ CTranslatorDXLToPlStmt::PwindowFromDXLWindow
 		pdxltrctxOut
 		);
 
+	ListCell *plc;
+
+	foreach (plc, pplan->targetlist)
+	{
+		TargetEntry *pte = (TargetEntry *) lfirst(plc);
+		if (IsA(pte->expr, WindowFunc))
+		{
+			WindowFunc *pwinfunc = (WindowFunc *) pte->expr;
+			pwindow->winref = pwinfunc->winref;
+			break;
+		}
+	}
+
 	pplan->lefttree = pplanChild;
 	pplan->nMotionNodes = pplanChild->nMotionNodes;
 
@@ -2317,8 +2330,7 @@ CTranslatorDXLToPlStmt::PwindowFromDXLWindow
 		pwindow->ordNumCols = ulNumCols;
 		pwindow->ordColIdx = (AttrNumber *) gpdb::GPDBAlloc(ulNumCols * sizeof(AttrNumber));
 		pwindow->ordOperators = (Oid *) gpdb::GPDBAlloc(ulNumCols * sizeof(Oid));
-		pwindow->nullsFirst = (bool *) gpdb::GPDBAlloc(ulNumCols * sizeof(bool));
-		TranslateSortCols(pdxlnSortColList, &dxltrctxChild, pwindow->ordColIdx, pwindow->ordOperators, pwindow->nullsFirst);
+		TranslateSortCols(pdxlnSortColList, &dxltrctxChild, pwindow->ordColIdx, pwindow->ordOperators);
 
 		// translate the window frame specified in the window key
 		if (NULL != pdxlwindowkey->Pdxlwf())
@@ -4744,7 +4756,10 @@ CTranslatorDXLToPlStmt::TranslateSortCols
 
 		pattnoSortColIds[ul] = pteSortCol->resno;
 		poidSortOpIds[ul] = CMDIdGPDB::PmdidConvert(pdxlopSortCol->PmdidSortOp())->OidObjectId();
-		pboolNullsFirst[ul] = pdxlopSortCol->FSortNullsFirst();
+		if (pboolNullsFirst)
+		{
+			pboolNullsFirst[ul] = pdxlopSortCol->FSortNullsFirst();
+		}
 	}
 }
 

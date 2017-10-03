@@ -2191,12 +2191,14 @@ query_is_distinct_for(Query *query, List *colnos, List *opids)
 		List	   *grouptles;
 		List	   *sortops;
 		List	   *eqops;
+		ListCell   *l_sortop;
 		ListCell   *l_eqop;
 
 		get_sortgroupclauses_tles(query->groupClause, query->targetList,
 								  &grouptles, &sortops, &eqops);
 
-		forboth(l, grouptles, l_eqop, eqops)
+// fix me		forboth(l, grouptles, l_eqop, eqops)
+		forthree(l, grouptles, l_sortop, sortops, l_eqop, eqops)
 		{
 			TargetEntry *tle = (TargetEntry *) lfirst(l);
 
@@ -2221,6 +2223,12 @@ query_is_distinct_for(Query *query, List *colnos, List *opids)
 	/*
 	 * UNION, INTERSECT, EXCEPT guarantee uniqueness of the whole output row,
 	 * except with ALL.
+	 *
+	 * XXX this code knows that prepunion.c will adopt the default sort/group
+	 * operators for each column datatype to determine uniqueness.  It'd
+	 * probably be better if these operators were chosen at parse time and
+	 * stored into the parsetree, instead of leaving bits of the planner to
+	 * decide semantics.
 	 */
 	if (query->setOperations)
 	{

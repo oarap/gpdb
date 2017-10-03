@@ -838,6 +838,7 @@ _outWindowAgg(StringInfo str, WindowAgg *node)
 
 	_outPlanInfo(str, (Plan *) node);
 
+	WRITE_UINT_FIELD(winref);
 	WRITE_INT_FIELD(partNumCols);
 
 	appendStringInfoLiteral(str, " :partColIdx");
@@ -857,6 +858,10 @@ _outWindowAgg(StringInfo str, WindowAgg *node)
 	appendStringInfoString(str, " :ordOperations");
 	for (i = 0; i < node->ordNumCols; i++)
 		appendStringInfo(str, " %u", node->ordOperators[i]);
+
+	WRITE_INT_FIELD(firstOrderCol);
+	WRITE_OID_FIELD(firstOrderCmpOperator);
+	WRITE_BOOL_FIELD(firstOrderNullsFirst);
 
 	WRITE_INT_FIELD(frameOptions);
 	WRITE_NODE_FIELD(startOffset);
@@ -1231,7 +1236,6 @@ _outParam(StringInfo str, Param *node)
 	WRITE_INT_FIELD(paramtypmod);
 }
 
-#ifndef COMPILING_BINARY_FUNCS
 static void
 _outAggref(StringInfo str, Aggref *node)
 {
@@ -1239,24 +1243,17 @@ _outAggref(StringInfo str, Aggref *node)
 
 	WRITE_OID_FIELD(aggfnoid);
 	WRITE_OID_FIELD(aggtype);
+	WRITE_NODE_FIELD(aggdirectargs);
 	WRITE_NODE_FIELD(args);
-	WRITE_UINT_FIELD(agglevelsup);
-	WRITE_BOOL_FIELD(aggstar);
-	WRITE_BOOL_FIELD(aggdistinct);
-	WRITE_NODE_FIELD(aggfilter);
-	WRITE_ENUM_FIELD(aggstage, AggStage);
 	WRITE_NODE_FIELD(aggorder);
-}
-#endif /* COMPILING_BINARY_FUNCS */
-
-static void
-_outAggOrder(StringInfo str, AggOrder *node)
-{
-	WRITE_NODE_TYPE("AGGORDER");
-
-    WRITE_BOOL_FIELD(sortImplicit);
-    WRITE_NODE_FIELD(sortTargets);
-    WRITE_NODE_FIELD(sortClause);
+	WRITE_NODE_FIELD(aggdistinct);
+	WRITE_NODE_FIELD(aggfilter);
+	WRITE_BOOL_FIELD(aggstar);
+	WRITE_BOOL_FIELD(aggvariadic);
+	WRITE_CHAR_FIELD(aggkind);
+	WRITE_ENUM_FIELD(aggstage, AggStage);
+	WRITE_UINT_FIELD(agglevelsup);
+	WRITE_LOCATION_FIELD(location);
 }
 
 static void
@@ -1291,7 +1288,6 @@ _outArrayRef(StringInfo str, ArrayRef *node)
 	WRITE_NODE_FIELD(refassgnexpr);
 }
 
-#ifndef COMPILING_BINARY_FUNCS
 static void
 _outFuncExpr(StringInfo str, FuncExpr *node)
 {
@@ -1300,11 +1296,11 @@ _outFuncExpr(StringInfo str, FuncExpr *node)
 	WRITE_OID_FIELD(funcid);
 	WRITE_OID_FIELD(funcresulttype);
 	WRITE_BOOL_FIELD(funcretset);
+	WRITE_BOOL_FIELD(funcvariadic);
 	WRITE_ENUM_FIELD(funcformat, CoercionForm);
 	WRITE_NODE_FIELD(args);
 	WRITE_BOOL_FIELD(is_tablefunc);  /* GPDB */
 }
-#endif /* COMPILING_BINARY_FUNCS */
 
 static void
 _outOpExpr(StringInfo str, OpExpr *node)
@@ -2913,7 +2909,6 @@ _outDefineStmt(StringInfo str, DefineStmt *node)
 	WRITE_NODE_FIELD(defnames);
 	WRITE_NODE_FIELD(args);
 	WRITE_NODE_FIELD(definition);
-	WRITE_BOOL_FIELD(ordered);  /* CDB */
 	WRITE_BOOL_FIELD(trusted);  /* CDB */
 }
 
@@ -3226,6 +3221,7 @@ _outFuncCall(StringInfo str, FuncCall *node)
 	WRITE_NODE_FIELD(args);
 	WRITE_NODE_FIELD(agg_order);
 	WRITE_NODE_FIELD(agg_filter);
+	WRITE_BOOL_FIELD(agg_within_group);
 	WRITE_BOOL_FIELD(agg_star);
 	WRITE_BOOL_FIELD(agg_distinct);
 	WRITE_BOOL_FIELD(func_variadic);
@@ -3563,21 +3559,6 @@ static void
 _outGroupId(StringInfo str, GroupId *node __attribute__((unused)))
 {
 	WRITE_NODE_TYPE("GROUPID");
-}
-
-static void
-_outPercentileExpr(StringInfo str, PercentileExpr *node)
-{
-	WRITE_NODE_TYPE("PERCENTILEEXPR");
-
-	WRITE_OID_FIELD(perctype);
-	WRITE_NODE_FIELD(args);
-	WRITE_ENUM_FIELD(perckind, PercKind);
-	WRITE_NODE_FIELD(sortClause);
-	WRITE_NODE_FIELD(sortTargets);
-	WRITE_NODE_FIELD(pcExpr);
-	WRITE_NODE_FIELD(tcExpr);
-	WRITE_LOCATION_FIELD(location);
 }
 
 static void
@@ -4541,9 +4522,6 @@ _outNode(StringInfo str, void *obj)
 			case T_Aggref:
 				_outAggref(str, obj);
 				break;
-			case T_AggOrder:
-				_outAggOrder(str, obj);
-				break;
 			case T_WindowFunc:
 				_outWindowFunc(str, obj);
 				break;
@@ -5037,9 +5015,6 @@ _outNode(StringInfo str, void *obj)
 				break;
 			case T_GroupId:
 				_outGroupId(str, obj);
-				break;
-			case T_PercentileExpr:
-				_outPercentileExpr(str, obj);
 				break;
 			case T_WindowClause:
 				_outWindowClause(str, obj);

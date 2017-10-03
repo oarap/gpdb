@@ -344,6 +344,7 @@ makeFuncExpr(Oid funcid, Oid rettype, List *args, CoercionForm fformat)
 	funcexpr->funcid = funcid;
 	funcexpr->funcresulttype = rettype;
 	funcexpr->funcretset = false;		/* only allowed case here */
+	funcexpr->funcvariadic = false;		/* only allowed case here */
 	funcexpr->funcformat = fformat;
 	funcexpr->args = args;
 	funcexpr->location = -1;
@@ -368,32 +369,3 @@ makeDefElem(char *name, Node *arg)
 	res->defaction = DEFELEM_UNSPEC;
 	return res;
 }
-
-/*
- * makeAggrefByOid -
- * 	make a trivial aggregate expression.
- *
- * If you need more info, add it to the returned pointer.
- */
-Aggref *
-makeAggrefByOid(Oid aggfnoid, List *args)
-{
-	Aggref	   *aggref;
-	Oid			rettype;
-
-	get_func_result_type(aggfnoid, &rettype, NULL);
-	aggref = makeNode(Aggref);
-	aggref->aggfnoid = aggfnoid;
-	aggref->aggtype = rettype;
-	aggref->args = args;
-	aggref->agglevelsup = 0;
-	aggref->aggstar = false;
-	aggref->aggdistinct = false;
-	aggref->aggstage = AGGSTAGE_NORMAL;
-	aggref->aggorder = NULL;
-	aggref->aggfilter = NULL;
-	aggref->location = -1;
-
-	return aggref;
-}
-

@@ -54,7 +54,6 @@ static Relids adjust_relid_set(Relids relids, int oldrelid, int newrelid);
 
 /*
  * checkExprHasAggs -
- *	Check if an expression contains an aggregate function call.
  */
 bool
 checkExprHasAggs(Node *node)
@@ -63,7 +62,6 @@ checkExprHasAggs(Node *node)
 }
 
 /*
- * checkExprHasAggs -
  *	Check if an expression contains an aggregate function call.
  *
  * The objective of this routine is to detect whether there are aggregates
@@ -99,13 +97,6 @@ contain_aggs_of_level_walker(Node *node, contain_aggs_of_level_context *context)
 		if (((Aggref *) node)->agglevelsup == context->sublevels_up)
 			return true;		/* abort the tree traversal and return true */
 		/* else fall through to examine argument */
-	}
-
-	if (IsA(node, PercentileExpr))
-	{
-		/* PercentileExpr is always levelsup == 0 */
-		if (context->sublevels_up == 0)
-			return true;
 	}
 
 	if (IsA(node, Query))
@@ -173,16 +164,6 @@ locate_agg_of_level_walker(Node *node,
 		}
 		/* else fall through to examine argument */
 	}
-	if (IsA(node, PercentileExpr))
-	{
-		/* PercentileExpr is always levelsup == 0 */
-		if (context->sublevels_up == 0 &&
-			((PercentileExpr *) node)->location >= 0)
-		{
-			context->agg_location = ((PercentileExpr *) node)->location;
-			return true;
-		}
-	}
 	if (IsA(node, Query))
 	{
 		/* Recurse into subselects */
@@ -200,12 +181,12 @@ locate_agg_of_level_walker(Node *node,
 }
 
 /*
- * checkExprHasWindowFuncs -
+ * contain_windowfuncs -
  *	Check if an expression contains a window function call of the
  *	current query level.
  */
 bool
-checkExprHasWindowFuncs(Node *node)
+contain_windowfuncs(Node *node)
 {
 	/*
 	 * Must be prepared to start with a Query or a bare expression tree; if
@@ -1093,7 +1074,7 @@ AddQual(Query *parsetree, Node *qual)
 	/*
 	 * We had better not have stuck an aggregate into the WHERE clause.
 	 */
-	Assert(!checkExprHasAggs(copy));
+	Assert(!contain_aggs_of_level(copy, 0));
 
 	/*
 	 * Make sure query is marked correctly if added qual has sublinks. Need
@@ -1388,6 +1369,7 @@ map_variable_attnos(Node *node,
  * Messy, isn't it?  We do not need to do similar pushups for hasAggs,
  * because it isn't possible for this transformation to insert a level-zero
  * aggregate reference into a subquery --- it could only insert outer aggs.
+ * Likewise for hasWindowFuncs.
  */
 
 typedef struct

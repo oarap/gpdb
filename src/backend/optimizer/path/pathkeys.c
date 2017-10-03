@@ -195,7 +195,9 @@ gen_implied_qual(PlannerInfo *root,
 	 */
 	if (bms_membership(new_qualscope) == BMS_MULTIPLE)
 	{
-		List	   *vars = pull_var_clause(new_clause, true);
+		List	   *vars = pull_var_clause(new_clause,
+										   PVC_RECURSE_AGGREGATES,
+										   PVC_INCLUDE_PLACEHOLDERS);
 
 		add_vars_to_targetlist(root, vars, required_relids);
 		list_free(vars);
@@ -1289,7 +1291,7 @@ make_pathkeys_for_sortclauses(PlannerInfo *root,
 /*
  * make_pathkeys_for_groupclause
  *	 Generate a pathkeys list that represents the sort order specified by
- *	 a list of GroupClauses or GroupingClauses.
+ *	 a list of SortGroupClauses or GroupingClauses.
  *
  * Note: similar to make_pathkeys_for_sortclauses, the result is NOT in
  * canonical form.
@@ -1322,8 +1324,9 @@ make_pathkeys_for_groupclause(PlannerInfo *root,
 			pathkey = make_pathkey_from_sortinfo(root, sortkey, gc->sortop, gc->nulls_first, false, 0);
 
 			/*
-			 * The pathkey becomes a one-element sublist. canonicalize_pathkeys() might
-			 * replace it with a longer sublist later.
+			 * Similar to SortGroupClauses, the pathkey becomes a one-element
+			 * sublist. canonicalize_pathkeys() might replace it with a longer
+			 * sublist later.
 			 */
 			pathkeys = lappend(pathkeys, pathkey);
 		}

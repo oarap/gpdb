@@ -122,9 +122,9 @@ typedef struct Query
 	bool		hasAggs;		/* has aggregates in tlist or havingQual */
 	bool		hasWindowFuncs; /* has window functions in tlist */
 	bool		hasSubLinks;	/* has subquery SubLink */
+	bool		hasDistinctOn;	/* distinctClause is from DISTINCT ON */
 	bool        hasDynamicFunctions; /* has functions with unstable return types */
 	bool		hasFuncsWithExecRestrictions; /* has functions with EXECUTE ON MASTER or ALL SEGMENTS */
-	bool		hasDistinctOn;	/* distinctClause is from DISTINCT ON */
 
 	List	   *rtable;			/* list of range table entries */
 	FromExpr   *jointree;		/* table join tree (FROM and WHERE clauses) */
@@ -134,7 +134,7 @@ typedef struct Query
 	List	   *returningList;	/* return-values list (of TargetEntry) */
 
 	/*
-	 * A list of GroupClauses or GroupingClauses.  The order of GroupClauses
+	 * A list of SortGroupClauses or GroupingClauses.  The order of SortGroupClauses
 	 * or GroupingClauses are based on input queries. However, in each
 	 * grouping set, all GroupClauses will appear in front of GroupingClauses.
 	 * See the following GROUP BY clause:
@@ -143,9 +143,9 @@ typedef struct Query
 	 *
 	 * the result list can be roughly represented as follows.
 	 *
-	 * GroupClause(a) --> GroupingClause( ROLLUP, groupsets (GroupClause(b)
-	 * --> GroupClause(c) ) ) --> GroupingClause( CUBE, groupsets
-	 * (GroupClause(e) --> GroupClause(d) ) )
+	 * SortGroupClause(a) --> GroupingClause( ROLLUP, groupsets (SortGroupClause(b)
+	 * --> SortGroupClause(c) ) ) --> GroupingClause( CUBE, groupsets
+	 * (SortGroupClause(e) --> SortGroupClause(d) ) )
 	 */
 	List	   *groupClause;	/* a list of SortGroupClause's */
 
@@ -302,6 +302,8 @@ typedef struct TypeCast
 /*
  * FuncCall - a function or aggregate invocation
  *
+ * agg_order (if not NIL) indicates we saw 'foo(... ORDER BY ...)', or if
+ * agg_within_group is true, it was 'foo(...) WITHIN GROUP (ORDER BY ...)'.
  * agg_star indicates we saw a 'foo(*)' construct, while agg_distinct
  * indicates we saw 'foo(DISTINCT ...)'.  In either case, the construct
  * *must* be an aggregate call.  Otherwise, it might be either an
@@ -315,6 +317,7 @@ typedef struct FuncCall
 	List	   *args;			/* the arguments (list of exprs) */
 	List	   *agg_order;		/* ORDER BY (list of SortBy) */
 	Node	   *agg_filter;		/* FILTER clause, if any */
+	bool		agg_within_group;		/* ORDER BY appeared in WITHIN GROUP */
 	bool		agg_star;		/* argument was really '*' */
 	bool		agg_distinct;	/* arguments were labeled DISTINCT */
 	bool		func_variadic;	/* last argument was labeled VARIADIC */
@@ -2085,7 +2088,6 @@ typedef struct DefineStmt
 	List	   *defnames;		/* qualified name (list of Value strings) */
 	List	   *args;			/* a list of TypeName (if needed) */
 	List	   *definition;		/* a list of DefElem */
-	bool        ordered;        /* signals ordered aggregates */
 	bool		trusted;		/* used only for PROTOCOL as this point */
 } DefineStmt;
 

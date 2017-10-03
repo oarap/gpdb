@@ -152,6 +152,9 @@ expression_tree_walker(Node *node,
 				Aggref	   *expr = (Aggref *) node;
 
 				/* recurse directly on List */
+				if (expression_tree_walker((Node *) expr->aggdirectargs,
+										   walker, context))
+					return true;
 				if (expression_tree_walker((Node *) expr->args,
 										   walker, context))
 					return true;
@@ -159,19 +162,6 @@ expression_tree_walker(Node *node,
 										   walker, context))
 					return true;
 				if (walker((Node *) expr->aggfilter, context))
-					return true;
-			}
-			break;
-		case T_AggOrder:
-			{
-				AggOrder	   *expr = (AggOrder *) node;
-
-				/* recurse directly on List */
-				if (expression_tree_walker((Node *) expr->sortTargets,
-										   walker, context))
-					return true;
-				if (expression_tree_walker((Node *) expr->sortClause,
-										   walker, context))
 					return true;
 			}
 			break;
@@ -498,22 +488,6 @@ expression_tree_walker(Node *node,
 				if (walker((Node *) wc->endOffset, context))
 					return true;
 				return false;
-			}
-			break;
-		case T_PercentileExpr:
-			{
-				PercentileExpr *perc = (PercentileExpr *) node;
-
-				if (walker((Node *) perc->args, context))
-					return true;
-				if (walker((Node *) perc->sortClause, context))
-					return true;
-				if (walker((Node *) perc->sortTargets, context))
-					return true;
-				if (walker((Node *) perc->pcExpr, context))
-					return true;
-				if (walker((Node *) perc->tcExpr, context))
-					return true;
 			}
 			break;
 
@@ -1153,7 +1127,6 @@ plan_tree_walker(Node *node,
 		case T_CurrentOfExpr:
 		case T_RangeTblRef:
 		case T_Aggref:
-		case T_AggOrder:
 		case T_ArrayRef:
 		case T_FuncExpr:
 		case T_OpExpr:
@@ -1186,7 +1159,6 @@ plan_tree_walker(Node *node,
 		case T_PartBoundOpenExpr:
 		case T_PartListRuleExpr:
 		case T_PartListNullTestExpr:
-		case T_WindowKey:
 
 		default:
 			return expression_tree_walker(node, walker, context);
