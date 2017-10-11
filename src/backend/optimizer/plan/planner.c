@@ -2273,14 +2273,16 @@ grouping_planner(PlannerInfo *root, double tuple_fraction)
 					 * Reduce the number of rows to move by adding a [Sort
 					 * and] Unique prior to the redistribute Motion.
 					 */
-					if (parse->sortClause)
+					if (sort_pathkeys)
 					{
 						if (!pathkeys_contained_in(sort_pathkeys, current_pathkeys))
 						{
 							result_plan = (Plan *)
-								make_sort_from_sortclauses(root,
-														   parse->sortClause,
-														   result_plan);
+								make_sort_from_pathkeys(root,
+														result_plan,
+														sort_pathkeys,
+														limit_tuples,
+														true);
 							((Sort *) result_plan)->noduplicates = gp_enable_sort_distinct;
 							current_pathkeys = sort_pathkeys;
 							mark_sort_locus(result_plan);
