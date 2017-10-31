@@ -424,7 +424,9 @@ ERROR:  value for domain str_domain2 violates check constraint "str_domain2_chec
 -- unknown type are enforced correctly.
 create domain pos_int as int4 check (value > 0) not null;
 prepare s1 as select $1::pos_int = 10 as "is_ten";
+INFO:  GPORCA failed to produce a plan, falling back to planner
 execute s1(10);
+INFO:  GPORCA failed to produce a plan, falling back to planner
  is_ten 
 --------
  t
@@ -442,6 +444,7 @@ begin
     return p1;
 end$$ language plpgsql;
 select doubledecrement(3); -- fail because of implicit null assignment
+INFO:  GPORCA failed to produce a plan, falling back to planner
 ERROR:  domain pos_int does not allow null values
 CONTEXT:  PL/pgSQL function "doubledecrement" line 2 during statement block local variable initialization
 create or replace function doubledecrement(p1 pos_int) returns pos_int as $$
@@ -450,6 +453,7 @@ begin
     return p1;
 end$$ language plpgsql;
 select doubledecrement(3); -- fail at initialization assignment
+INFO:  GPORCA failed to produce a plan, falling back to planner
 ERROR:  value for domain pos_int violates check constraint "pos_int_check"
 CONTEXT:  PL/pgSQL function "doubledecrement" line 2 during statement block local variable initialization
 create or replace function doubledecrement(p1 pos_int) returns pos_int as $$
@@ -459,16 +463,27 @@ begin
     return v - 1;
 end$$ language plpgsql;
 select doubledecrement(null); -- fail before call
+INFO:  GPORCA failed to produce a plan, falling back to planner
 ERROR:  domain pos_int does not allow null values
 select doubledecrement(0); -- fail before call
+INFO:  GPORCA failed to produce a plan, falling back to planner
 ERROR:  value for domain pos_int violates check constraint "pos_int_check"
 select doubledecrement(1); -- fail at assignment to v
+INFO:  GPORCA failed to produce a plan, falling back to planner
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1  - 1"
+PL/pgSQL function "doubledecrement" line 3 at assignment
 ERROR:  value for domain pos_int violates check constraint "pos_int_check"
 CONTEXT:  PL/pgSQL function "doubledecrement" line 3 at assignment
 select doubledecrement(2); -- fail at return
+INFO:  GPORCA failed to produce a plan, falling back to planner
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1  - 1"
+PL/pgSQL function "doubledecrement" line 4 at RETURN
 ERROR:  value for domain pos_int violates check constraint "pos_int_check"
 CONTEXT:  PL/pgSQL function "doubledecrement" while casting return value to function's return type
 select doubledecrement(3); -- good
+INFO:  GPORCA failed to produce a plan, falling back to planner
  doubledecrement 
 -----------------
                1
@@ -480,6 +495,7 @@ create domain posint as int4;
 create type ddtest1 as (f1 posint);
 create table ddtest2(f1 ddtest1);
 insert into ddtest2 values(row(-1));
+INFO:  GPORCA failed to produce a plan, falling back to planner
 alter domain posint add constraint c1 check(value >= 0);
 ERROR:  cannot alter type "posint" because column "ddtest2"."f1" uses it
 drop table ddtest2;

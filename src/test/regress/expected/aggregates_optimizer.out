@@ -22,6 +22,7 @@ SELECT avg(b)::numeric(10,3) AS avg_107_943 FROM aggtest;
 (1 row)
 
 SELECT avg(gpa) AS avg_3_4 FROM ONLY student;
+INFO:  GPORCA failed to produce a plan, falling back to planner
  avg_3_4 
 ---------
      3.4
@@ -46,6 +47,7 @@ SELECT sum(b) AS avg_431_773 FROM aggtest;
 (1 row)
 
 SELECT sum(gpa) AS avg_6_8 FROM ONLY student;
+INFO:  GPORCA failed to produce a plan, falling back to planner
  avg_6_8 
 ---------
      6.8
@@ -70,6 +72,7 @@ SELECT max(aggtest.b) AS max_324_78 FROM aggtest;
 (1 row)
 
 SELECT max(student.gpa) AS max_3_7 FROM student;
+INFO:  GPORCA failed to produce a plan, falling back to planner
  max_3_7 
 ---------
      3.7
@@ -268,6 +271,8 @@ SELECT oldcnt(*) AS cnt_1000 FROM onek;
 (1 row)
 
 SELECT sum2(q1,q2) FROM int8_tbl;
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL function "sum3" during startup
        sum2        
 -------------------
  18271560493827981
@@ -300,6 +305,7 @@ LINE 4:                where sum(distinct a.four + b.four) = b.four)...
 select
   (select max((select i.unique2 from tenk1 i where i.unique1 = o.unique1)))
 from tenk1 o;
+INFO:  GPORCA failed to produce a plan, falling back to planner
  ?column? 
 ----------
      9999
@@ -539,6 +545,7 @@ select max(unique2), generate_series(1,3) as g from tenk1 order by g desc;
 --
 select array_agg(a order by b)
   from (values (1,4),(2,3),(3,1),(4,2)) v(a,b);
+INFO:  GPORCA failed to produce a plan, falling back to planner
  array_agg 
 -----------
  {3,4,2,1}
@@ -546,6 +553,7 @@ select array_agg(a order by b)
 
 select array_agg(a order by a)
   from (values (1,4),(2,3),(3,1),(4,2)) v(a,b);
+INFO:  GPORCA failed to produce a plan, falling back to planner
  array_agg 
 -----------
  {1,2,3,4}
@@ -553,6 +561,7 @@ select array_agg(a order by a)
 
 select array_agg(a order by a desc)
   from (values (1,4),(2,3),(3,1),(4,2)) v(a,b);
+INFO:  GPORCA failed to produce a plan, falling back to planner
  array_agg 
 -----------
  {4,3,2,1}
@@ -560,6 +569,7 @@ select array_agg(a order by a desc)
 
 select array_agg(b order by a desc)
   from (values (1,4),(2,3),(3,1),(4,2)) v(a,b);
+INFO:  GPORCA failed to produce a plan, falling back to planner
  array_agg 
 -----------
  {2,1,3,4}
@@ -567,6 +577,7 @@ select array_agg(b order by a desc)
 
 select array_agg(distinct a)
   from (values (1),(2),(1),(3),(null),(2)) v(a);
+INFO:  GPORCA failed to produce a plan, falling back to planner
   array_agg   
 --------------
  {1,2,3,NULL}
@@ -584,6 +595,9 @@ select array_agg(distinct a order by a desc nulls last)
 -- multi-arg aggs, strict/nonstrict, distinct/order by
 select aggfstr(a,b,c)
   from (values (1,3,'foo'),(0,null,null),(2,2,'bar'),(3,1,'baz')) v(a,b,c);
+INFO:  GPORCA failed to produce a plan, falling back to planner
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL function "aggf_trans" during startup
                 aggfstr                
 ---------------------------------------
  {"(1,3,foo)","(2,2,bar)","(3,1,baz)"}
@@ -591,6 +605,9 @@ select aggfstr(a,b,c)
 
 select aggfns(a,b,c)
   from (values (1,3,'foo'),(0,null,null),(2,2,'bar'),(3,1,'baz')) v(a,b,c);
+INFO:  GPORCA failed to produce a plan, falling back to planner
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL function "aggfns_trans" during startup
                     aggfns                     
 -----------------------------------------------
  {"(1,3,foo)","(0,,)","(2,2,bar)","(3,1,baz)"}
@@ -631,12 +648,17 @@ create view agg_view1 as
   select aggfns(a,b,c)
     from (values (1,3,'foo'),(0,null,null),(2,2,'bar'),(3,1,'baz')) v(a,b,c);
 select * from agg_view1;
+INFO:  GPORCA failed to produce a plan, falling back to planner
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL function "aggfns_trans" during startup
                     aggfns                     
 -----------------------------------------------
  {"(1,3,foo)","(0,,)","(2,2,bar)","(3,1,baz)"}
 (1 row)
 
 select pg_get_viewdef('agg_view1'::regclass);
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT * FROM pg_catalog.pg_rewrite WHERE ev_class = $1 AND rulename = $2"
                                                                      pg_get_viewdef                                                                     
 --------------------------------------------------------------------------------------------------------------------------------------------------------
  SELECT aggfns(v.a, v.b, v.c) AS aggfns FROM (VALUES (1,3,'foo'::text), (0,NULL::integer,NULL::text), (2,2,'bar'::text), (3,1,'baz'::text)) v(a, b, c);
@@ -647,6 +669,7 @@ create or replace view agg_view1 as
     from (values (1,3,'foo'),(0,null,null),(2,2,'bar'),(3,1,'baz')) v(a,b,c),
          generate_series(1,3) i;
 select * from agg_view1;
+INFO:  GPORCA failed to produce a plan, falling back to planner
 ERROR:  DISTINCT is supported only for single-argument aggregates
 select pg_get_viewdef('agg_view1'::regclass);
                                                                                        pg_get_viewdef                                                                                        
@@ -668,6 +691,9 @@ create or replace view agg_view1 as
   select aggfns(a,b,c order by b+1)
     from (values (1,3,'foo'),(0,null,null),(2,2,'bar'),(3,1,'baz')) v(a,b,c);
 select * from agg_view1;
+INFO:  GPORCA failed to produce a plan, falling back to planner
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL function "aggfns_trans" during startup
                     aggfns                     
 -----------------------------------------------
  {"(3,1,baz)","(2,2,bar)","(1,3,foo)","(0,,)"}
@@ -683,6 +709,9 @@ create or replace view agg_view1 as
   select aggfns(a,a,c order by b)
     from (values (1,3,'foo'),(0,null,null),(2,2,'bar'),(3,1,'baz')) v(a,b,c);
 select * from agg_view1;
+INFO:  GPORCA failed to produce a plan, falling back to planner
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL function "aggfns_trans" during startup
                      aggfns                     
 ------------------------------------------------
  {"(3,3,baz)","(2,2,bar)","(1,1,foo)","(0,0,)"}
@@ -698,13 +727,18 @@ create or replace view agg_view1 as
   select aggfns(a,b,c order by c using ~<~)
     from (values (1,3,'foo'),(0,null,null),(2,2,'bar'),(3,1,'baz')) v(a,b,c);
 select * from agg_view1;
+INFO:  GPORCA failed to produce a plan, falling back to planner
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL function "aggfns_trans" during startup
                     aggfns                     
 -----------------------------------------------
  {"(2,2,bar)","(3,1,baz)","(1,3,foo)","(0,,)"}
 (1 row)
 
 select pg_get_viewdef('agg_view1'::regclass);
-                                                                                pg_get_viewdef                                                                                 
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT * FROM pg_catalog.pg_rewrite WHERE ev_class = $1 AND rulename = $2"
+                                                                                      pg_get_viewdef
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
  SELECT aggfns(v.a, v.b, v.c ORDER BY v.c USING ~<~ NULLS LAST) AS aggfns FROM (VALUES (1,3,'foo'::text), (0,NULL::integer,NULL::text), (2,2,'bar'::text), (3,1,'baz'::text)) v(a, b, c);
 (1 row)
@@ -747,30 +781,35 @@ LINE 1: select array_agg(distinct a,a,c order by a,b)
 HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
 -- string_agg tests
 select string_agg(a) from (values('aaaa'),('bbbb'),('cccc')) g(a);
+INFO:  GPORCA failed to produce a plan, falling back to planner
   string_agg  
 --------------
  aaaabbbbcccc
 (1 row)
 
 select string_agg(a,',') from (values('aaaa'),('bbbb'),('cccc')) g(a);
+INFO:  GPORCA failed to produce a plan, falling back to planner
    string_agg   
 ----------------
  aaaa,bbbb,cccc
 (1 row)
 
 select string_agg(a,',') from (values('aaaa'),(null),('bbbb'),('cccc')) g(a);
+INFO:  GPORCA failed to produce a plan, falling back to planner
    string_agg   
 ----------------
  aaaa,bbbb,cccc
 (1 row)
 
 select string_agg(a,',') from (values(null),(null),('bbbb'),('cccc')) g(a);
+INFO:  GPORCA failed to produce a plan, falling back to planner
  string_agg 
 ------------
  bbbb,cccc
 (1 row)
 
 select string_agg(a,',') from (values(null),(null)) g(a);
+INFO:  GPORCA failed to produce a plan, falling back to planner
  string_agg 
 ------------
  
@@ -778,6 +817,7 @@ select string_agg(a,',') from (values(null),(null)) g(a);
 
 -- FILTER tests
 select min(unique1) filter (where unique1 > 100) from tenk1;
+INFO:  GPORCA failed to produce a plan, falling back to planner
  min 
 -----
  101
@@ -785,6 +825,7 @@ select min(unique1) filter (where unique1 > 100) from tenk1;
 
 select ten, sum(distinct four) filter (where four::text ~ '123') from onek a
 group by ten;
+INFO:  GPORCA failed to produce a plan, falling back to planner
  ten | sum 
 -----+-----
    0 |    
@@ -802,6 +843,7 @@ group by ten;
 select ten, sum(distinct four) filter (where four > 10) from onek a
 group by ten
 having exists (select 1 from onek b where sum(distinct a.four) = b.four);
+INFO:  GPORCA failed to produce a plan, falling back to planner
  ten | sum 
 -----+-----
    0 |    
@@ -829,6 +871,7 @@ from (values (2),(3)) t1(outer_c); -- inner query is aggregation query
 select (select count(*) filter (where outer_c <> 0)
         from (values (1)) t0(inner_c))
 from (values (2),(3)) t1(outer_c); -- outer query is aggregation query
+INFO:  GPORCA failed to produce a plan, falling back to planner
  ?column? 
 ----------
         2
@@ -837,6 +880,7 @@ from (values (2),(3)) t1(outer_c); -- outer query is aggregation query
 select (select count(inner_c) filter (where outer_c <> 0)
         from (values (1)) t0(inner_c))
 from (values (2),(3)) t1(outer_c); -- inner query is aggregation query
+INFO:  GPORCA failed to produce a plan, falling back to planner
  ?column? 
 ----------
         1
@@ -847,6 +891,7 @@ select
   (select max((select i.unique2 from tenk1 i where i.unique1 = o.unique1))
      filter (where o.unique1 < 10))
 from tenk1 o;					-- outer query is aggregation query
+INFO:  GPORCA failed to produce a plan, falling back to planner
  ?column? 
 ----------
      9998
@@ -855,6 +900,7 @@ from tenk1 o;					-- outer query is aggregation query
 -- subquery in FILTER clause (PostgreSQL extension)
 select sum(unique1) FILTER (WHERE
   unique1 IN (SELECT unique1 FROM onek where unique1 < 100)) FROM tenk1;
+INFO:  GPORCA failed to produce a plan, falling back to planner
  sum  
 ------
  4950

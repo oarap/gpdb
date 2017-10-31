@@ -1027,212 +1027,254 @@ insert into Room values ('106', 'Office');
 -- Second we install the wall connectors
 --
 insert into WSlot values ('WS.001.1a', '001', '', '');
-ERROR:  function cannot execute on segment because it accesses relation "public.room"  (seg1 127.0.0.1:40001 pid=1761)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.room"  (seg1 127.0.0.1:25433 pid=72000)
 DETAIL:  
 SQL statement "SELECT  count(*) = 0 from Room where roomno =  $1 "
 PL/pgSQL function "tg_wslot_biu" line 2 at IF
 insert into WSlot values ('WS.001.1b', '001', '', '');
-ERROR:  function cannot execute on segment because it accesses relation "public.room"  (seg1 127.0.0.1:40001 pid=1761)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.room"  (seg1 127.0.0.1:25433 pid=72000)
 DETAIL:  
 SQL statement "SELECT  count(*) = 0 from Room where roomno =  $1 "
 PL/pgSQL function "tg_wslot_biu" line 2 at IF
 insert into WSlot values ('WS.001.2a', '001', '', '');
-ERROR:  function cannot execute on segment because it accesses relation "public.room"  (seg1 127.0.0.1:40001 pid=1761)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.room"  (seg1 127.0.0.1:25433 pid=72000)
 DETAIL:  
 SQL statement "SELECT  count(*) = 0 from Room where roomno =  $1 "
 PL/pgSQL function "tg_wslot_biu" line 2 at IF
 insert into WSlot values ('WS.001.2b', '001', '', '');
-ERROR:  function cannot execute on segment because it accesses relation "public.room"  (seg2 127.0.0.1:40002 pid=1762)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.room"  (seg2 127.0.0.1:25434 pid=72001)
 DETAIL:  
 SQL statement "SELECT  count(*) = 0 from Room where roomno =  $1 "
 PL/pgSQL function "tg_wslot_biu" line 2 at IF
 insert into WSlot values ('WS.001.3a', '001', '', '');
-ERROR:  function cannot execute on segment because it accesses relation "public.room"  (seg0 127.0.0.1:40000 pid=1760)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.room"  (seg0 127.0.0.1:25432 pid=71996)
 DETAIL:  
 SQL statement "SELECT  count(*) = 0 from Room where roomno =  $1 "
 PL/pgSQL function "tg_wslot_biu" line 2 at IF
 insert into WSlot values ('WS.001.3b', '001', '', '');
-ERROR:  function cannot execute on segment because it accesses relation "public.room"  (seg2 127.0.0.1:40002 pid=1762)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.room"  (seg2 127.0.0.1:25434 pid=72001)
 DETAIL:  
 SQL statement "SELECT  count(*) = 0 from Room where roomno =  $1 "
 PL/pgSQL function "tg_wslot_biu" line 2 at IF
 insert into WSlot values ('WS.002.1a', '002', '', '');
-ERROR:  function cannot execute on segment because it accesses relation "public.room"  (seg0 127.0.0.1:40000 pid=1760)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.room"  (seg0 127.0.0.1:25432 pid=71996)
 DETAIL:  
 SQL statement "SELECT  count(*) = 0 from Room where roomno =  $1 "
 PL/pgSQL function "tg_wslot_biu" line 2 at IF
 insert into WSlot values ('WS.002.1b', '002', '', '');
-ERROR:  function cannot execute on segment because it accesses relation "public.room"  (seg1 127.0.0.1:40001 pid=1761)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.room"  (seg1 127.0.0.1:25433 pid=72000)
 DETAIL:  
 SQL statement "SELECT  count(*) = 0 from Room where roomno =  $1 "
 PL/pgSQL function "tg_wslot_biu" line 2 at IF
 insert into WSlot values ('WS.002.2a', '002', '', '');
-ERROR:  function cannot execute on segment because it accesses relation "public.room"  (seg0 127.0.0.1:40000 pid=1760)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.room"  (seg0 127.0.0.1:25432 pid=71996)
 DETAIL:  
 SQL statement "SELECT  count(*) = 0 from Room where roomno =  $1 "
 PL/pgSQL function "tg_wslot_biu" line 2 at IF
 insert into WSlot values ('WS.002.2b', '002', '', '');
-ERROR:  function cannot execute on segment because it accesses relation "public.room"  (seg0 127.0.0.1:40000 pid=1760)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.room"  (seg0 127.0.0.1:25432 pid=71996)
 DETAIL:  
 SQL statement "SELECT  count(*) = 0 from Room where roomno =  $1 "
 PL/pgSQL function "tg_wslot_biu" line 2 at IF
 insert into WSlot values ('WS.002.3a', '002', '', '');
-ERROR:  function cannot execute on segment because it accesses relation "public.room"  (seg0 127.0.0.1:40000 pid=1760)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.room"  (seg0 127.0.0.1:25432 pid=71996)
 DETAIL:  
 SQL statement "SELECT  count(*) = 0 from Room where roomno =  $1 "
 PL/pgSQL function "tg_wslot_biu" line 2 at IF
 insert into WSlot values ('WS.002.3b', '002', '', '');
-ERROR:  function cannot execute on segment because it accesses relation "public.room"  (seg0 127.0.0.1:40000 pid=1760)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.room"  (seg0 127.0.0.1:25432 pid=71996)
 DETAIL:  
 SQL statement "SELECT  count(*) = 0 from Room where roomno =  $1 "
 PL/pgSQL function "tg_wslot_biu" line 2 at IF
 insert into WSlot values ('WS.003.1a', '003', '', '');
-ERROR:  function cannot execute on segment because it accesses relation "public.room"  (seg2 127.0.0.1:40002 pid=1762)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.room"  (seg2 127.0.0.1:25434 pid=72001)
 DETAIL:  
 SQL statement "SELECT  count(*) = 0 from Room where roomno =  $1 "
 PL/pgSQL function "tg_wslot_biu" line 2 at IF
 insert into WSlot values ('WS.003.1b', '003', '', '');
-ERROR:  function cannot execute on segment because it accesses relation "public.room"  (seg1 127.0.0.1:40001 pid=1761)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.room"  (seg1 127.0.0.1:25433 pid=72000)
 DETAIL:  
 SQL statement "SELECT  count(*) = 0 from Room where roomno =  $1 "
 PL/pgSQL function "tg_wslot_biu" line 2 at IF
 insert into WSlot values ('WS.003.2a', '003', '', '');
-ERROR:  function cannot execute on segment because it accesses relation "public.room"  (seg2 127.0.0.1:40002 pid=1762)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.room"  (seg2 127.0.0.1:25434 pid=72001)
 DETAIL:  
 SQL statement "SELECT  count(*) = 0 from Room where roomno =  $1 "
 PL/pgSQL function "tg_wslot_biu" line 2 at IF
 insert into WSlot values ('WS.003.2b', '003', '', '');
-ERROR:  function cannot execute on segment because it accesses relation "public.room"  (seg2 127.0.0.1:40002 pid=1762)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.room"  (seg2 127.0.0.1:25434 pid=72001)
 DETAIL:  
 SQL statement "SELECT  count(*) = 0 from Room where roomno =  $1 "
 PL/pgSQL function "tg_wslot_biu" line 2 at IF
 insert into WSlot values ('WS.003.3a', '003', '', '');
-ERROR:  function cannot execute on segment because it accesses relation "public.room"  (seg1 127.0.0.1:40001 pid=1761)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.room"  (seg1 127.0.0.1:25433 pid=72000)
 DETAIL:  
 SQL statement "SELECT  count(*) = 0 from Room where roomno =  $1 "
 PL/pgSQL function "tg_wslot_biu" line 2 at IF
 insert into WSlot values ('WS.003.3b', '003', '', '');
-ERROR:  function cannot execute on segment because it accesses relation "public.room"  (seg1 127.0.0.1:40001 pid=1761)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.room"  (seg1 127.0.0.1:25433 pid=72000)
 DETAIL:  
 SQL statement "SELECT  count(*) = 0 from Room where roomno =  $1 "
 PL/pgSQL function "tg_wslot_biu" line 2 at IF
 insert into WSlot values ('WS.101.1a', '101', '', '');
-ERROR:  function cannot execute on segment because it accesses relation "public.room"  (seg2 127.0.0.1:40002 pid=1762)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.room"  (seg2 127.0.0.1:25434 pid=72001)
 DETAIL:  
 SQL statement "SELECT  count(*) = 0 from Room where roomno =  $1 "
 PL/pgSQL function "tg_wslot_biu" line 2 at IF
 insert into WSlot values ('WS.101.1b', '101', '', '');
-ERROR:  function cannot execute on segment because it accesses relation "public.room"  (seg2 127.0.0.1:40002 pid=1762)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.room"  (seg2 127.0.0.1:25434 pid=72001)
 DETAIL:  
 SQL statement "SELECT  count(*) = 0 from Room where roomno =  $1 "
 PL/pgSQL function "tg_wslot_biu" line 2 at IF
 insert into WSlot values ('WS.101.2a', '101', '', '');
-ERROR:  function cannot execute on segment because it accesses relation "public.room"  (seg2 127.0.0.1:40002 pid=1762)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.room"  (seg2 127.0.0.1:25434 pid=72001)
 DETAIL:  
 SQL statement "SELECT  count(*) = 0 from Room where roomno =  $1 "
 PL/pgSQL function "tg_wslot_biu" line 2 at IF
 insert into WSlot values ('WS.101.2b', '101', '', '');
-ERROR:  function cannot execute on segment because it accesses relation "public.room"  (seg1 127.0.0.1:40001 pid=1761)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.room"  (seg1 127.0.0.1:25433 pid=72000)
 DETAIL:  
 SQL statement "SELECT  count(*) = 0 from Room where roomno =  $1 "
 PL/pgSQL function "tg_wslot_biu" line 2 at IF
 insert into WSlot values ('WS.101.3a', '101', '', '');
-ERROR:  function cannot execute on segment because it accesses relation "public.room"  (seg2 127.0.0.1:40002 pid=1762)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.room"  (seg2 127.0.0.1:25434 pid=72001)
 DETAIL:  
 SQL statement "SELECT  count(*) = 0 from Room where roomno =  $1 "
 PL/pgSQL function "tg_wslot_biu" line 2 at IF
 insert into WSlot values ('WS.101.3b', '101', '', '');
-ERROR:  function cannot execute on segment because it accesses relation "public.room"  (seg0 127.0.0.1:40000 pid=1760)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.room"  (seg0 127.0.0.1:25432 pid=71996)
 DETAIL:  
 SQL statement "SELECT  count(*) = 0 from Room where roomno =  $1 "
 PL/pgSQL function "tg_wslot_biu" line 2 at IF
 insert into WSlot values ('WS.102.1a', '102', '', '');
-ERROR:  function cannot execute on segment because it accesses relation "public.room"  (seg2 127.0.0.1:40002 pid=1762)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.room"  (seg2 127.0.0.1:25434 pid=72001)
 DETAIL:  
 SQL statement "SELECT  count(*) = 0 from Room where roomno =  $1 "
 PL/pgSQL function "tg_wslot_biu" line 2 at IF
 insert into WSlot values ('WS.102.1b', '102', '', '');
-ERROR:  function cannot execute on segment because it accesses relation "public.room"  (seg1 127.0.0.1:40001 pid=1761)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.room"  (seg1 127.0.0.1:25433 pid=72000)
 DETAIL:  
 SQL statement "SELECT  count(*) = 0 from Room where roomno =  $1 "
 PL/pgSQL function "tg_wslot_biu" line 2 at IF
 insert into WSlot values ('WS.102.2a', '102', '', '');
-ERROR:  function cannot execute on segment because it accesses relation "public.room"  (seg0 127.0.0.1:40000 pid=1760)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.room"  (seg0 127.0.0.1:25432 pid=71996)
 DETAIL:  
 SQL statement "SELECT  count(*) = 0 from Room where roomno =  $1 "
 PL/pgSQL function "tg_wslot_biu" line 2 at IF
 insert into WSlot values ('WS.102.2b', '102', '', '');
-ERROR:  function cannot execute on segment because it accesses relation "public.room"  (seg0 127.0.0.1:40000 pid=1760)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.room"  (seg0 127.0.0.1:25432 pid=71996)
 DETAIL:  
 SQL statement "SELECT  count(*) = 0 from Room where roomno =  $1 "
 PL/pgSQL function "tg_wslot_biu" line 2 at IF
 insert into WSlot values ('WS.102.3a', '102', '', '');
-ERROR:  function cannot execute on segment because it accesses relation "public.room"  (seg0 127.0.0.1:40000 pid=1760)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.room"  (seg0 127.0.0.1:25432 pid=71996)
 DETAIL:  
 SQL statement "SELECT  count(*) = 0 from Room where roomno =  $1 "
 PL/pgSQL function "tg_wslot_biu" line 2 at IF
 insert into WSlot values ('WS.102.3b', '102', '', '');
-ERROR:  function cannot execute on segment because it accesses relation "public.room"  (seg0 127.0.0.1:40000 pid=1760)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.room"  (seg0 127.0.0.1:25432 pid=71996)
 DETAIL:  
 SQL statement "SELECT  count(*) = 0 from Room where roomno =  $1 "
 PL/pgSQL function "tg_wslot_biu" line 2 at IF
 insert into WSlot values ('WS.105.1a', '105', '', '');
-ERROR:  function cannot execute on segment because it accesses relation "public.room"  (seg2 127.0.0.1:40002 pid=1762)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.room"  (seg2 127.0.0.1:25434 pid=72001)
 DETAIL:  
 SQL statement "SELECT  count(*) = 0 from Room where roomno =  $1 "
 PL/pgSQL function "tg_wslot_biu" line 2 at IF
 insert into WSlot values ('WS.105.1b', '105', '', '');
-ERROR:  function cannot execute on segment because it accesses relation "public.room"  (seg2 127.0.0.1:40002 pid=1762)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.room"  (seg2 127.0.0.1:25434 pid=72001)
 DETAIL:  
 SQL statement "SELECT  count(*) = 0 from Room where roomno =  $1 "
 PL/pgSQL function "tg_wslot_biu" line 2 at IF
 insert into WSlot values ('WS.105.2a', '105', '', '');
-ERROR:  function cannot execute on segment because it accesses relation "public.room"  (seg1 127.0.0.1:40001 pid=1761)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.room"  (seg1 127.0.0.1:25433 pid=72000)
 DETAIL:  
 SQL statement "SELECT  count(*) = 0 from Room where roomno =  $1 "
 PL/pgSQL function "tg_wslot_biu" line 2 at IF
 insert into WSlot values ('WS.105.2b', '105', '', '');
-ERROR:  function cannot execute on segment because it accesses relation "public.room"  (seg0 127.0.0.1:40000 pid=1760)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.room"  (seg0 127.0.0.1:25432 pid=71996)
 DETAIL:  
 SQL statement "SELECT  count(*) = 0 from Room where roomno =  $1 "
 PL/pgSQL function "tg_wslot_biu" line 2 at IF
 insert into WSlot values ('WS.105.3a', '105', '', '');
-ERROR:  function cannot execute on segment because it accesses relation "public.room"  (seg2 127.0.0.1:40002 pid=1762)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.room"  (seg2 127.0.0.1:25434 pid=72001)
 DETAIL:  
 SQL statement "SELECT  count(*) = 0 from Room where roomno =  $1 "
 PL/pgSQL function "tg_wslot_biu" line 2 at IF
 insert into WSlot values ('WS.105.3b', '105', '', '');
-ERROR:  function cannot execute on segment because it accesses relation "public.room"  (seg0 127.0.0.1:40000 pid=1760)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.room"  (seg0 127.0.0.1:25432 pid=71996)
 DETAIL:  
 SQL statement "SELECT  count(*) = 0 from Room where roomno =  $1 "
 PL/pgSQL function "tg_wslot_biu" line 2 at IF
 insert into WSlot values ('WS.106.1a', '106', '', '');
-ERROR:  function cannot execute on segment because it accesses relation "public.room"  (seg0 127.0.0.1:40000 pid=1760)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.room"  (seg0 127.0.0.1:25432 pid=71996)
 DETAIL:  
 SQL statement "SELECT  count(*) = 0 from Room where roomno =  $1 "
 PL/pgSQL function "tg_wslot_biu" line 2 at IF
 insert into WSlot values ('WS.106.1b', '106', '', '');
-ERROR:  function cannot execute on segment because it accesses relation "public.room"  (seg2 127.0.0.1:40002 pid=1762)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.room"  (seg2 127.0.0.1:25434 pid=72001)
 DETAIL:  
 SQL statement "SELECT  count(*) = 0 from Room where roomno =  $1 "
 PL/pgSQL function "tg_wslot_biu" line 2 at IF
 insert into WSlot values ('WS.106.2a', '106', '', '');
-ERROR:  function cannot execute on segment because it accesses relation "public.room"  (seg1 127.0.0.1:40001 pid=1761)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.room"  (seg1 127.0.0.1:25433 pid=72000)
 DETAIL:  
 SQL statement "SELECT  count(*) = 0 from Room where roomno =  $1 "
 PL/pgSQL function "tg_wslot_biu" line 2 at IF
 insert into WSlot values ('WS.106.2b', '106', '', '');
-ERROR:  function cannot execute on segment because it accesses relation "public.room"  (seg1 127.0.0.1:40001 pid=1761)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.room"  (seg1 127.0.0.1:25433 pid=72000)
 DETAIL:  
 SQL statement "SELECT  count(*) = 0 from Room where roomno =  $1 "
 PL/pgSQL function "tg_wslot_biu" line 2 at IF
 insert into WSlot values ('WS.106.3a', '106', '', '');
-ERROR:  function cannot execute on segment because it accesses relation "public.room"  (seg0 127.0.0.1:40000 pid=1760)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.room"  (seg0 127.0.0.1:25432 pid=71996)
 DETAIL:  
 SQL statement "SELECT  count(*) = 0 from Room where roomno =  $1 "
 PL/pgSQL function "tg_wslot_biu" line 2 at IF
 insert into WSlot values ('WS.106.3b', '106', '', '');
-ERROR:  function cannot execute on segment because it accesses relation "public.room"  (seg0 127.0.0.1:40000 pid=1760)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.room"  (seg0 127.0.0.1:25432 pid=71996)
 DETAIL:  
 SQL statement "SELECT  count(*) = 0 from Room where roomno =  $1 "
 PL/pgSQL function "tg_wslot_biu" line 2 at IF
@@ -1244,32 +1286,38 @@ insert into PField values ('PF0_1', 'Wallslots basement');
 -- The cables for these will be made later, so they are unconnected for now
 --
 insert into PSlot values ('PS.base.a1', 'PF0_1', '', '');
-ERROR:  function cannot execute on segment because it accesses relation "public.pfield"  (seg2 127.0.0.1:40002 pid=1762)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.pfield"  (seg2 127.0.0.1:25434 pid=72001)
 DETAIL:  
 SQL statement "select * from PField where name =  $1 "
 PL/pgSQL function "tg_pslot_biu" line 5 at SQL statement
 insert into PSlot values ('PS.base.a2', 'PF0_1', '', '');
-ERROR:  function cannot execute on segment because it accesses relation "public.pfield"  (seg0 127.0.0.1:40000 pid=1760)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.pfield"  (seg0 127.0.0.1:25432 pid=71996)
 DETAIL:  
 SQL statement "select * from PField where name =  $1 "
 PL/pgSQL function "tg_pslot_biu" line 5 at SQL statement
 insert into PSlot values ('PS.base.a3', 'PF0_1', '', '');
-ERROR:  function cannot execute on segment because it accesses relation "public.pfield"  (seg1 127.0.0.1:40001 pid=1761)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.pfield"  (seg1 127.0.0.1:25433 pid=72000)
 DETAIL:  
 SQL statement "select * from PField where name =  $1 "
 PL/pgSQL function "tg_pslot_biu" line 5 at SQL statement
 insert into PSlot values ('PS.base.a4', 'PF0_1', '', '');
-ERROR:  function cannot execute on segment because it accesses relation "public.pfield"  (seg0 127.0.0.1:40000 pid=1760)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.pfield"  (seg0 127.0.0.1:25432 pid=71996)
 DETAIL:  
 SQL statement "select * from PField where name =  $1 "
 PL/pgSQL function "tg_pslot_biu" line 5 at SQL statement
 insert into PSlot values ('PS.base.a5', 'PF0_1', '', '');
-ERROR:  function cannot execute on segment because it accesses relation "public.pfield"  (seg1 127.0.0.1:40001 pid=1761)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.pfield"  (seg1 127.0.0.1:25433 pid=72000)
 DETAIL:  
 SQL statement "select * from PField where name =  $1 "
 PL/pgSQL function "tg_pslot_biu" line 5 at SQL statement
 insert into PSlot values ('PS.base.a6', 'PF0_1', '', '');
-ERROR:  function cannot execute on segment because it accesses relation "public.pfield"  (seg2 127.0.0.1:40002 pid=1762)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.pfield"  (seg2 127.0.0.1:25434 pid=72001)
 DETAIL:  
 SQL statement "select * from PField where name =  $1 "
 PL/pgSQL function "tg_pslot_biu" line 5 at SQL statement
@@ -1277,62 +1325,74 @@ PL/pgSQL function "tg_pslot_biu" line 5 at SQL statement
 -- These are already wired to the wall connectors
 --
 insert into PSlot values ('PS.base.b1', 'PF0_1', '', 'WS.002.1a');
-ERROR:  function cannot execute on segment because it accesses relation "public.pfield"  (seg0 127.0.0.1:40000 pid=1760)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.pfield"  (seg0 127.0.0.1:25432 pid=71996)
 DETAIL:  
 SQL statement "select * from PField where name =  $1 "
 PL/pgSQL function "tg_pslot_biu" line 5 at SQL statement
 insert into PSlot values ('PS.base.b2', 'PF0_1', '', 'WS.002.1b');
-ERROR:  function cannot execute on segment because it accesses relation "public.pfield"  (seg0 127.0.0.1:40000 pid=1760)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.pfield"  (seg0 127.0.0.1:25432 pid=71996)
 DETAIL:  
 SQL statement "select * from PField where name =  $1 "
 PL/pgSQL function "tg_pslot_biu" line 5 at SQL statement
 insert into PSlot values ('PS.base.b3', 'PF0_1', '', 'WS.002.2a');
-ERROR:  function cannot execute on segment because it accesses relation "public.pfield"  (seg2 127.0.0.1:40002 pid=1762)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.pfield"  (seg2 127.0.0.1:25434 pid=72001)
 DETAIL:  
 SQL statement "select * from PField where name =  $1 "
 PL/pgSQL function "tg_pslot_biu" line 5 at SQL statement
 insert into PSlot values ('PS.base.b4', 'PF0_1', '', 'WS.002.2b');
-ERROR:  function cannot execute on segment because it accesses relation "public.pfield"  (seg0 127.0.0.1:40000 pid=1760)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.pfield"  (seg0 127.0.0.1:25432 pid=71996)
 DETAIL:  
 SQL statement "select * from PField where name =  $1 "
 PL/pgSQL function "tg_pslot_biu" line 5 at SQL statement
 insert into PSlot values ('PS.base.b5', 'PF0_1', '', 'WS.002.3a');
-ERROR:  function cannot execute on segment because it accesses relation "public.pfield"  (seg2 127.0.0.1:40002 pid=1762)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.pfield"  (seg2 127.0.0.1:25434 pid=72001)
 DETAIL:  
 SQL statement "select * from PField where name =  $1 "
 PL/pgSQL function "tg_pslot_biu" line 5 at SQL statement
 insert into PSlot values ('PS.base.b6', 'PF0_1', '', 'WS.002.3b');
-ERROR:  function cannot execute on segment because it accesses relation "public.pfield"  (seg2 127.0.0.1:40002 pid=1762)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.pfield"  (seg2 127.0.0.1:25434 pid=72001)
 DETAIL:  
 SQL statement "select * from PField where name =  $1 "
 PL/pgSQL function "tg_pslot_biu" line 5 at SQL statement
 insert into PSlot values ('PS.base.c1', 'PF0_1', '', 'WS.003.1a');
-ERROR:  function cannot execute on segment because it accesses relation "public.pfield"  (seg2 127.0.0.1:40002 pid=1762)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.pfield"  (seg2 127.0.0.1:25434 pid=72001)
 DETAIL:  
 SQL statement "select * from PField where name =  $1 "
 PL/pgSQL function "tg_pslot_biu" line 5 at SQL statement
 insert into PSlot values ('PS.base.c2', 'PF0_1', '', 'WS.003.1b');
-ERROR:  function cannot execute on segment because it accesses relation "public.pfield"  (seg2 127.0.0.1:40002 pid=1762)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.pfield"  (seg2 127.0.0.1:25434 pid=72001)
 DETAIL:  
 SQL statement "select * from PField where name =  $1 "
 PL/pgSQL function "tg_pslot_biu" line 5 at SQL statement
 insert into PSlot values ('PS.base.c3', 'PF0_1', '', 'WS.003.2a');
-ERROR:  function cannot execute on segment because it accesses relation "public.pfield"  (seg0 127.0.0.1:40000 pid=1760)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.pfield"  (seg0 127.0.0.1:25432 pid=71996)
 DETAIL:  
 SQL statement "select * from PField where name =  $1 "
 PL/pgSQL function "tg_pslot_biu" line 5 at SQL statement
 insert into PSlot values ('PS.base.c4', 'PF0_1', '', 'WS.003.2b');
-ERROR:  function cannot execute on segment because it accesses relation "public.pfield"  (seg2 127.0.0.1:40002 pid=1762)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.pfield"  (seg2 127.0.0.1:25434 pid=72001)
 DETAIL:  
 SQL statement "select * from PField where name =  $1 "
 PL/pgSQL function "tg_pslot_biu" line 5 at SQL statement
 insert into PSlot values ('PS.base.c5', 'PF0_1', '', 'WS.003.3a');
-ERROR:  function cannot execute on segment because it accesses relation "public.pfield"  (seg0 127.0.0.1:40000 pid=1760)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.pfield"  (seg0 127.0.0.1:25432 pid=71996)
 DETAIL:  
 SQL statement "select * from PField where name =  $1 "
 PL/pgSQL function "tg_pslot_biu" line 5 at SQL statement
 insert into PSlot values ('PS.base.c6', 'PF0_1', '', 'WS.003.3b');
-ERROR:  function cannot execute on segment because it accesses relation "public.pfield"  (seg0 127.0.0.1:40000 pid=1760)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.pfield"  (seg0 127.0.0.1:25432 pid=71996)
 DETAIL:  
 SQL statement "select * from PField where name =  $1 "
 PL/pgSQL function "tg_pslot_biu" line 5 at SQL statement
@@ -1342,183 +1402,219 @@ PL/pgSQL function "tg_pslot_biu" line 5 at SQL statement
 --
 insert into PField values ('PF0_X', 'Phonelines basement');
 insert into PSlot values ('PS.base.ta1', 'PF0_X', '', '');
-ERROR:  function cannot execute on segment because it accesses relation "public.pfield"  (seg2 127.0.0.1:40002 pid=1762)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.pfield"  (seg2 127.0.0.1:25434 pid=72001)
 DETAIL:  
 SQL statement "select * from PField where name =  $1 "
 PL/pgSQL function "tg_pslot_biu" line 5 at SQL statement
 insert into PSlot values ('PS.base.ta2', 'PF0_X', '', '');
-ERROR:  function cannot execute on segment because it accesses relation "public.pfield"  (seg2 127.0.0.1:40002 pid=1762)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.pfield"  (seg2 127.0.0.1:25434 pid=72001)
 DETAIL:  
 SQL statement "select * from PField where name =  $1 "
 PL/pgSQL function "tg_pslot_biu" line 5 at SQL statement
 insert into PSlot values ('PS.base.ta3', 'PF0_X', '', '');
-ERROR:  function cannot execute on segment because it accesses relation "public.pfield"  (seg0 127.0.0.1:40000 pid=1760)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.pfield"  (seg0 127.0.0.1:25432 pid=71996)
 DETAIL:  
 SQL statement "select * from PField where name =  $1 "
 PL/pgSQL function "tg_pslot_biu" line 5 at SQL statement
 insert into PSlot values ('PS.base.ta4', 'PF0_X', '', '');
-ERROR:  function cannot execute on segment because it accesses relation "public.pfield"  (seg0 127.0.0.1:40000 pid=1760)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.pfield"  (seg0 127.0.0.1:25432 pid=71996)
 DETAIL:  
 SQL statement "select * from PField where name =  $1 "
 PL/pgSQL function "tg_pslot_biu" line 5 at SQL statement
 insert into PSlot values ('PS.base.ta5', 'PF0_X', '', '');
-ERROR:  function cannot execute on segment because it accesses relation "public.pfield"  (seg1 127.0.0.1:40001 pid=1761)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.pfield"  (seg1 127.0.0.1:25433 pid=72000)
 DETAIL:  
 SQL statement "select * from PField where name =  $1 "
 PL/pgSQL function "tg_pslot_biu" line 5 at SQL statement
 insert into PSlot values ('PS.base.ta6', 'PF0_X', '', '');
-ERROR:  function cannot execute on segment because it accesses relation "public.pfield"  (seg1 127.0.0.1:40001 pid=1761)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.pfield"  (seg1 127.0.0.1:25433 pid=72000)
 DETAIL:  
 SQL statement "select * from PField where name =  $1 "
 PL/pgSQL function "tg_pslot_biu" line 5 at SQL statement
 insert into PSlot values ('PS.base.tb1', 'PF0_X', '', '');
-ERROR:  function cannot execute on segment because it accesses relation "public.pfield"  (seg0 127.0.0.1:40000 pid=1760)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.pfield"  (seg0 127.0.0.1:25432 pid=71996)
 DETAIL:  
 SQL statement "select * from PField where name =  $1 "
 PL/pgSQL function "tg_pslot_biu" line 5 at SQL statement
 insert into PSlot values ('PS.base.tb2', 'PF0_X', '', '');
-ERROR:  function cannot execute on segment because it accesses relation "public.pfield"  (seg2 127.0.0.1:40002 pid=1762)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.pfield"  (seg2 127.0.0.1:25434 pid=72001)
 DETAIL:  
 SQL statement "select * from PField where name =  $1 "
 PL/pgSQL function "tg_pslot_biu" line 5 at SQL statement
 insert into PSlot values ('PS.base.tb3', 'PF0_X', '', '');
-ERROR:  function cannot execute on segment because it accesses relation "public.pfield"  (seg1 127.0.0.1:40001 pid=1761)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.pfield"  (seg1 127.0.0.1:25433 pid=72000)
 DETAIL:  
 SQL statement "select * from PField where name =  $1 "
 PL/pgSQL function "tg_pslot_biu" line 5 at SQL statement
 insert into PSlot values ('PS.base.tb4', 'PF0_X', '', '');
-ERROR:  function cannot execute on segment because it accesses relation "public.pfield"  (seg2 127.0.0.1:40002 pid=1762)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.pfield"  (seg2 127.0.0.1:25434 pid=72001)
 DETAIL:  
 SQL statement "select * from PField where name =  $1 "
 PL/pgSQL function "tg_pslot_biu" line 5 at SQL statement
 insert into PSlot values ('PS.base.tb5', 'PF0_X', '', '');
-ERROR:  function cannot execute on segment because it accesses relation "public.pfield"  (seg1 127.0.0.1:40001 pid=1761)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.pfield"  (seg1 127.0.0.1:25433 pid=72000)
 DETAIL:  
 SQL statement "select * from PField where name =  $1 "
 PL/pgSQL function "tg_pslot_biu" line 5 at SQL statement
 insert into PSlot values ('PS.base.tb6', 'PF0_X', '', '');
-ERROR:  function cannot execute on segment because it accesses relation "public.pfield"  (seg0 127.0.0.1:40000 pid=1760)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.pfield"  (seg0 127.0.0.1:25432 pid=71996)
 DETAIL:  
 SQL statement "select * from PField where name =  $1 "
 PL/pgSQL function "tg_pslot_biu" line 5 at SQL statement
 insert into PField values ('PF1_1', 'Wallslots 1st floor');
 insert into PSlot values ('PS.1st.a1', 'PF1_1', '', 'WS.101.1a');
-ERROR:  function cannot execute on segment because it accesses relation "public.pfield"  (seg2 127.0.0.1:40002 pid=1762)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.pfield"  (seg2 127.0.0.1:25434 pid=72001)
 DETAIL:  
 SQL statement "select * from PField where name =  $1 "
 PL/pgSQL function "tg_pslot_biu" line 5 at SQL statement
 insert into PSlot values ('PS.1st.a2', 'PF1_1', '', 'WS.101.1b');
-ERROR:  function cannot execute on segment because it accesses relation "public.pfield"  (seg2 127.0.0.1:40002 pid=1762)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.pfield"  (seg2 127.0.0.1:25434 pid=72001)
 DETAIL:  
 SQL statement "select * from PField where name =  $1 "
 PL/pgSQL function "tg_pslot_biu" line 5 at SQL statement
 insert into PSlot values ('PS.1st.a3', 'PF1_1', '', 'WS.101.2a');
-ERROR:  function cannot execute on segment because it accesses relation "public.pfield"  (seg1 127.0.0.1:40001 pid=1761)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.pfield"  (seg1 127.0.0.1:25433 pid=72000)
 DETAIL:  
 SQL statement "select * from PField where name =  $1 "
 PL/pgSQL function "tg_pslot_biu" line 5 at SQL statement
 insert into PSlot values ('PS.1st.a4', 'PF1_1', '', 'WS.101.2b');
-ERROR:  function cannot execute on segment because it accesses relation "public.pfield"  (seg1 127.0.0.1:40001 pid=1761)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.pfield"  (seg1 127.0.0.1:25433 pid=72000)
 DETAIL:  
 SQL statement "select * from PField where name =  $1 "
 PL/pgSQL function "tg_pslot_biu" line 5 at SQL statement
 insert into PSlot values ('PS.1st.a5', 'PF1_1', '', 'WS.101.3a');
-ERROR:  function cannot execute on segment because it accesses relation "public.pfield"  (seg0 127.0.0.1:40000 pid=1760)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.pfield"  (seg0 127.0.0.1:25432 pid=71996)
 DETAIL:  
 SQL statement "select * from PField where name =  $1 "
 PL/pgSQL function "tg_pslot_biu" line 5 at SQL statement
 insert into PSlot values ('PS.1st.a6', 'PF1_1', '', 'WS.101.3b');
-ERROR:  function cannot execute on segment because it accesses relation "public.pfield"  (seg0 127.0.0.1:40000 pid=1760)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.pfield"  (seg0 127.0.0.1:25432 pid=71996)
 DETAIL:  
 SQL statement "select * from PField where name =  $1 "
 PL/pgSQL function "tg_pslot_biu" line 5 at SQL statement
 insert into PSlot values ('PS.1st.b1', 'PF1_1', '', 'WS.102.1a');
-ERROR:  function cannot execute on segment because it accesses relation "public.pfield"  (seg0 127.0.0.1:40000 pid=1760)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.pfield"  (seg0 127.0.0.1:25432 pid=71996)
 DETAIL:  
 SQL statement "select * from PField where name =  $1 "
 PL/pgSQL function "tg_pslot_biu" line 5 at SQL statement
 insert into PSlot values ('PS.1st.b2', 'PF1_1', '', 'WS.102.1b');
-ERROR:  function cannot execute on segment because it accesses relation "public.pfield"  (seg1 127.0.0.1:40001 pid=1761)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.pfield"  (seg1 127.0.0.1:25433 pid=72000)
 DETAIL:  
 SQL statement "select * from PField where name =  $1 "
 PL/pgSQL function "tg_pslot_biu" line 5 at SQL statement
 insert into PSlot values ('PS.1st.b3', 'PF1_1', '', 'WS.102.2a');
-ERROR:  function cannot execute on segment because it accesses relation "public.pfield"  (seg2 127.0.0.1:40002 pid=1762)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.pfield"  (seg2 127.0.0.1:25434 pid=72001)
 DETAIL:  
 SQL statement "select * from PField where name =  $1 "
 PL/pgSQL function "tg_pslot_biu" line 5 at SQL statement
 insert into PSlot values ('PS.1st.b4', 'PF1_1', '', 'WS.102.2b');
-ERROR:  function cannot execute on segment because it accesses relation "public.pfield"  (seg0 127.0.0.1:40000 pid=1760)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.pfield"  (seg0 127.0.0.1:25432 pid=71996)
 DETAIL:  
 SQL statement "select * from PField where name =  $1 "
 PL/pgSQL function "tg_pslot_biu" line 5 at SQL statement
 insert into PSlot values ('PS.1st.b5', 'PF1_1', '', 'WS.102.3a');
-ERROR:  function cannot execute on segment because it accesses relation "public.pfield"  (seg1 127.0.0.1:40001 pid=1761)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.pfield"  (seg1 127.0.0.1:25433 pid=72000)
 DETAIL:  
 SQL statement "select * from PField where name =  $1 "
 PL/pgSQL function "tg_pslot_biu" line 5 at SQL statement
 insert into PSlot values ('PS.1st.b6', 'PF1_1', '', 'WS.102.3b');
-ERROR:  function cannot execute on segment because it accesses relation "public.pfield"  (seg2 127.0.0.1:40002 pid=1762)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.pfield"  (seg2 127.0.0.1:25434 pid=72001)
 DETAIL:  
 SQL statement "select * from PField where name =  $1 "
 PL/pgSQL function "tg_pslot_biu" line 5 at SQL statement
 insert into PSlot values ('PS.1st.c1', 'PF1_1', '', 'WS.105.1a');
-ERROR:  function cannot execute on segment because it accesses relation "public.pfield"  (seg1 127.0.0.1:40001 pid=1761)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.pfield"  (seg1 127.0.0.1:25433 pid=72000)
 DETAIL:  
 SQL statement "select * from PField where name =  $1 "
 PL/pgSQL function "tg_pslot_biu" line 5 at SQL statement
 insert into PSlot values ('PS.1st.c2', 'PF1_1', '', 'WS.105.1b');
-ERROR:  function cannot execute on segment because it accesses relation "public.pfield"  (seg0 127.0.0.1:40000 pid=1760)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.pfield"  (seg0 127.0.0.1:25432 pid=71996)
 DETAIL:  
 SQL statement "select * from PField where name =  $1 "
 PL/pgSQL function "tg_pslot_biu" line 5 at SQL statement
 insert into PSlot values ('PS.1st.c3', 'PF1_1', '', 'WS.105.2a');
-ERROR:  function cannot execute on segment because it accesses relation "public.pfield"  (seg2 127.0.0.1:40002 pid=1762)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.pfield"  (seg2 127.0.0.1:25434 pid=72001)
 DETAIL:  
 SQL statement "select * from PField where name =  $1 "
 PL/pgSQL function "tg_pslot_biu" line 5 at SQL statement
 insert into PSlot values ('PS.1st.c4', 'PF1_1', '', 'WS.105.2b');
-ERROR:  function cannot execute on segment because it accesses relation "public.pfield"  (seg0 127.0.0.1:40000 pid=1760)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.pfield"  (seg0 127.0.0.1:25432 pid=71996)
 DETAIL:  
 SQL statement "select * from PField where name =  $1 "
 PL/pgSQL function "tg_pslot_biu" line 5 at SQL statement
 insert into PSlot values ('PS.1st.c5', 'PF1_1', '', 'WS.105.3a');
-ERROR:  function cannot execute on segment because it accesses relation "public.pfield"  (seg2 127.0.0.1:40002 pid=1762)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.pfield"  (seg2 127.0.0.1:25434 pid=72001)
 DETAIL:  
 SQL statement "select * from PField where name =  $1 "
 PL/pgSQL function "tg_pslot_biu" line 5 at SQL statement
 insert into PSlot values ('PS.1st.c6', 'PF1_1', '', 'WS.105.3b');
-ERROR:  function cannot execute on segment because it accesses relation "public.pfield"  (seg1 127.0.0.1:40001 pid=1761)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.pfield"  (seg1 127.0.0.1:25433 pid=72000)
 DETAIL:  
 SQL statement "select * from PField where name =  $1 "
 PL/pgSQL function "tg_pslot_biu" line 5 at SQL statement
 insert into PSlot values ('PS.1st.d1', 'PF1_1', '', 'WS.106.1a');
-ERROR:  function cannot execute on segment because it accesses relation "public.pfield"  (seg1 127.0.0.1:40001 pid=1761)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.pfield"  (seg1 127.0.0.1:25433 pid=72000)
 DETAIL:  
 SQL statement "select * from PField where name =  $1 "
 PL/pgSQL function "tg_pslot_biu" line 5 at SQL statement
 insert into PSlot values ('PS.1st.d2', 'PF1_1', '', 'WS.106.1b');
-ERROR:  function cannot execute on segment because it accesses relation "public.pfield"  (seg1 127.0.0.1:40001 pid=1761)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.pfield"  (seg1 127.0.0.1:25433 pid=72000)
 DETAIL:  
 SQL statement "select * from PField where name =  $1 "
 PL/pgSQL function "tg_pslot_biu" line 5 at SQL statement
 insert into PSlot values ('PS.1st.d3', 'PF1_1', '', 'WS.106.2a');
-ERROR:  function cannot execute on segment because it accesses relation "public.pfield"  (seg2 127.0.0.1:40002 pid=1762)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.pfield"  (seg2 127.0.0.1:25434 pid=72001)
 DETAIL:  
 SQL statement "select * from PField where name =  $1 "
 PL/pgSQL function "tg_pslot_biu" line 5 at SQL statement
 insert into PSlot values ('PS.1st.d4', 'PF1_1', '', 'WS.106.2b');
-ERROR:  function cannot execute on segment because it accesses relation "public.pfield"  (seg1 127.0.0.1:40001 pid=1761)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.pfield"  (seg1 127.0.0.1:25433 pid=72000)
 DETAIL:  
 SQL statement "select * from PField where name =  $1 "
 PL/pgSQL function "tg_pslot_biu" line 5 at SQL statement
 insert into PSlot values ('PS.1st.d5', 'PF1_1', '', 'WS.106.3a');
-ERROR:  function cannot execute on segment because it accesses relation "public.pfield"  (seg2 127.0.0.1:40002 pid=1762)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.pfield"  (seg2 127.0.0.1:25434 pid=72001)
 DETAIL:  
 SQL statement "select * from PField where name =  $1 "
 PL/pgSQL function "tg_pslot_biu" line 5 at SQL statement
 insert into PSlot values ('PS.1st.d6', 'PF1_1', '', 'WS.106.3b');
-ERROR:  function cannot execute on segment because it accesses relation "public.pfield"  (seg2 127.0.0.1:40002 pid=1762)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.pfield"  (seg2 127.0.0.1:25434 pid=72001)
 DETAIL:  
 SQL statement "select * from PField where name =  $1 "
 PL/pgSQL function "tg_pslot_biu" line 5 at SQL statement
@@ -1528,7 +1624,9 @@ PL/pgSQL function "tg_pslot_biu" line 5 at SQL statement
 -- correct it after
 --
 update PSlot set backlink = 'WS.001.1a' where slotname = 'PS.base.a1';
+INFO:  GPORCA failed to produce a plan, falling back to planner
 update PSlot set backlink = 'WS.001.1b' where slotname = 'PS.base.a3';
+INFO:  GPORCA failed to produce a plan, falling back to planner
 select * from WSlot where roomno = '001' order by slotname;
  slotname | roomno | slotlink | backlink 
 ----------+--------+----------+----------
@@ -1540,6 +1638,7 @@ select * from PSlot where slotname ~ 'PS.base.a' order by slotname;
 (0 rows)
 
 update PSlot set backlink = 'WS.001.2a' where slotname = 'PS.base.a3';
+INFO:  GPORCA failed to produce a plan, falling back to planner
 select * from WSlot where roomno = '001' order by slotname;
  slotname | roomno | slotlink | backlink 
 ----------+--------+----------+----------
@@ -1551,6 +1650,7 @@ select * from PSlot where slotname ~ 'PS.base.a' order by slotname;
 (0 rows)
 
 update PSlot set backlink = 'WS.001.1b' where slotname = 'PS.base.a2';
+INFO:  GPORCA failed to produce a plan, falling back to planner
 select * from WSlot where roomno = '001' order by slotname;
  slotname | roomno | slotlink | backlink 
 ----------+--------+----------+----------
@@ -1567,7 +1667,9 @@ select * from PSlot where slotname ~ 'PS.base.a' order by slotname;
 -- WSlot and corresponding PSlot point to each other.
 --
 update WSlot set backlink = 'PS.base.a4' where slotname = 'WS.001.2b';
+INFO:  GPORCA failed to produce a plan, falling back to planner
 update WSlot set backlink = 'PS.base.a6' where slotname = 'WS.001.3a';
+INFO:  GPORCA failed to produce a plan, falling back to planner
 select * from WSlot where roomno = '001' order by slotname;
  slotname | roomno | slotlink | backlink 
 ----------+--------+----------+----------
@@ -1579,6 +1681,7 @@ select * from PSlot where slotname ~ 'PS.base.a' order by slotname;
 (0 rows)
 
 update WSlot set backlink = 'PS.base.a6' where slotname = 'WS.001.3b';
+INFO:  GPORCA failed to produce a plan, falling back to planner
 select * from WSlot where roomno = '001' order by slotname;
  slotname | roomno | slotlink | backlink 
 ----------+--------+----------+----------
@@ -1590,6 +1693,7 @@ select * from PSlot where slotname ~ 'PS.base.a' order by slotname;
 (0 rows)
 
 update WSlot set backlink = 'PS.base.a5' where slotname = 'WS.001.3a';
+INFO:  GPORCA failed to produce a plan, falling back to planner
 select * from WSlot where roomno = '001' order by slotname;
  slotname | roomno | slotlink | backlink 
 ----------+--------+----------+----------
@@ -1602,62 +1706,74 @@ select * from PSlot where slotname ~ 'PS.base.a' order by slotname;
 
 insert into PField values ('PF1_2', 'Phonelines 1st floor');
 insert into PSlot values ('PS.1st.ta1', 'PF1_2', '', '');
-ERROR:  function cannot execute on segment because it accesses relation "public.pfield"  (seg1 127.0.0.1:40001 pid=1761)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.pfield"  (seg1 127.0.0.1:25433 pid=72000)
 DETAIL:  
 SQL statement "select * from PField where name =  $1 "
 PL/pgSQL function "tg_pslot_biu" line 5 at SQL statement
 insert into PSlot values ('PS.1st.ta2', 'PF1_2', '', '');
-ERROR:  function cannot execute on segment because it accesses relation "public.pfield"  (seg1 127.0.0.1:40001 pid=1761)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.pfield"  (seg1 127.0.0.1:25433 pid=72000)
 DETAIL:  
 SQL statement "select * from PField where name =  $1 "
 PL/pgSQL function "tg_pslot_biu" line 5 at SQL statement
 insert into PSlot values ('PS.1st.ta3', 'PF1_2', '', '');
-ERROR:  function cannot execute on segment because it accesses relation "public.pfield"  (seg0 127.0.0.1:40000 pid=1760)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.pfield"  (seg0 127.0.0.1:25432 pid=71996)
 DETAIL:  
 SQL statement "select * from PField where name =  $1 "
 PL/pgSQL function "tg_pslot_biu" line 5 at SQL statement
 insert into PSlot values ('PS.1st.ta4', 'PF1_2', '', '');
-ERROR:  function cannot execute on segment because it accesses relation "public.pfield"  (seg0 127.0.0.1:40000 pid=1760)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.pfield"  (seg0 127.0.0.1:25432 pid=71996)
 DETAIL:  
 SQL statement "select * from PField where name =  $1 "
 PL/pgSQL function "tg_pslot_biu" line 5 at SQL statement
 insert into PSlot values ('PS.1st.ta5', 'PF1_2', '', '');
-ERROR:  function cannot execute on segment because it accesses relation "public.pfield"  (seg2 127.0.0.1:40002 pid=1762)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.pfield"  (seg2 127.0.0.1:25434 pid=72001)
 DETAIL:  
 SQL statement "select * from PField where name =  $1 "
 PL/pgSQL function "tg_pslot_biu" line 5 at SQL statement
 insert into PSlot values ('PS.1st.ta6', 'PF1_2', '', '');
-ERROR:  function cannot execute on segment because it accesses relation "public.pfield"  (seg2 127.0.0.1:40002 pid=1762)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.pfield"  (seg2 127.0.0.1:25434 pid=72001)
 DETAIL:  
 SQL statement "select * from PField where name =  $1 "
 PL/pgSQL function "tg_pslot_biu" line 5 at SQL statement
 insert into PSlot values ('PS.1st.tb1', 'PF1_2', '', '');
-ERROR:  function cannot execute on segment because it accesses relation "public.pfield"  (seg1 127.0.0.1:40001 pid=1761)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.pfield"  (seg1 127.0.0.1:25433 pid=72000)
 DETAIL:  
 SQL statement "select * from PField where name =  $1 "
 PL/pgSQL function "tg_pslot_biu" line 5 at SQL statement
 insert into PSlot values ('PS.1st.tb2', 'PF1_2', '', '');
-ERROR:  function cannot execute on segment because it accesses relation "public.pfield"  (seg2 127.0.0.1:40002 pid=1762)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.pfield"  (seg2 127.0.0.1:25434 pid=72001)
 DETAIL:  
 SQL statement "select * from PField where name =  $1 "
 PL/pgSQL function "tg_pslot_biu" line 5 at SQL statement
 insert into PSlot values ('PS.1st.tb3', 'PF1_2', '', '');
-ERROR:  function cannot execute on segment because it accesses relation "public.pfield"  (seg0 127.0.0.1:40000 pid=1760)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.pfield"  (seg0 127.0.0.1:25432 pid=71996)
 DETAIL:  
 SQL statement "select * from PField where name =  $1 "
 PL/pgSQL function "tg_pslot_biu" line 5 at SQL statement
 insert into PSlot values ('PS.1st.tb4', 'PF1_2', '', '');
-ERROR:  function cannot execute on segment because it accesses relation "public.pfield"  (seg1 127.0.0.1:40001 pid=1761)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.pfield"  (seg1 127.0.0.1:25433 pid=72000)
 DETAIL:  
 SQL statement "select * from PField where name =  $1 "
 PL/pgSQL function "tg_pslot_biu" line 5 at SQL statement
 insert into PSlot values ('PS.1st.tb5', 'PF1_2', '', '');
-ERROR:  function cannot execute on segment because it accesses relation "public.pfield"  (seg2 127.0.0.1:40002 pid=1762)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.pfield"  (seg2 127.0.0.1:25434 pid=72001)
 DETAIL:  
 SQL statement "select * from PField where name =  $1 "
 PL/pgSQL function "tg_pslot_biu" line 5 at SQL statement
 insert into PSlot values ('PS.1st.tb6', 'PF1_2', '', '');
-ERROR:  function cannot execute on segment because it accesses relation "public.pfield"  (seg0 127.0.0.1:40000 pid=1760)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.pfield"  (seg0 127.0.0.1:25432 pid=71996)
 DETAIL:  
 SQL statement "select * from PField where name =  $1 "
 PL/pgSQL function "tg_pslot_biu" line 5 at SQL statement
@@ -1665,6 +1781,7 @@ PL/pgSQL function "tg_pslot_biu" line 5 at SQL statement
 -- Fix the wrong name for patchfield PF0_2
 --
 update PField set name = 'PF0_2' where name = 'PF0_X';
+INFO:  GPORCA failed to produce a plan, falling back to planner
 ERROR:  Cannot parallelize an UPDATE statement that updates the distribution columns
 select * from PSlot order by slotname;
  slotname | pfname | slotlink | backlink 
@@ -1683,140 +1800,160 @@ select * from WSlot order by slotname;
 -- backlink field.
 --
 insert into PLine values ('PL.001', '-0', 'Central call', 'PS.base.ta1');
-ERROR:  function cannot execute on segment because it accesses relation "public.pslot"  (seg2 127.0.0.1:40002 pid=1762)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.pslot"  (seg2 127.0.0.1:25434 pid=72001)
 DETAIL:  
 SQL statement "select * from PSlot where slotname =  $1 "
 PL/pgSQL function "tg_backlink_set" line 17 at SQL statement
 SQL statement "SELECT  tg_backlink_set( $1 ,  $2 )"
 PL/pgSQL function "tg_backlink_a" line 6 at assignment
 insert into PLine values ('PL.002', '-101', '', 'PS.base.ta2');
-ERROR:  function cannot execute on segment because it accesses relation "public.pslot"  (seg1 127.0.0.1:40001 pid=1761)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.pslot"  (seg1 127.0.0.1:25433 pid=72000)
 DETAIL:  
 SQL statement "select * from PSlot where slotname =  $1 "
 PL/pgSQL function "tg_backlink_set" line 17 at SQL statement
 SQL statement "SELECT  tg_backlink_set( $1 ,  $2 )"
 PL/pgSQL function "tg_backlink_a" line 6 at assignment
 insert into PLine values ('PL.003', '-102', '', 'PS.base.ta3');
-ERROR:  function cannot execute on segment because it accesses relation "public.pslot"  (seg0 127.0.0.1:40000 pid=1760)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.pslot"  (seg0 127.0.0.1:25432 pid=71996)
 DETAIL:  
 SQL statement "select * from PSlot where slotname =  $1 "
 PL/pgSQL function "tg_backlink_set" line 17 at SQL statement
 SQL statement "SELECT  tg_backlink_set( $1 ,  $2 )"
 PL/pgSQL function "tg_backlink_a" line 6 at assignment
 insert into PLine values ('PL.004', '-103', '', 'PS.base.ta5');
-ERROR:  function cannot execute on segment because it accesses relation "public.pslot"  (seg2 127.0.0.1:40002 pid=1762)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.pslot"  (seg2 127.0.0.1:25434 pid=72001)
 DETAIL:  
 SQL statement "select * from PSlot where slotname =  $1 "
 PL/pgSQL function "tg_backlink_set" line 17 at SQL statement
 SQL statement "SELECT  tg_backlink_set( $1 ,  $2 )"
 PL/pgSQL function "tg_backlink_a" line 6 at assignment
 insert into PLine values ('PL.005', '-104', '', 'PS.base.ta6');
-ERROR:  function cannot execute on segment because it accesses relation "public.pslot"  (seg1 127.0.0.1:40001 pid=1761)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.pslot"  (seg1 127.0.0.1:25433 pid=72000)
 DETAIL:  
 SQL statement "select * from PSlot where slotname =  $1 "
 PL/pgSQL function "tg_backlink_set" line 17 at SQL statement
 SQL statement "SELECT  tg_backlink_set( $1 ,  $2 )"
 PL/pgSQL function "tg_backlink_a" line 6 at assignment
 insert into PLine values ('PL.006', '-106', '', 'PS.base.tb2');
-ERROR:  function cannot execute on segment because it accesses relation "public.pslot"  (seg0 127.0.0.1:40000 pid=1760)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.pslot"  (seg0 127.0.0.1:25432 pid=71996)
 DETAIL:  
 SQL statement "select * from PSlot where slotname =  $1 "
 PL/pgSQL function "tg_backlink_set" line 17 at SQL statement
 SQL statement "SELECT  tg_backlink_set( $1 ,  $2 )"
 PL/pgSQL function "tg_backlink_a" line 6 at assignment
 insert into PLine values ('PL.007', '-108', '', 'PS.base.tb3');
-ERROR:  function cannot execute on segment because it accesses relation "public.pslot"  (seg2 127.0.0.1:40002 pid=1762)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.pslot"  (seg2 127.0.0.1:25434 pid=72001)
 DETAIL:  
 SQL statement "select * from PSlot where slotname =  $1 "
 PL/pgSQL function "tg_backlink_set" line 17 at SQL statement
 SQL statement "SELECT  tg_backlink_set( $1 ,  $2 )"
 PL/pgSQL function "tg_backlink_a" line 6 at assignment
 insert into PLine values ('PL.008', '-109', '', 'PS.base.tb4');
-ERROR:  function cannot execute on segment because it accesses relation "public.pslot"  (seg1 127.0.0.1:40001 pid=1761)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.pslot"  (seg1 127.0.0.1:25433 pid=72000)
 DETAIL:  
 SQL statement "select * from PSlot where slotname =  $1 "
 PL/pgSQL function "tg_backlink_set" line 17 at SQL statement
 SQL statement "SELECT  tg_backlink_set( $1 ,  $2 )"
 PL/pgSQL function "tg_backlink_a" line 6 at assignment
 insert into PLine values ('PL.009', '-121', '', 'PS.base.tb5');
-ERROR:  function cannot execute on segment because it accesses relation "public.pslot"  (seg0 127.0.0.1:40000 pid=1760)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.pslot"  (seg0 127.0.0.1:25432 pid=71996)
 DETAIL:  
 SQL statement "select * from PSlot where slotname =  $1 "
 PL/pgSQL function "tg_backlink_set" line 17 at SQL statement
 SQL statement "SELECT  tg_backlink_set( $1 ,  $2 )"
 PL/pgSQL function "tg_backlink_a" line 6 at assignment
 insert into PLine values ('PL.010', '-122', '', 'PS.base.tb6');
-ERROR:  function cannot execute on segment because it accesses relation "public.pslot"  (seg1 127.0.0.1:40001 pid=1761)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.pslot"  (seg1 127.0.0.1:25433 pid=72000)
 DETAIL:  
 SQL statement "select * from PSlot where slotname =  $1 "
 PL/pgSQL function "tg_backlink_set" line 17 at SQL statement
 SQL statement "SELECT  tg_backlink_set( $1 ,  $2 )"
 PL/pgSQL function "tg_backlink_a" line 6 at assignment
 insert into PLine values ('PL.015', '-134', '', 'PS.1st.ta1');
-ERROR:  function cannot execute on segment because it accesses relation "public.pslot"  (seg1 127.0.0.1:40001 pid=1761)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.pslot"  (seg1 127.0.0.1:25433 pid=72000)
 DETAIL:  
 SQL statement "select * from PSlot where slotname =  $1 "
 PL/pgSQL function "tg_backlink_set" line 17 at SQL statement
 SQL statement "SELECT  tg_backlink_set( $1 ,  $2 )"
 PL/pgSQL function "tg_backlink_a" line 6 at assignment
 insert into PLine values ('PL.016', '-137', '', 'PS.1st.ta3');
-ERROR:  function cannot execute on segment because it accesses relation "public.pslot"  (seg2 127.0.0.1:40002 pid=1762)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.pslot"  (seg2 127.0.0.1:25434 pid=72001)
 DETAIL:  
 SQL statement "select * from PSlot where slotname =  $1 "
 PL/pgSQL function "tg_backlink_set" line 17 at SQL statement
 SQL statement "SELECT  tg_backlink_set( $1 ,  $2 )"
 PL/pgSQL function "tg_backlink_a" line 6 at assignment
 insert into PLine values ('PL.017', '-139', '', 'PS.1st.ta4');
-ERROR:  function cannot execute on segment because it accesses relation "public.pslot"  (seg0 127.0.0.1:40000 pid=1760)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.pslot"  (seg0 127.0.0.1:25432 pid=71996)
 DETAIL:  
 SQL statement "select * from PSlot where slotname =  $1 "
 PL/pgSQL function "tg_backlink_set" line 17 at SQL statement
 SQL statement "SELECT  tg_backlink_set( $1 ,  $2 )"
 PL/pgSQL function "tg_backlink_a" line 6 at assignment
 insert into PLine values ('PL.018', '-362', '', 'PS.1st.tb1');
-ERROR:  function cannot execute on segment because it accesses relation "public.pslot"  (seg2 127.0.0.1:40002 pid=1762)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.pslot"  (seg2 127.0.0.1:25434 pid=72001)
 DETAIL:  
 SQL statement "select * from PSlot where slotname =  $1 "
 PL/pgSQL function "tg_backlink_set" line 17 at SQL statement
 SQL statement "SELECT  tg_backlink_set( $1 ,  $2 )"
 PL/pgSQL function "tg_backlink_a" line 6 at assignment
 insert into PLine values ('PL.019', '-363', '', 'PS.1st.tb2');
-ERROR:  function cannot execute on segment because it accesses relation "public.pslot"  (seg0 127.0.0.1:40000 pid=1760)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.pslot"  (seg0 127.0.0.1:25432 pid=71996)
 DETAIL:  
 SQL statement "select * from PSlot where slotname =  $1 "
 PL/pgSQL function "tg_backlink_set" line 17 at SQL statement
 SQL statement "SELECT  tg_backlink_set( $1 ,  $2 )"
 PL/pgSQL function "tg_backlink_a" line 6 at assignment
 insert into PLine values ('PL.020', '-364', '', 'PS.1st.tb3');
-ERROR:  function cannot execute on segment because it accesses relation "public.pslot"  (seg1 127.0.0.1:40001 pid=1761)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.pslot"  (seg1 127.0.0.1:25433 pid=72000)
 DETAIL:  
 SQL statement "select * from PSlot where slotname =  $1 "
 PL/pgSQL function "tg_backlink_set" line 17 at SQL statement
 SQL statement "SELECT  tg_backlink_set( $1 ,  $2 )"
 PL/pgSQL function "tg_backlink_a" line 6 at assignment
 insert into PLine values ('PL.021', '-365', '', 'PS.1st.tb5');
-ERROR:  function cannot execute on segment because it accesses relation "public.pslot"  (seg0 127.0.0.1:40000 pid=1760)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.pslot"  (seg0 127.0.0.1:25432 pid=71996)
 DETAIL:  
 SQL statement "select * from PSlot where slotname =  $1 "
 PL/pgSQL function "tg_backlink_set" line 17 at SQL statement
 SQL statement "SELECT  tg_backlink_set( $1 ,  $2 )"
 PL/pgSQL function "tg_backlink_a" line 6 at assignment
 insert into PLine values ('PL.022', '-367', '', 'PS.1st.tb6');
-ERROR:  function cannot execute on segment because it accesses relation "public.pslot"  (seg0 127.0.0.1:40000 pid=1760)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.pslot"  (seg0 127.0.0.1:25432 pid=71996)
 DETAIL:  
 SQL statement "select * from PSlot where slotname =  $1 "
 PL/pgSQL function "tg_backlink_set" line 17 at SQL statement
 SQL statement "SELECT  tg_backlink_set( $1 ,  $2 )"
 PL/pgSQL function "tg_backlink_a" line 6 at assignment
 insert into PLine values ('PL.028', '-501', 'Fax entrance', 'PS.base.ta2');
-ERROR:  function cannot execute on segment because it accesses relation "public.pslot"  (seg0 127.0.0.1:40000 pid=1760)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.pslot"  (seg0 127.0.0.1:25432 pid=71996)
 DETAIL:  
 SQL statement "select * from PSlot where slotname =  $1 "
 PL/pgSQL function "tg_backlink_set" line 17 at SQL statement
 SQL statement "SELECT  tg_backlink_set( $1 ,  $2 )"
 PL/pgSQL function "tg_backlink_a" line 6 at assignment
 insert into PLine values ('PL.029', '-502', 'Fax 1st floor', 'PS.1st.ta1');
-ERROR:  function cannot execute on segment because it accesses relation "public.pslot"  (seg2 127.0.0.1:40002 pid=1762)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.pslot"  (seg2 127.0.0.1:25434 pid=72001)
 DETAIL:  
 SQL statement "select * from PSlot where slotname =  $1 "
 PL/pgSQL function "tg_backlink_set" line 17 at SQL statement
@@ -1827,43 +1964,52 @@ PL/pgSQL function "tg_backlink_a" line 6 at assignment
 -- phone lines to the corresponding patchfield slots.
 --
 insert into PHone values ('PH.hc001', 'Hicom standard', 'WS.001.1a');
-ERROR:  function cannot execute on segment because it accesses relation "public.wslot"  (seg2 127.0.0.1:40002 pid=1762)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.wslot"  (seg2 127.0.0.1:25434 pid=72001)
 DETAIL:  
 SQL statement "select * from WSlot where slotname =  $1 "
 PL/pgSQL function "tg_slotlink_set" line 37 at SQL statement
 SQL statement "SELECT  tg_slotlink_set( $1 ,  $2 )"
 PL/pgSQL function "tg_slotlink_a" line 6 at assignment
 update PSlot set slotlink = 'PS.base.ta1' where slotname = 'PS.base.a1';
+INFO:  GPORCA failed to produce a plan, falling back to planner
 insert into PHone values ('PH.hc002', 'Hicom standard', 'WS.002.1a');
-ERROR:  function cannot execute on segment because it accesses relation "public.wslot"  (seg2 127.0.0.1:40002 pid=1762)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.wslot"  (seg2 127.0.0.1:25434 pid=72001)
 DETAIL:  
 SQL statement "select * from WSlot where slotname =  $1 "
 PL/pgSQL function "tg_slotlink_set" line 37 at SQL statement
 SQL statement "SELECT  tg_slotlink_set( $1 ,  $2 )"
 PL/pgSQL function "tg_slotlink_a" line 6 at assignment
 update PSlot set slotlink = 'PS.base.ta5' where slotname = 'PS.base.b1';
+INFO:  GPORCA failed to produce a plan, falling back to planner
 insert into PHone values ('PH.hc003', 'Hicom standard', 'WS.002.2a');
-ERROR:  function cannot execute on segment because it accesses relation "public.wslot"  (seg0 127.0.0.1:40000 pid=1760)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.wslot"  (seg0 127.0.0.1:25432 pid=71996)
 DETAIL:  
 SQL statement "select * from WSlot where slotname =  $1 "
 PL/pgSQL function "tg_slotlink_set" line 37 at SQL statement
 SQL statement "SELECT  tg_slotlink_set( $1 ,  $2 )"
 PL/pgSQL function "tg_slotlink_a" line 6 at assignment
 update PSlot set slotlink = 'PS.base.tb2' where slotname = 'PS.base.b3';
+INFO:  GPORCA failed to produce a plan, falling back to planner
 insert into PHone values ('PH.fax001', 'Canon fax', 'WS.001.2a');
-ERROR:  function cannot execute on segment because it accesses relation "public.wslot"  (seg0 127.0.0.1:40000 pid=1760)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.wslot"  (seg0 127.0.0.1:25432 pid=71996)
 DETAIL:  
 SQL statement "select * from WSlot where slotname =  $1 "
 PL/pgSQL function "tg_slotlink_set" line 37 at SQL statement
 SQL statement "SELECT  tg_slotlink_set( $1 ,  $2 )"
 PL/pgSQL function "tg_slotlink_a" line 6 at assignment
 update PSlot set slotlink = 'PS.base.ta2' where slotname = 'PS.base.a3';
+INFO:  GPORCA failed to produce a plan, falling back to planner
 --
 -- Install a hub at one of the patchfields, plug a computers
 -- ethernet interface into the wall and patch it to the hub.
 --
 insert into Hub values ('base.hub1', 'Patchfield PF0_1 hub', 16);
-ERROR:  function cannot execute on segment because it issues a non-SELECT statement  (seg1 127.0.0.1:40001 pid=1761)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it issues a non-SELECT statement  (seg1 127.0.0.1:25433 pid=72000)
 DETAIL:  
 SQL statement "insert into HSlot (slotname, hubname, slotno, slotlink) values ('HS.dummy',  $1 ,  $2 , '')"
 PL/pgSQL function "tg_hub_adjustslots" line 10 at SQL statement
@@ -1871,11 +2017,13 @@ SQL statement "SELECT  tg_hub_adjustslots( $1 , 0,  $2 )"
 PL/pgSQL function "tg_hub_a" line 6 at assignment
 insert into System values ('orion', 'PC');
 insert into IFace values ('IF', 'orion', 'eth0', 'WS.002.1b');
-ERROR:  function cannot execute on segment because it accesses relation "public.system"  (seg2 127.0.0.1:40002 pid=1762)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.system"  (seg2 127.0.0.1:25434 pid=72001)
 DETAIL:  
 SQL statement "select * from system where name =  $1 "
 PL/pgSQL function "tg_iface_biu" line 5 at SQL statement
 update PSlot set slotlink = 'HS.base.hub1.1' where slotname = 'PS.base.b2';
+INFO:  GPORCA failed to produce a plan, falling back to planner
 --
 -- Now we take a look at the patchfield
 --
@@ -1893,30 +2041,39 @@ select * from PField_v1 where pfname = 'PF0_2' order by slotname;
 -- Finally we want errors
 --
 insert into PField values ('PF1_1', 'should fail due to unique index');
-ERROR:  duplicate key value violates unique constraint "pfield_name"  (seg2 127.0.0.1:40002 pid=1762)
+ERROR:  duplicate key value violates unique constraint "pfield_name"  (seg2 127.0.0.1:25434 pid=72001)
 DETAIL:  Key (name)=(PF1_1) already exists.
 update PSlot set backlink = 'WS.not.there' where slotname = 'PS.base.a1';
+INFO:  GPORCA failed to produce a plan, falling back to planner
 update PSlot set backlink = 'XX.illegal' where slotname = 'PS.base.a1';
+INFO:  GPORCA failed to produce a plan, falling back to planner
 update PSlot set slotlink = 'PS.not.there' where slotname = 'PS.base.a1';
+INFO:  GPORCA failed to produce a plan, falling back to planner
 update PSlot set slotlink = 'XX.illegal' where slotname = 'PS.base.a1';
+INFO:  GPORCA failed to produce a plan, falling back to planner
 insert into HSlot values ('HS', 'base.hub1', 1, '');
-ERROR:  function cannot execute on segment because it accesses relation "public.hub"  (seg2 127.0.0.1:40002 pid=1762)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.hub"  (seg2 127.0.0.1:25434 pid=72001)
 DETAIL:  
 SQL statement "select * from Hub where name =  $1 "
 PL/pgSQL function "tg_hslot_biu" line 6 at SQL statement
 insert into HSlot values ('HS', 'base.hub1', 20, '');
-ERROR:  function cannot execute on segment because it accesses relation "public.hub"  (seg2 127.0.0.1:40002 pid=1762)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.hub"  (seg2 127.0.0.1:25434 pid=72001)
 DETAIL:  
 SQL statement "select * from Hub where name =  $1 "
 PL/pgSQL function "tg_hslot_biu" line 6 at SQL statement
 delete from HSlot;
+INFO:  GPORCA failed to produce a plan, falling back to planner
 insert into IFace values ('IF', 'notthere', 'eth0', '');
-ERROR:  function cannot execute on segment because it accesses relation "public.system"  (seg2 127.0.0.1:40002 pid=1762)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.system"  (seg2 127.0.0.1:25434 pid=72001)
 DETAIL:  
 SQL statement "select * from system where name =  $1 "
 PL/pgSQL function "tg_iface_biu" line 5 at SQL statement
 insert into IFace values ('IF', 'orion', 'ethernet_interface_name_too_long', '');
-ERROR:  function cannot execute on segment because it accesses relation "public.system"  (seg2 127.0.0.1:40002 pid=1762)
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ERROR:  function cannot execute on segment because it accesses relation "public.system"  (seg2 127.0.0.1:25434 pid=72001)
 DETAIL:  
 SQL statement "select * from system where name =  $1 "
 PL/pgSQL function "tg_iface_biu" line 5 at SQL statement
@@ -1938,6 +2095,35 @@ BEGIN
     RETURN rslt;
 END;' LANGUAGE plpgsql;
 SELECT recursion_test(4,3);
+INFO:  GPORCA failed to produce a plan, falling back to planner
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1  <= 0"
+PL/pgSQL function "recursion_test" line 3 at IF
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT  CAST( $1  AS TEXT) || ',' || recursion_test( $1  - 1,  $2 )"
+PL/pgSQL function "recursion_test" line 6 at assignment
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT  CAST( $1  AS TEXT)"
+PL/pgSQL function "recursion_test" line 4 at assignment
+SQL statement "SELECT  CAST( $1  AS TEXT) || ',' || recursion_test( $1  - 1,  $2 )"
+PL/pgSQL function "recursion_test" line 6 at assignment
+SQL statement "SELECT  CAST( $1  AS TEXT) || ',' || recursion_test( $1  - 1,  $2 )"
+PL/pgSQL function "recursion_test" line 6 at assignment
+SQL statement "SELECT  CAST( $1  AS TEXT) || ',' || recursion_test( $1  - 1,  $2 )"
+PL/pgSQL function "recursion_test" line 6 at assignment
+SQL statement "SELECT  CAST( $1  AS TEXT) || ',' || recursion_test( $1  - 1,  $2 )"
+PL/pgSQL function "recursion_test" line 6 at assignment
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1 "
+PL/pgSQL function "recursion_test" line 8 at RETURN
+SQL statement "SELECT  CAST( $1  AS TEXT) || ',' || recursion_test( $1  - 1,  $2 )"
+PL/pgSQL function "recursion_test" line 6 at assignment
+SQL statement "SELECT  CAST( $1  AS TEXT) || ',' || recursion_test( $1  - 1,  $2 )"
+PL/pgSQL function "recursion_test" line 6 at assignment
+SQL statement "SELECT  CAST( $1  AS TEXT) || ',' || recursion_test( $1  - 1,  $2 )"
+PL/pgSQL function "recursion_test" line 6 at assignment
+SQL statement "SELECT  CAST( $1  AS TEXT) || ',' || recursion_test( $1  - 1,  $2 )"
+PL/pgSQL function "recursion_test" line 6 at assignment
  recursion_test 
 ----------------
  4,3,2,1,3
@@ -1983,6 +2169,22 @@ create function test_found()
   return true;
   end;' language plpgsql;
 select test_found();
+INFO:  GPORCA failed to produce a plan, falling back to planner
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1 "
+PL/pgSQL function "test_found" line 4 at IF
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1 "
+PL/pgSQL function "test_found" line 9 at IF
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT  not  $1 "
+PL/pgSQL function "test_found" line 14 at IF
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1 "
+PL/pgSQL function "test_found" line 21 at IF
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT  not  $1 "
+PL/pgSQL function "test_found" line 29 at IF
  test_found 
 ------------
  t
@@ -2052,6 +2254,15 @@ BEGIN
 	RETURN;
 END;' language plpgsql;
 select * from test_ret_set_scalar(1,10);
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1 "
+PL/pgSQL function "test_ret_set_scalar" line 4 at FOR with integer loop variable
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1 "
+PL/pgSQL function "test_ret_set_scalar" line 4 at FOR with integer loop variable
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1  + 1"
+PL/pgSQL function "test_ret_set_scalar" line 5 at RETURN NEXT
  test_ret_set_scalar 
 ---------------------
                    2
@@ -2082,6 +2293,9 @@ BEGIN
 	RETURN;
 END;' language plpgsql;
 SELECT * FROM test_ret_set_rec_dyn(1500) AS (a int, b int, c int);
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1  > 10"
+PL/pgSQL function "test_ret_set_rec_dyn" line 4 at IF
  a | b  | c  
 ---+----+----
  5 | 10 | 15
@@ -2108,12 +2322,17 @@ BEGIN
 	END IF;
 END;' language plpgsql;
 SELECT * FROM test_ret_rec_dyn(1500) AS (a int, b int, c int);
+INFO:  GPORCA failed to produce a plan, falling back to planner
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1  > 10"
+PL/pgSQL function "test_ret_rec_dyn" line 4 at IF
  a | b  | c  
 ---+----+----
  5 | 10 | 15
 (1 row)
 
 SELECT * FROM test_ret_rec_dyn(5) AS (a int, b numeric, c text);
+INFO:  GPORCA failed to produce a plan, falling back to planner
  a  | b |  c  
 ----+---+-----
  50 | 5 | xxx
@@ -2137,12 +2356,17 @@ begin
   return;
 end$$ language plpgsql;
 select f1(42);
+INFO:  GPORCA failed to produce a plan, falling back to planner
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1 +1"
+PL/pgSQL function "f1" line 2 at assignment
  f1 
 ----
  43
 (1 row)
 
 select * from f1(42);
+INFO:  GPORCA failed to produce a plan, falling back to planner
  j  
 ----
  43
@@ -2153,12 +2377,17 @@ begin
   i := i+1;
 end$$ language plpgsql;
 select f1(42);
+INFO:  GPORCA failed to produce a plan, falling back to planner
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1 +1"
+PL/pgSQL function "f1" line 2 at assignment
  f1 
 ----
  43
 (1 row)
 
 select * from f1(42);
+INFO:  GPORCA failed to produce a plan, falling back to planner
  i  
 ----
  43
@@ -2174,6 +2403,12 @@ begin
   return;
 end$$ language plpgsql;
 select * from f1(42);
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1 +1"
+PL/pgSQL function "f1" line 2 at assignment
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1 +2"
+PL/pgSQL function "f1" line 4 at assignment
  j  
 ----
  43
@@ -2188,12 +2423,20 @@ begin
   k := 'foo';
 end$$ language plpgsql;
 select f1(42);
+INFO:  GPORCA failed to produce a plan, falling back to planner
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1 "
+PL/pgSQL function "f1" line 2 at assignment
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1 +1"
+PL/pgSQL function "f1" line 3 at assignment
     f1    
 ----------
  (43,foo)
 (1 row)
 
 select * from f1(42);
+INFO:  GPORCA failed to produce a plan, falling back to planner
  j  |  k  
 ----+-----
  43 | foo
@@ -2210,6 +2453,12 @@ begin
   return next;
 end$$ language plpgsql;
 select * from f1(42);
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1 +1"
+PL/pgSQL function "f1" line 2 at assignment
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1 +1"
+PL/pgSQL function "f1" line 5 at assignment
  j  |  k   
 ----+------
  43 | foo
@@ -2224,12 +2473,26 @@ begin
   return;
 end$$ language plpgsql;
 select * from duplic(42);
+INFO:  GPORCA failed to produce a plan, falling back to planner
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1 "
+PL/pgSQL function "duplic" line 2 at assignment
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT  array[ $1 , $1 ]"
+PL/pgSQL function "duplic" line 3 at assignment
  j  |    k    
 ----+---------
  42 | {42,42}
 (1 row)
 
 select * from duplic('foo'::text);
+INFO:  GPORCA failed to produce a plan, falling back to planner
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1 "
+PL/pgSQL function "duplic" line 2 at assignment
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT  array[ $1 , $1 ]"
+PL/pgSQL function "duplic" line 3 at assignment
   j  |     k     
 -----+-----------
  foo | {foo,foo}
@@ -2273,6 +2536,32 @@ BEGIN
 	RETURN;
 END;' language plpgsql;
 SELECT perform_test_func();
+INFO:  GPORCA failed to produce a plan, falling back to planner
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1 "
+PL/pgSQL function "perform_test_func" line 2 at IF
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT  simple_func(5)"
+PL/pgSQL function "perform_test_func" line 6 at PERFORM
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1  < 20"
+PL/pgSQL function "simple_func" line 2 at IF
+SQL statement "SELECT  simple_func(5)"
+PL/pgSQL function "perform_test_func" line 6 at PERFORM
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "INSERT INTO perform_test VALUES ( $1 ,  $1  + 10)"
+PL/pgSQL function "simple_func" line 3 at SQL statement
+SQL statement "SELECT  simple_func(5)"
+PL/pgSQL function "perform_test_func" line 6 at PERFORM
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1 "
+PL/pgSQL function "perform_test_func" line 8 at IF
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT  simple_func(50)"
+PL/pgSQL function "perform_test_func" line 12 at PERFORM
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1 "
+PL/pgSQL function "perform_test_func" line 14 at IF
  perform_test_func 
 -------------------
  
@@ -2314,15 +2603,35 @@ begin
 	return x;
 end$$ language plpgsql;
 select trap_zero_divide(50);
+INFO:  GPORCA failed to produce a plan, falling back to planner
 NOTICE:  should see this
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT  100 /  $1 "
+PL/pgSQL function "trap_zero_divide" line 6 at assignment
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1 "
+PL/pgSQL function "trap_zero_divide" line 7 at RAISE
 NOTICE:  should see this only if 50 <> 0
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1 "
+PL/pgSQL function "trap_zero_divide" line 8 at assignment
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1 "
+PL/pgSQL function "trap_zero_divide" line 9 at RAISE
 NOTICE:  should see this only if 50 fits in smallint
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1  < 0"
+PL/pgSQL function "trap_zero_divide" line 10 at IF
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1 "
+PL/pgSQL function "trap_zero_divide" line 21 at RETURN
  trap_zero_divide 
 ------------------
                 2
 (1 row)
 
 select trap_zero_divide(0);
+INFO:  GPORCA failed to produce a plan, falling back to planner
 NOTICE:  should see this
 NOTICE:  caught division_by_zero
  trap_zero_divide 
@@ -2331,6 +2640,7 @@ NOTICE:  caught division_by_zero
 (1 row)
 
 select trap_zero_divide(100000);
+INFO:  GPORCA failed to produce a plan, falling back to planner
 NOTICE:  should see this
 NOTICE:  should see this only if 100000 <> 0
 NOTICE:  caught numeric_value_out_of_range
@@ -2340,9 +2650,13 @@ NOTICE:  caught numeric_value_out_of_range
 (1 row)
 
 select trap_zero_divide(-100);
+INFO:  GPORCA failed to produce a plan, falling back to planner
 NOTICE:  should see this
 NOTICE:  should see this only if -100 <> 0
 NOTICE:  should see this only if -100 fits in smallint
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1 "
+PL/pgSQL function "trap_zero_divide" line 11 at RAISE
 ERROR:  -100 is less than zero
 create function trap_matching_test(int) returns int as $$
 declare x int;
@@ -2365,12 +2679,26 @@ begin
 	return x;
 end$$ language plpgsql;
 select trap_matching_test(50);
+INFO:  GPORCA failed to produce a plan, falling back to planner
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT  100 /  $1 "
+PL/pgSQL function "trap_matching_test" line 6 at assignment
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1 "
+PL/pgSQL function "trap_matching_test" line 7 at assignment
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "select unique1 from tenk1 where unique2 = (select unique2 from tenk1 b where ten =  $1 )"
+PL/pgSQL function "trap_matching_test" line 8 at SQL statement
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1 "
+PL/pgSQL function "trap_matching_test" line 18 at RETURN
  trap_matching_test 
 --------------------
                   2
 (1 row)
 
 select trap_matching_test(0);
+INFO:  GPORCA failed to produce a plan, falling back to planner
 NOTICE:  caught data_exception
  trap_matching_test 
 --------------------
@@ -2378,6 +2706,7 @@ NOTICE:  caught data_exception
 (1 row)
 
 select trap_matching_test(100000);
+INFO:  GPORCA failed to produce a plan, falling back to planner
 NOTICE:  caught data_exception
  trap_matching_test 
 --------------------
@@ -2385,6 +2714,7 @@ NOTICE:  caught data_exception
 (1 row)
 
 select trap_matching_test(1);
+INFO:  GPORCA failed to produce a plan, falling back to planner
 NOTICE:  caught numeric_value_out_of_range or cardinality_violation
  trap_matching_test 
 --------------------
@@ -2415,7 +2745,26 @@ begin
 end$$ language plpgsql;
 set statement_timeout to 2000;
 select blockme();
+INFO:  GPORCA failed to produce a plan, falling back to planner
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "insert into foo values( $1 )"
+PL/pgSQL function "blockme" line 4 at SQL statement
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1  + 1"
+PL/pgSQL function "blockme" line 6 at assignment
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "insert into foo values( $1 )"
+PL/pgSQL function "blockme" line 7 at SQL statement
 NOTICE:  nyeah nyeah, can't stop me
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1  * 10"
+PL/pgSQL function "blockme" line 16 at assignment
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "insert into foo values( $1 )"
+PL/pgSQL function "blockme" line 18 at SQL statement
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1 "
+PL/pgSQL function "blockme" line 19 at RETURN
  blockme 
 ---------
       20
@@ -2446,15 +2795,52 @@ begin
   return x;
 end$$ language plpgsql;
 select test_variable_storage();
+INFO:  GPORCA failed to produce a plan, falling back to planner
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1  || '5678'"
+PL/pgSQL function "test_variable_storage" line 5 at assignment
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT  trap_zero_divide(-100)"
+PL/pgSQL function "test_variable_storage" line 7 at PERFORM
 NOTICE:  should see this
 CONTEXT:  SQL statement "SELECT  trap_zero_divide(-100)"
+PL/pgSQL function "test_variable_storage" line 7 at PERFORM
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  PL/pgSQL function "trap_zero_divide" line 6 at assignment
+SQL statement "SELECT  trap_zero_divide(-100)"
+PL/pgSQL function "test_variable_storage" line 7 at PERFORM
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  PL/pgSQL function "trap_zero_divide" line 7 at RAISE
+SQL statement "SELECT  trap_zero_divide(-100)"
 PL/pgSQL function "test_variable_storage" line 7 at PERFORM
 NOTICE:  should see this only if -100 <> 0
 CONTEXT:  SQL statement "SELECT  trap_zero_divide(-100)"
 PL/pgSQL function "test_variable_storage" line 7 at PERFORM
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  PL/pgSQL function "trap_zero_divide" line 8 at assignment
+SQL statement "SELECT  trap_zero_divide(-100)"
+PL/pgSQL function "test_variable_storage" line 7 at PERFORM
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  PL/pgSQL function "trap_zero_divide" line 9 at RAISE
+SQL statement "SELECT  trap_zero_divide(-100)"
+PL/pgSQL function "test_variable_storage" line 7 at PERFORM
 NOTICE:  should see this only if -100 fits in smallint
 CONTEXT:  SQL statement "SELECT  trap_zero_divide(-100)"
 PL/pgSQL function "test_variable_storage" line 7 at PERFORM
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  PL/pgSQL function "trap_zero_divide" line 10 at IF
+SQL statement "SELECT  trap_zero_divide(-100)"
+PL/pgSQL function "test_variable_storage" line 7 at PERFORM
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  PL/pgSQL function "trap_zero_divide" line 11 at RAISE
+SQL statement "SELECT  trap_zero_divide(-100)"
+PL/pgSQL function "test_variable_storage" line 7 at PERFORM
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1  || '9012'"
+PL/pgSQL function "test_variable_storage" line 10 at assignment
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1 "
+PL/pgSQL function "test_variable_storage" line 12 at RETURN
  test_variable_storage 
 -----------------------
  123456789012
@@ -2466,10 +2852,14 @@ PL/pgSQL function "test_variable_storage" line 7 at PERFORM
 create temp table master(f1 int primary key);
 NOTICE:  CREATE TABLE / PRIMARY KEY will create implicit index "master_pkey" for table "master"
 create temp table slave(f1 int references master deferrable);
+NOTICE:  Table doesn't have 'DISTRIBUTED BY' clause -- Using column named 'f1' as the Greenplum Database data distribution key for this table.
+HINT:  The 'DISTRIBUTED BY' clause determines the distribution of data. Make sure column(s) chosen are the optimal data distribution key to minimize skew.
 WARNING:  Referential integrity (FOREIGN KEY) constraints are not supported in Greenplum Database, will not be enforced.
 insert into master values(1);
 insert into slave values(1);
+INFO:  GPORCA failed to produce a plan, falling back to planner
 insert into slave values(2);	-- fails
+INFO:  GPORCA failed to produce a plan, falling back to planner
 create function trap_foreign_key(int) returns int as $$
 begin
 	begin	-- start a subtransaction
@@ -2493,12 +2883,17 @@ begin
 	return 1;
 end$$ language plpgsql;
 select trap_foreign_key(1);
+INFO:  GPORCA failed to produce a plan, falling back to planner
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "insert into slave values( $1 )"
+PL/pgSQL function "trap_foreign_key" line 3 at SQL statement
  trap_foreign_key 
 ------------------
                 1
 (1 row)
 
 select trap_foreign_key(2);	-- detects FK violation
+INFO:  GPORCA failed to produce a plan, falling back to planner
  trap_foreign_key 
 ------------------
                 1
@@ -2507,6 +2902,7 @@ select trap_foreign_key(2);	-- detects FK violation
 begin;
   set constraints all deferred;
   select trap_foreign_key(2);	-- should not detect FK violation
+INFO:  GPORCA failed to produce a plan, falling back to planner
  trap_foreign_key 
 ------------------
                 1
@@ -2516,6 +2912,7 @@ begin;
     set constraints all immediate; -- fails
   rollback to x;
   select trap_foreign_key_2();  -- detects FK violation
+INFO:  GPORCA failed to produce a plan, falling back to planner
  trap_foreign_key_2 
 --------------------
                   1
@@ -2538,6 +2935,15 @@ begin
 end$$ language plpgsql stable;
 insert into users values('user1');
 select sp_id_user('user1');
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "select id from users where login =  $1 "
+PL/pgSQL function "sp_id_user" line 3 at SQL statement
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1 "
+PL/pgSQL function "sp_id_user" line 4 at IF
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1 "
+PL/pgSQL function "sp_id_user" line 4 at RETURN
  sp_id_user 
 ------------
           1
@@ -2564,30 +2970,53 @@ begin
   RETURN my_id_user;
 end$$ language plpgsql;
 select sp_add_user('user1');
+INFO:  GPORCA failed to produce a plan, falling back to planner
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT  sp_id_user(  $1  )"
+PL/pgSQL function "sp_add_user" line 3 at assignment
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1  > 0"
+PL/pgSQL function "sp_add_user" line 4 at IF
  sp_add_user 
 -------------
           -1
 (1 row)
 
 select sp_add_user('user2');
+INFO:  GPORCA failed to produce a plan, falling back to planner
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "INSERT INTO users ( login ) VALUES (  $1  )"
+PL/pgSQL function "sp_add_user" line 7 at SQL statement
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT  sp_id_user(  $1  )"
+PL/pgSQL function "sp_add_user" line 8 at assignment
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1  = 0"
+PL/pgSQL function "sp_add_user" line 9 at IF
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1 "
+PL/pgSQL function "sp_add_user" line 12 at RETURN
  sp_add_user 
 -------------
            2
 (1 row)
 
 select sp_add_user('user2');
+INFO:  GPORCA failed to produce a plan, falling back to planner
  sp_add_user 
 -------------
           -1
 (1 row)
 
 select sp_add_user('user3');
+INFO:  GPORCA failed to produce a plan, falling back to planner
  sp_add_user 
 -------------
            3
 (1 row)
 
 select sp_add_user('user3');
+INFO:  GPORCA failed to produce a plan, falling back to planner
  sp_add_user 
 -------------
           -1
@@ -2614,6 +3043,18 @@ end
 $$ language plpgsql;
 begin;
 select refcursor_test1('test1');
+INFO:  GPORCA failed to produce a plan, falling back to planner
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT  return_refcursor( $1 )"
+PL/pgSQL function "refcursor_test1" line 2 at PERFORM
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1 "
+PL/pgSQL function "return_refcursor" line 3 at RETURN
+SQL statement "SELECT  return_refcursor( $1 )"
+PL/pgSQL function "refcursor_test1" line 2 at PERFORM
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1 "
+PL/pgSQL function "refcursor_test1" line 3 at RETURN
  refcursor_test1 
 -----------------
  test1
@@ -2626,6 +3067,7 @@ fetch next in test1;
 (1 row)
 
 select refcursor_test1('test2');
+INFO:  GPORCA failed to produce a plan, falling back to planner
  refcursor_test1 
 -----------------
  test2
@@ -2660,6 +3102,16 @@ end
 $$ language plpgsql;
 select refcursor_test2(20000, 20000) as "Should be false",
        refcursor_test2(20, 20) as "Should be true";
+INFO:  GPORCA failed to produce a plan, falling back to planner
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1 ,  $2 "
+PL/pgSQL function "refcursor_test2" line 5 at OPEN
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement " select * from rc_test where a >  $1  and b >  $2 "
+PL/pgSQL function "refcursor_test2" line 5 at OPEN
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1 "
+PL/pgSQL function "refcursor_test2" line 8 at IF
  Should be false | Should be true 
 -----------------+----------------
  f               | t
@@ -2675,6 +3127,7 @@ begin
 end;
 $$ language plpgsql;
 select raise_test1(5);
+INFO:  GPORCA failed to produce a plan, falling back to planner
 ERROR:  too many parameters specified for RAISE
 CONTEXT:  PL/pgSQL function "raise_test1" line 2 at RAISE
 create function raise_test2(int) returns int as $$
@@ -2684,6 +3137,13 @@ begin
 end;
 $$ language plpgsql;
 select raise_test2(10);
+INFO:  GPORCA failed to produce a plan, falling back to planner
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1 "
+PL/pgSQL function "raise_test2" line 2 at RAISE
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1 "
+PL/pgSQL function "raise_test2" line 2 at RAISE
 ERROR:  too few parameters specified for RAISE
 CONTEXT:  PL/pgSQL function "raise_test2" line 2 at RAISE
 --
@@ -2740,6 +3200,7 @@ begin
     perform 2+2;
 end;$$ language plpgsql;
 select void_return_expr();
+INFO:  GPORCA failed to produce a plan, falling back to planner
  void_return_expr 
 ------------------
  
@@ -2751,6 +3212,7 @@ begin
     perform 2+2;
 end;$$ language plpgsql;
 select missing_return_expr();
+INFO:  GPORCA failed to produce a plan, falling back to planner
 ERROR:  control reached end of function without RETURN
 CONTEXT:  PL/pgSQL function "missing_return_expr"
 drop function void_return_expr();
@@ -2780,8 +3242,42 @@ begin
     return _v;
 end; $$ language plpgsql;
 select execute_into_test('eifoo');
+INFO:  GPORCA failed to produce a plan, falling back to planner
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT  'insert into '|| $1 ||' values(10,15)'"
+PL/pgSQL function "execute_into_test" line 9 at EXECUTE statement
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "select (row).* from (select row(10,1)::eifoo) s"
+PL/pgSQL function "execute_into_test" line 10 at EXECUTE statement
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1 "
+PL/pgSQL function "execute_into_test" line 11 at RAISE
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1 "
+PL/pgSQL function "execute_into_test" line 11 at RAISE
 NOTICE:  10 1
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT  'select * from '|| $1 ||' limit 1'"
+PL/pgSQL function "execute_into_test" line 12 at EXECUTE statement
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1 "
+PL/pgSQL function "execute_into_test" line 13 at RAISE
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1 "
+PL/pgSQL function "execute_into_test" line 13 at RAISE
 NOTICE:  10 15
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT  'select *, 20 from '|| $1 ||' limit 1'"
+PL/pgSQL function "execute_into_test" line 14 at EXECUTE statement
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1 "
+PL/pgSQL function "execute_into_test" line 15 at RAISE
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1 "
+PL/pgSQL function "execute_into_test" line 15 at RAISE
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1 "
+PL/pgSQL function "execute_into_test" line 15 at RAISE
 NOTICE:  10 15 20
  execute_into_test 
 -------------------
@@ -2800,6 +3296,7 @@ end; $$ language plpgsql;
 -- should fail: SQLSTATE and SQLERRM are only in defined EXCEPTION
 -- blocks
 select excpt_test1();
+INFO:  GPORCA failed to produce a plan, falling back to planner
 ERROR:  column "sqlstate" does not exist
 LINE 1: SELECT  sqlstate
                 ^
@@ -2815,6 +3312,7 @@ begin
 end; $$ language plpgsql;
 -- should fail
 select excpt_test2();
+INFO:  GPORCA failed to produce a plan, falling back to planner
 ERROR:  column "sqlstate" does not exist
 LINE 1: SELECT  sqlstate
                 ^
@@ -2840,9 +3338,34 @@ begin
     end;
 end; $$ language plpgsql;
 select excpt_test3();
+INFO:  GPORCA failed to produce a plan, falling back to planner
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1 "
+PL/pgSQL function "excpt_test3" line 5 at RAISE
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1 "
+PL/pgSQL function "excpt_test3" line 5 at RAISE
 NOTICE:  caught exception P0001 user exception
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1 "
+PL/pgSQL function "excpt_test3" line 7 at RAISE
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1 "
+PL/pgSQL function "excpt_test3" line 7 at RAISE
 NOTICE:  P0001 user exception
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1 "
+PL/pgSQL function "excpt_test3" line 14 at RAISE
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1 "
+PL/pgSQL function "excpt_test3" line 14 at RAISE
 NOTICE:  caught exception 22012 division by zero
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1 "
+PL/pgSQL function "excpt_test3" line 16 at RAISE
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1 "
+PL/pgSQL function "excpt_test3" line 16 at RAISE
 NOTICE:  P0001 user exception
  excpt_test3 
 -------------
@@ -2863,6 +3386,22 @@ begin
     raise notice '%; %; %; %; %; %', a, a[i], c, (select c || 'abc'), row(10,'aaa',NULL,30), NULL;
 end;$$ language plpgsql;
 select raise_exprs();
+INFO:  GPORCA failed to produce a plan, falling back to planner
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1 "
+PL/pgSQL function "raise_exprs" line 7 at RAISE
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1 [ $2 ]"
+PL/pgSQL function "raise_exprs" line 7 at RAISE
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1 "
+PL/pgSQL function "raise_exprs" line 7 at RAISE
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT  (select  $1  || 'abc')"
+PL/pgSQL function "raise_exprs" line 7 at RAISE
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT  row(10,'aaa',NULL,30)"
+PL/pgSQL function "raise_exprs" line 7 at RAISE
 NOTICE:  {10,20,30}; 20; xyz; xyzabc; (10,aaa,,30); <NULL>
  raise_exprs 
 -------------
@@ -2955,8 +3494,18 @@ begin
   end loop;
 end; $$ language plpgsql;
 select continue_test1();
+INFO:  GPORCA failed to produce a plan, falling back to planner
 NOTICE:  ---1---
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1  + 1"
+PL/pgSQL function "continue_test1" line 5 at assignment
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1 "
+PL/pgSQL function "continue_test1" line 6 at RAISE
 NOTICE:  1
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1  < 10"
+PL/pgSQL function "continue_test1" line 7 at EXIT
 NOTICE:  2
 NOTICE:  3
 NOTICE:  4
@@ -2967,7 +3516,16 @@ NOTICE:  8
 NOTICE:  9
 NOTICE:  10
 NOTICE:  ---2---
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1  - 1"
+PL/pgSQL function "continue_test1" line 14 at assignment
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1 "
+PL/pgSQL function "continue_test1" line 16 at RAISE
 NOTICE:  9
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1  > 0"
+PL/pgSQL function "continue_test1" line 17 at EXIT
 NOTICE:  8
 NOTICE:  7
 NOTICE:  6
@@ -2978,12 +3536,30 @@ NOTICE:  2
 NOTICE:  1
 NOTICE:  0
 NOTICE:  ---3---
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1  < 10"
+PL/pgSQL function "continue_test1" line 24 at WHILE
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1  + 1"
+PL/pgSQL function "continue_test1" line 25 at assignment
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1  % 2 = 0"
+PL/pgSQL function "continue_test1" line 26 at EXIT
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1 "
+PL/pgSQL function "continue_test1" line 27 at RAISE
 NOTICE:  1
 NOTICE:  3
 NOTICE:  5
 NOTICE:  7
 NOTICE:  9
 NOTICE:  ---4---
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1  < 5"
+PL/pgSQL function "continue_test1" line 34 at EXIT
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1 "
+PL/pgSQL function "continue_test1" line 35 at RAISE
 NOTICE:  5
 NOTICE:  6
 NOTICE:  7
@@ -2991,22 +3567,58 @@ NOTICE:  8
 NOTICE:  9
 NOTICE:  10
 NOTICE:  ---5---
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1  <= 20"
+PL/pgSQL function "continue_test1" line 41 at EXIT
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1 "
+PL/pgSQL function "continue_test1" line 42 at RAISE
 NOTICE:  30
 NOTICE:  40
 NOTICE:  ---6---
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1  <= 20"
+PL/pgSQL function "continue_test1" line 47 at EXIT
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1 "
+PL/pgSQL function "continue_test1" line 48 at RAISE
 NOTICE:  30
 NOTICE:  40
 NOTICE:  ---7---
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1 "
+PL/pgSQL function "continue_test1" line 53 at RAISE
 NOTICE:  1
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1  = 3"
+PL/pgSQL function "continue_test1" line 54 at EXIT
 NOTICE:  2
 NOTICE:  3
 NOTICE:  ---8---
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1  <= 3"
+PL/pgSQL function "continue_test1" line 59 at WHILE
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1 "
+PL/pgSQL function "continue_test1" line 60 at RAISE
 NOTICE:  1
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1  + 1"
+PL/pgSQL function "continue_test1" line 61 at assignment
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1  = 3"
+PL/pgSQL function "continue_test1" line 62 at EXIT
 NOTICE:  2
 NOTICE:  3
 NOTICE:  ---9---
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1 "
+PL/pgSQL function "continue_test1" line 67 at RAISE
 NOTICE:  10
 NOTICE:  ---10---
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1 "
+PL/pgSQL function "continue_test1" line 73 at RAISE
 NOTICE:  10
  continue_test1 
 ----------------
@@ -3024,6 +3636,7 @@ end;
 $$ language plpgsql;
 -- should fail
 select continue_test2();
+INFO:  GPORCA failed to produce a plan, falling back to planner
 ERROR:  CONTINUE cannot be used outside a loop
 CONTEXT:  PL/pgSQL function "continue_test2"
 -- CONTINUE can't reference the label of a named block
@@ -3039,6 +3652,7 @@ end;
 $$ language plpgsql;
 -- should fail
 select continue_test3();
+INFO:  GPORCA failed to produce a plan, falling back to planner
 ERROR:  CONTINUE cannot be used outside a loop
 CONTEXT:  PL/pgSQL function "continue_test3"
 drop function continue_test1();
@@ -3060,6 +3674,7 @@ begin
 end blbl;
 $$ language plpgsql;
 select end_label1();
+INFO:  GPORCA failed to produce a plan, falling back to planner
  end_label1 
 ------------
  
@@ -3127,21 +3742,55 @@ begin
 end;
 $proc$ language plpgsql;
 select for_vect();
+INFO:  GPORCA failed to produce a plan, falling back to planner
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1 "
+PL/pgSQL function "for_vect" line 5 at RAISE
 NOTICE:  1
 NOTICE:  2
 NOTICE:  3
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1 "
+PL/pgSQL function "for_vect" line 9 at RAISE
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1 "
+PL/pgSQL function "for_vect" line 9 at RAISE
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1 "
+PL/pgSQL function "for_vect" line 9 at RAISE
 NOTICE:  1 BB CC
 NOTICE:  2 BB CC
 NOTICE:  3 BB CC
 NOTICE:  4 BB CC
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1 "
+PL/pgSQL function "for_vect" line 13 at RAISE
 NOTICE:  1
 NOTICE:  2
 NOTICE:  3
 NOTICE:  4
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1 "
+PL/pgSQL function "for_vect" line 17 at RAISE
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1 "
+PL/pgSQL function "for_vect" line 17 at RAISE
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1 "
+PL/pgSQL function "for_vect" line 17 at RAISE
 NOTICE:  1 BB CC
 NOTICE:  2 BB CC
 NOTICE:  3 BB CC
 NOTICE:  4 BB CC
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1 "
+PL/pgSQL function "for_vect" line 21 at RAISE
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1 "
+PL/pgSQL function "for_vect" line 21 at RAISE
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1 "
+PL/pgSQL function "for_vect" line 21 at RAISE
 NOTICE:  1 bb cc
 NOTICE:  2 bb cc
 NOTICE:  3 bb cc
@@ -3164,6 +3813,13 @@ begin
   return x = y;
 end$$ language plpgsql;
 select multi_datum_use(42);
+INFO:  GPORCA failed to produce a plan, falling back to planner
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "select unique1/ $1 , unique1/ $1  from tenk1 group by unique1/ $1 "
+PL/pgSQL function "multi_datum_use" line 5 at SQL statement
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1  =  $2 "
+PL/pgSQL function "multi_datum_use" line 6 at RETURN
  multi_datum_use 
 -----------------
  t
@@ -3184,6 +3840,7 @@ begin
   raise notice 'x.f1 = %, x.f2 = %', x.f1, x.f2;
 end$$ language plpgsql;
 select footest();
+INFO:  GPORCA failed to produce a plan, falling back to planner
 ERROR:  The RETURNING clause of the INSERT statement is not supported in this version of Greenplum Database.
 CONTEXT:  SQL statement "insert into foo values(5,6) returning *"
 PL/pgSQL function "footest" line 4 at SQL statement
@@ -3195,6 +3852,7 @@ begin
   raise notice 'x.f1 = %, x.f2 = %', x.f1, x.f2;
 end$$ language plpgsql;
 select footest();
+INFO:  GPORCA failed to produce a plan, falling back to planner
 ERROR:  The RETURNING clause of the INSERT statement is not supported in this version of Greenplum Database.
 CONTEXT:  SQL statement "insert into foo values(7,8),(9,10) returning *"
 PL/pgSQL function "footest" line 4 at SQL statement
@@ -3206,6 +3864,7 @@ begin
   raise notice 'x.f1 = %, x.f2 = %', x.f1, x.f2;
 end$$ language plpgsql;
 select footest();
+INFO:  GPORCA failed to produce a plan, falling back to planner
 ERROR:  The RETURNING clause of the INSERT statement is not supported in this version of Greenplum Database.
 CONTEXT:  SQL statement "insert into foo values(5,6) returning *"
 PL/pgSQL function "footest" line 4 at EXECUTE statement
@@ -3217,6 +3876,7 @@ begin
   raise notice 'x.f1 = %, x.f2 = %', x.f1, x.f2;
 end$$ language plpgsql;
 select footest();
+INFO:  GPORCA failed to produce a plan, falling back to planner
 ERROR:  The RETURNING clause of the INSERT statement is not supported in this version of Greenplum Database.
 CONTEXT:  SQL statement "insert into foo values(7,8),(9,10) returning *"
 PL/pgSQL function "footest" line 4 at EXECUTE statement
@@ -3235,6 +3895,13 @@ begin
   raise notice 'x.f1 = %, x.f2 = %', x.f1, x.f2;
 end$$ language plpgsql;
 select footest();
+INFO:  GPORCA failed to produce a plan, falling back to planner
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1 "
+PL/pgSQL function "footest" line 5 at RAISE
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1 "
+PL/pgSQL function "footest" line 5 at RAISE
 NOTICE:  x.f1 = 3, x.f2 = 4
  footest 
 ---------
@@ -3249,6 +3916,7 @@ begin
   raise notice 'x.f1 = %, x.f2 = %', x.f1, x.f2;
 end$$ language plpgsql;
 select footest();
+INFO:  GPORCA failed to produce a plan, falling back to planner
 ERROR:  query returned no rows
 CONTEXT:  PL/pgSQL function "footest" line 4 at SQL statement
 create or replace function footest() returns void as $$
@@ -3259,6 +3927,7 @@ begin
   raise notice 'x.f1 = %, x.f2 = %', x.f1, x.f2;
 end$$ language plpgsql;
 select footest();
+INFO:  GPORCA failed to produce a plan, falling back to planner
 ERROR:  query returned no rows
 CONTEXT:  PL/pgSQL function "footest" line 4 at SQL statement
 create or replace function footest() returns void as $$
@@ -3269,6 +3938,13 @@ begin
   raise notice 'x.f1 = %, x.f2 = %', x.f1, x.f2;
 end$$ language plpgsql;
 select footest();
+INFO:  GPORCA failed to produce a plan, falling back to planner
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1 "
+PL/pgSQL function "footest" line 5 at RAISE
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1 "
+PL/pgSQL function "footest" line 5 at RAISE
 NOTICE:  x.f1 = 3, x.f2 = 4
  footest 
 ---------
@@ -3283,6 +3959,7 @@ begin
   raise notice 'x.f1 = %, x.f2 = %', x.f1, x.f2;
 end$$ language plpgsql;
 select footest();
+INFO:  GPORCA failed to produce a plan, falling back to planner
 ERROR:  query returned no rows
 CONTEXT:  PL/pgSQL function "footest" line 4 at EXECUTE statement
 create or replace function footest() returns void as $$
@@ -3293,6 +3970,7 @@ begin
   raise notice 'x.f1 = %, x.f2 = %', x.f1, x.f2;
 end$$ language plpgsql;
 select footest();
+INFO:  GPORCA failed to produce a plan, falling back to planner
 ERROR:  query returned no rows
 CONTEXT:  PL/pgSQL function "footest" line 4 at EXECUTE statement
 drop function footest();
@@ -3385,6 +4063,15 @@ begin
 end;
 $$ language plpgsql;
 select * from sc_test();
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT  not  $1 "
+PL/pgSQL function "sc_test" line 8 at IF
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1 "
+PL/pgSQL function "sc_test" line 12 at IF
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1 "
+PL/pgSQL function "sc_test" line 13 at RETURN NEXT
  sc_test 
 ---------
        3
@@ -3411,9 +4098,22 @@ begin
 end;
 $$ language plpgsql;
 select pl_qual_names(42);
+INFO:  GPORCA failed to produce a plan, falling back to planner
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1 "
+PL/pgSQL function "pl_qual_names" line 9 at RAISE
 NOTICE:  param1 = 2
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1 "
+PL/pgSQL function "pl_qual_names" line 10 at RAISE
 NOTICE:  pl_qual_names.param1 = 42
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1 "
+PL/pgSQL function "pl_qual_names" line 11 at RAISE
 NOTICE:  outerblock.param1 = 1
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1 "
+PL/pgSQL function "pl_qual_names" line 12 at RAISE
 NOTICE:  innerblock.param1 = 2
  pl_qual_names 
 ---------------
@@ -3457,6 +4157,9 @@ begin
 end;
 $$ language plpgsql;
 select * from ret_query2(8);
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement " select md5(s.x::text), s.x, s.x > 0 from generate_series(-8,  $1 ) s (x) where s.x % 2 = 0"
+PL/pgSQL function "ret_query2" line 2 at RETURN QUERY
                 x                 | y  | z 
 ----------------------------------+----+---
  a8d2ec85eaf98407310b72eb73dda247 | -8 | f
@@ -3482,12 +4185,28 @@ begin
 end
 $$ language plpgsql;
 select exc_using(5, 'foobar');
+INFO:  GPORCA failed to produce a plan, falling back to planner
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1 +1"
+PL/pgSQL function "exc_using" line 3 at FOR over EXECUTE statement
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1 "
+PL/pgSQL function "exc_using" line 4 at RAISE
 NOTICE:  1
 NOTICE:  2
 NOTICE:  3
 NOTICE:  4
 NOTICE:  5
 NOTICE:  6
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1 "
+PL/pgSQL function "exc_using" line 6 at EXECUTE statement
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT  $1 "
+PL/pgSQL function "exc_using" line 6 at EXECUTE statement
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1 "
+PL/pgSQL function "exc_using" line 7 at RETURN
  exc_using 
 -----------
         26
@@ -3530,22 +4249,62 @@ begin
 end;
 $$ language plpgsql;
 select forc01();
+INFO:  GPORCA failed to produce a plan, falling back to planner
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement " select * from generate_series( $1 , $2 ) i"
+PL/pgSQL function "forc01" line 7 at FOR over cursor
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1 "
+PL/pgSQL function "forc01" line 8 at RAISE
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1 "
+PL/pgSQL function "forc01" line 8 at RAISE
 NOTICE:  5 from c
 NOTICE:  6 from c
 NOTICE:  7 from c
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1 "
+PL/pgSQL function "forc01" line 12 at RAISE
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1 "
+PL/pgSQL function "forc01" line 12 at RAISE
 NOTICE:  9 from c
 NOTICE:  10 from c
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1 "
+PL/pgSQL function "forc01" line 16 at RAISE
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1 "
+PL/pgSQL function "forc01" line 16 at RAISE
 NOTICE:  41 from c2
 NOTICE:  42 from c2
 NOTICE:  43 from c2
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1 "
+PL/pgSQL function "forc01" line 19 at RAISE
 NOTICE:  after loop, c2 = c2
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1 "
+PL/pgSQL function "forc01" line 22 at RAISE
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1 "
+PL/pgSQL function "forc01" line 22 at RAISE
 NOTICE:  41 from special_name
 NOTICE:  42 from special_name
 NOTICE:  43 from special_name
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1 "
+PL/pgSQL function "forc01" line 24 at RAISE
 NOTICE:  after loop, c2 = special_name
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1 "
+PL/pgSQL function "forc01" line 29 at RAISE
 NOTICE:  41
 NOTICE:  42
 NOTICE:  43
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1 "
+PL/pgSQL function "forc01" line 31 at RAISE
 NOTICE:  after loop, c2 = <NULL>
  forc01 
 --------
@@ -3566,7 +4325,17 @@ begin
 end;
 $$ language plpgsql;
 select forc01();
+INFO:  GPORCA failed to produce a plan, falling back to planner
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1 "
+PL/pgSQL function "forc01" line 5 at RAISE
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1 "
+PL/pgSQL function "forc01" line 5 at RAISE
 NOTICE:  1, 1
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "update forc_test set i = i * 100, j =  $1  * 2 where current of  $2 "
+PL/pgSQL function "forc01" line 6 at SQL statement
 ERROR:  cursor "c" is not a simply updatable scan of table "forc_test"
 CONTEXT:  SQL statement "update forc_test set i = i * 100, j =  $1  * 2 where current of  $2 "
 PL/pgSQL function "forc01" line 6 at SQL statement
@@ -3615,6 +4384,19 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 SELECT nonsimple_expr_test();
+INFO:  GPORCA failed to produce a plan, falling back to planner
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT  (SELECT  $1 )"
+PL/pgSQL function "nonsimple_expr_test" line 10 at assignment
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT (SELECT  $1 )"
+PL/pgSQL function "nonsimple_expr_test" line 10 at assignment
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT (SELECT  $1 +1)"
+PL/pgSQL function "nonsimple_expr_test" line 10 at assignment
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1 "
+PL/pgSQL function "nonsimple_expr_test" line 11 at RETURN
    nonsimple_expr_test   
 -------------------------
  {{foo,fool},{baz,quux}}
@@ -3635,6 +4417,10 @@ begin
 end;
 $$ LANGUAGE plpgsql;
 SELECT nonsimple_expr_test();
+INFO:  GPORCA failed to produce a plan, falling back to planner
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1 "
+PL/pgSQL function "nonsimple_expr_test" line 10 at RETURN
  nonsimple_expr_test 
 ---------------------
                    1
@@ -3660,6 +4446,221 @@ $$ language plpgsql;
 create function sql_recurse(float8) returns float8 as
 $$ select recurse($1) limit 1; $$ language sql;
 select recurse(10);
+INFO:  GPORCA failed to produce a plan, falling back to planner
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT  ( $1  > 0)"
+PL/pgSQL function "recurse" line 2 at IF
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT  sql_recurse( $1  - 1)"
+PL/pgSQL function "recurse" line 3 at RETURN
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL function "sql_recurse" during startup
+SQL statement "SELECT  sql_recurse( $1  - 1)"
+PL/pgSQL function "recurse" line 3 at RETURN
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL function "sql_recurse" during startup
+SQL statement "SELECT  sql_recurse( $1  - 1)"
+PL/pgSQL function "recurse" line 3 at RETURN
+SQL function "sql_recurse" statement 1
+SQL statement "SELECT  sql_recurse( $1  - 1)"
+PL/pgSQL function "recurse" line 3 at RETURN
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL function "sql_recurse" during startup
+SQL statement "SELECT  sql_recurse( $1  - 1)"
+PL/pgSQL function "recurse" line 3 at RETURN
+SQL function "sql_recurse" statement 1
+SQL statement "SELECT  sql_recurse( $1  - 1)"
+PL/pgSQL function "recurse" line 3 at RETURN
+SQL function "sql_recurse" statement 1
+SQL statement "SELECT  sql_recurse( $1  - 1)"
+PL/pgSQL function "recurse" line 3 at RETURN
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL function "sql_recurse" during startup
+SQL statement "SELECT  sql_recurse( $1  - 1)"
+PL/pgSQL function "recurse" line 3 at RETURN
+SQL function "sql_recurse" statement 1
+SQL statement "SELECT  sql_recurse( $1  - 1)"
+PL/pgSQL function "recurse" line 3 at RETURN
+SQL function "sql_recurse" statement 1
+SQL statement "SELECT  sql_recurse( $1  - 1)"
+PL/pgSQL function "recurse" line 3 at RETURN
+SQL function "sql_recurse" statement 1
+SQL statement "SELECT  sql_recurse( $1  - 1)"
+PL/pgSQL function "recurse" line 3 at RETURN
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL function "sql_recurse" during startup
+SQL statement "SELECT  sql_recurse( $1  - 1)"
+PL/pgSQL function "recurse" line 3 at RETURN
+SQL function "sql_recurse" statement 1
+SQL statement "SELECT  sql_recurse( $1  - 1)"
+PL/pgSQL function "recurse" line 3 at RETURN
+SQL function "sql_recurse" statement 1
+SQL statement "SELECT  sql_recurse( $1  - 1)"
+PL/pgSQL function "recurse" line 3 at RETURN
+SQL function "sql_recurse" statement 1
+SQL statement "SELECT  sql_recurse( $1  - 1)"
+PL/pgSQL function "recurse" line 3 at RETURN
+SQL function "sql_recurse" statement 1
+SQL statement "SELECT  sql_recurse( $1  - 1)"
+PL/pgSQL function "recurse" line 3 at RETURN
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL function "sql_recurse" during startup
+SQL statement "SELECT  sql_recurse( $1  - 1)"
+PL/pgSQL function "recurse" line 3 at RETURN
+SQL function "sql_recurse" statement 1
+SQL statement "SELECT  sql_recurse( $1  - 1)"
+PL/pgSQL function "recurse" line 3 at RETURN
+SQL function "sql_recurse" statement 1
+SQL statement "SELECT  sql_recurse( $1  - 1)"
+PL/pgSQL function "recurse" line 3 at RETURN
+SQL function "sql_recurse" statement 1
+SQL statement "SELECT  sql_recurse( $1  - 1)"
+PL/pgSQL function "recurse" line 3 at RETURN
+SQL function "sql_recurse" statement 1
+SQL statement "SELECT  sql_recurse( $1  - 1)"
+PL/pgSQL function "recurse" line 3 at RETURN
+SQL function "sql_recurse" statement 1
+SQL statement "SELECT  sql_recurse( $1  - 1)"
+PL/pgSQL function "recurse" line 3 at RETURN
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL function "sql_recurse" during startup
+SQL statement "SELECT  sql_recurse( $1  - 1)"
+PL/pgSQL function "recurse" line 3 at RETURN
+SQL function "sql_recurse" statement 1
+SQL statement "SELECT  sql_recurse( $1  - 1)"
+PL/pgSQL function "recurse" line 3 at RETURN
+SQL function "sql_recurse" statement 1
+SQL statement "SELECT  sql_recurse( $1  - 1)"
+PL/pgSQL function "recurse" line 3 at RETURN
+SQL function "sql_recurse" statement 1
+SQL statement "SELECT  sql_recurse( $1  - 1)"
+PL/pgSQL function "recurse" line 3 at RETURN
+SQL function "sql_recurse" statement 1
+SQL statement "SELECT  sql_recurse( $1  - 1)"
+PL/pgSQL function "recurse" line 3 at RETURN
+SQL function "sql_recurse" statement 1
+SQL statement "SELECT  sql_recurse( $1  - 1)"
+PL/pgSQL function "recurse" line 3 at RETURN
+SQL function "sql_recurse" statement 1
+SQL statement "SELECT  sql_recurse( $1  - 1)"
+PL/pgSQL function "recurse" line 3 at RETURN
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL function "sql_recurse" during startup
+SQL statement "SELECT  sql_recurse( $1  - 1)"
+PL/pgSQL function "recurse" line 3 at RETURN
+SQL function "sql_recurse" statement 1
+SQL statement "SELECT  sql_recurse( $1  - 1)"
+PL/pgSQL function "recurse" line 3 at RETURN
+SQL function "sql_recurse" statement 1
+SQL statement "SELECT  sql_recurse( $1  - 1)"
+PL/pgSQL function "recurse" line 3 at RETURN
+SQL function "sql_recurse" statement 1
+SQL statement "SELECT  sql_recurse( $1  - 1)"
+PL/pgSQL function "recurse" line 3 at RETURN
+SQL function "sql_recurse" statement 1
+SQL statement "SELECT  sql_recurse( $1  - 1)"
+PL/pgSQL function "recurse" line 3 at RETURN
+SQL function "sql_recurse" statement 1
+SQL statement "SELECT  sql_recurse( $1  - 1)"
+PL/pgSQL function "recurse" line 3 at RETURN
+SQL function "sql_recurse" statement 1
+SQL statement "SELECT  sql_recurse( $1  - 1)"
+PL/pgSQL function "recurse" line 3 at RETURN
+SQL function "sql_recurse" statement 1
+SQL statement "SELECT  sql_recurse( $1  - 1)"
+PL/pgSQL function "recurse" line 3 at RETURN
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL function "sql_recurse" during startup
+SQL statement "SELECT  sql_recurse( $1  - 1)"
+PL/pgSQL function "recurse" line 3 at RETURN
+SQL function "sql_recurse" statement 1
+SQL statement "SELECT  sql_recurse( $1  - 1)"
+PL/pgSQL function "recurse" line 3 at RETURN
+SQL function "sql_recurse" statement 1
+SQL statement "SELECT  sql_recurse( $1  - 1)"
+PL/pgSQL function "recurse" line 3 at RETURN
+SQL function "sql_recurse" statement 1
+SQL statement "SELECT  sql_recurse( $1  - 1)"
+PL/pgSQL function "recurse" line 3 at RETURN
+SQL function "sql_recurse" statement 1
+SQL statement "SELECT  sql_recurse( $1  - 1)"
+PL/pgSQL function "recurse" line 3 at RETURN
+SQL function "sql_recurse" statement 1
+SQL statement "SELECT  sql_recurse( $1  - 1)"
+PL/pgSQL function "recurse" line 3 at RETURN
+SQL function "sql_recurse" statement 1
+SQL statement "SELECT  sql_recurse( $1  - 1)"
+PL/pgSQL function "recurse" line 3 at RETURN
+SQL function "sql_recurse" statement 1
+SQL statement "SELECT  sql_recurse( $1  - 1)"
+PL/pgSQL function "recurse" line 3 at RETURN
+SQL function "sql_recurse" statement 1
+SQL statement "SELECT  sql_recurse( $1  - 1)"
+PL/pgSQL function "recurse" line 3 at RETURN
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL function "sql_recurse" during startup
+SQL statement "SELECT  sql_recurse( $1  - 1)"
+PL/pgSQL function "recurse" line 3 at RETURN
+SQL function "sql_recurse" statement 1
+SQL statement "SELECT  sql_recurse( $1  - 1)"
+PL/pgSQL function "recurse" line 3 at RETURN
+SQL function "sql_recurse" statement 1
+SQL statement "SELECT  sql_recurse( $1  - 1)"
+PL/pgSQL function "recurse" line 3 at RETURN
+SQL function "sql_recurse" statement 1
+SQL statement "SELECT  sql_recurse( $1  - 1)"
+PL/pgSQL function "recurse" line 3 at RETURN
+SQL function "sql_recurse" statement 1
+SQL statement "SELECT  sql_recurse( $1  - 1)"
+PL/pgSQL function "recurse" line 3 at RETURN
+SQL function "sql_recurse" statement 1
+SQL statement "SELECT  sql_recurse( $1  - 1)"
+PL/pgSQL function "recurse" line 3 at RETURN
+SQL function "sql_recurse" statement 1
+SQL statement "SELECT  sql_recurse( $1  - 1)"
+PL/pgSQL function "recurse" line 3 at RETURN
+SQL function "sql_recurse" statement 1
+SQL statement "SELECT  sql_recurse( $1  - 1)"
+PL/pgSQL function "recurse" line 3 at RETURN
+SQL function "sql_recurse" statement 1
+SQL statement "SELECT  sql_recurse( $1  - 1)"
+PL/pgSQL function "recurse" line 3 at RETURN
+SQL function "sql_recurse" statement 1
+SQL statement "SELECT  sql_recurse( $1  - 1)"
+PL/pgSQL function "recurse" line 3 at RETURN
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1 "
+PL/pgSQL function "recurse" line 5 at RETURN
+SQL function "sql_recurse" statement 1
+SQL statement "SELECT  sql_recurse( $1  - 1)"
+PL/pgSQL function "recurse" line 3 at RETURN
+SQL function "sql_recurse" statement 1
+SQL statement "SELECT  sql_recurse( $1  - 1)"
+PL/pgSQL function "recurse" line 3 at RETURN
+SQL function "sql_recurse" statement 1
+SQL statement "SELECT  sql_recurse( $1  - 1)"
+PL/pgSQL function "recurse" line 3 at RETURN
+SQL function "sql_recurse" statement 1
+SQL statement "SELECT  sql_recurse( $1  - 1)"
+PL/pgSQL function "recurse" line 3 at RETURN
+SQL function "sql_recurse" statement 1
+SQL statement "SELECT  sql_recurse( $1  - 1)"
+PL/pgSQL function "recurse" line 3 at RETURN
+SQL function "sql_recurse" statement 1
+SQL statement "SELECT  sql_recurse( $1  - 1)"
+PL/pgSQL function "recurse" line 3 at RETURN
+SQL function "sql_recurse" statement 1
+SQL statement "SELECT  sql_recurse( $1  - 1)"
+PL/pgSQL function "recurse" line 3 at RETURN
+SQL function "sql_recurse" statement 1
+SQL statement "SELECT  sql_recurse( $1  - 1)"
+PL/pgSQL function "recurse" line 3 at RETURN
+SQL function "sql_recurse" statement 1
+SQL statement "SELECT  sql_recurse( $1  - 1)"
+PL/pgSQL function "recurse" line 3 at RETURN
+SQL function "sql_recurse" statement 1
+SQL statement "SELECT  sql_recurse( $1  - 1)"
+PL/pgSQL function "recurse" line 3 at RETURN
  recurse 
 ---------
        0
@@ -3673,14 +4674,29 @@ begin
 end$$;
 BEGIN;
 create table public.stuffs (stuff text);
+NOTICE:  Table doesn't have 'DISTRIBUTED BY' clause -- Using column named 'stuff' as the Greenplum Database data distribution key for this table.
+HINT:  The 'DISTRIBUTED BY' clause determines the distribution of data. Make sure column(s) chosen are the optimal data distribution key to minimize skew.
 SAVEPOINT a;
 select error2('nonexistent.stuffs');
+INFO:  GPORCA failed to produce a plan, falling back to planner
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT  error1( $1 )"
+PL/pgSQL function "error2" line 2 at RETURN
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL function "error1" during startup
+SQL statement "SELECT  error1( $1 )"
+PL/pgSQL function "error2" line 2 at RETURN
 ERROR:  schema "nonexistent" does not exist
 CONTEXT:  SQL function "error1" statement 1
 SQL statement "SELECT  error1( $1 )"
 PL/pgSQL function "error2" line 2 at RETURN
 ROLLBACK TO a;
 select error2('public.stuffs');
+INFO:  GPORCA failed to produce a plan, falling back to planner
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL function "error1" during startup
+SQL statement "SELECT  error1( $1 )"
+PL/pgSQL function "error2" line 2 at RETURN
  error2 
 --------
  stuffs
@@ -3698,6 +4714,12 @@ BEGIN
         RAISE NOTICE '%, %', r.roomno, r.comment;
     END LOOP;
 END$$;
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1 "
+PL/pgSQL function "inline_code_block" line 5 at RAISE
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1 "
+PL/pgSQL function "inline_code_block" line 5 at RAISE
 NOTICE:  001, Entrance
 NOTICE:  002, Office
 NOTICE:  003, Office
@@ -3745,13 +4767,133 @@ begin
   end loop;
 end;
 $outer$;
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT  1 /  $1 "
+PL/pgSQL function "inline_code_block" line 3 at assignment
+SQL statement "
+      do $$
+      declare x int = 0;
+      begin
+        x := 1 / x;
+      end;
+      $$;
+    "
+PL/pgSQL function "inline_code_block" line 4 at EXECUTE statement
 NOTICE:  caught division by zero
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT  1 /  $1 "
+PL/pgSQL function "inline_code_block" line 3 at assignment
+SQL statement "
+      do $$
+      declare x int = 0;
+      begin
+        x := 1 / x;
+      end;
+      $$;
+    "
+PL/pgSQL function "inline_code_block" line 4 at EXECUTE statement
 NOTICE:  caught division by zero
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT  1 /  $1 "
+PL/pgSQL function "inline_code_block" line 3 at assignment
+SQL statement "
+      do $$
+      declare x int = 0;
+      begin
+        x := 1 / x;
+      end;
+      $$;
+    "
+PL/pgSQL function "inline_code_block" line 4 at EXECUTE statement
 NOTICE:  caught division by zero
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT  1 /  $1 "
+PL/pgSQL function "inline_code_block" line 3 at assignment
+SQL statement "
+      do $$
+      declare x int = 0;
+      begin
+        x := 1 / x;
+      end;
+      $$;
+    "
+PL/pgSQL function "inline_code_block" line 4 at EXECUTE statement
 NOTICE:  caught division by zero
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT  1 /  $1 "
+PL/pgSQL function "inline_code_block" line 3 at assignment
+SQL statement "
+      do $$
+      declare x int = 0;
+      begin
+        x := 1 / x;
+      end;
+      $$;
+    "
+PL/pgSQL function "inline_code_block" line 4 at EXECUTE statement
 NOTICE:  caught division by zero
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT  1 /  $1 "
+PL/pgSQL function "inline_code_block" line 3 at assignment
+SQL statement "
+      do $$
+      declare x int = 0;
+      begin
+        x := 1 / x;
+      end;
+      $$;
+    "
+PL/pgSQL function "inline_code_block" line 4 at EXECUTE statement
 NOTICE:  caught division by zero
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT  1 /  $1 "
+PL/pgSQL function "inline_code_block" line 3 at assignment
+SQL statement "
+      do $$
+      declare x int = 0;
+      begin
+        x := 1 / x;
+      end;
+      $$;
+    "
+PL/pgSQL function "inline_code_block" line 4 at EXECUTE statement
 NOTICE:  caught division by zero
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT  1 /  $1 "
+PL/pgSQL function "inline_code_block" line 3 at assignment
+SQL statement "
+      do $$
+      declare x int = 0;
+      begin
+        x := 1 / x;
+      end;
+      $$;
+    "
+PL/pgSQL function "inline_code_block" line 4 at EXECUTE statement
 NOTICE:  caught division by zero
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT  1 /  $1 "
+PL/pgSQL function "inline_code_block" line 3 at assignment
+SQL statement "
+      do $$
+      declare x int = 0;
+      begin
+        x := 1 / x;
+      end;
+      $$;
+    "
+PL/pgSQL function "inline_code_block" line 4 at EXECUTE statement
 NOTICE:  caught division by zero
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT  1 /  $1 "
+PL/pgSQL function "inline_code_block" line 3 at assignment
+SQL statement "
+      do $$
+      declare x int = 0;
+      begin
+        x := 1 / x;
+      end;
+      $$;
+    "
+PL/pgSQL function "inline_code_block" line 4 at EXECUTE statement
 NOTICE:  caught division by zero

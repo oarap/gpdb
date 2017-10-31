@@ -838,12 +838,16 @@ SELECT timestamp with time zone '2005-04-03 12:00-06' - interval '24 hours' as "
 RESET TIME ZONE;
 SET TIME ZONE 'PST8PDT';
 SELECT timestamptz(date '1994-01-01', time '11:00') AS "Jan_01_1994_10am";
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL function "timestamptz" during startup
        Jan_01_1994_10am       
 ------------------------------
  Sat Jan 01 11:00:00 1994 PST
 (1 row)
 
 SELECT timestamptz(date '1994-01-01', time '10:00') AS "Jan_01_1994_9am";
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL function "timestamptz" during startup
        Jan_01_1994_9am        
 ------------------------------
  Sat Jan 01 10:00:00 1994 PST
@@ -1452,6 +1456,8 @@ SELECT (timestamp with time zone '2000-11-26', timestamp with time zone '2000-11
 
 SELECT (timestamp with time zone '2000-11-27', timestamp with time zone '2000-11-28')
   OVERLAPS (timestamp with time zone '2000-11-27 12:00', interval '1 day') AS "True";
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL function "overlaps" during startup
  True 
 ------
  t
@@ -1459,6 +1465,8 @@ SELECT (timestamp with time zone '2000-11-27', timestamp with time zone '2000-11
 
 SELECT (timestamp with time zone '2000-11-27', interval '12 hours')
   OVERLAPS (timestamp with time zone '2000-11-27 12:00', timestamp with time zone '2000-11-30') AS "False";
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL function "overlaps" during startup
  False 
 -------
  f
@@ -1466,6 +1474,8 @@ SELECT (timestamp with time zone '2000-11-27', interval '12 hours')
 
 SELECT (timestamp with time zone '2000-11-27', interval '12 hours')
   OVERLAPS (timestamp with time zone '2000-11-27', interval '12 hours') AS "True";
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL function "overlaps" during startup
  True 
 ------
  t
@@ -1473,6 +1483,8 @@ SELECT (timestamp with time zone '2000-11-27', interval '12 hours')
 
 SELECT (timestamp with time zone '2000-11-27', interval '12 hours')
   OVERLAPS (timestamp with time zone '2000-11-27 12:00', interval '12 hours') AS "False";
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL function "overlaps" during startup
  False 
 -------
  f
@@ -1495,6 +1507,8 @@ SELECT (timestamp without time zone '2000-11-26', timestamp without time zone '2
 
 SELECT (timestamp without time zone '2000-11-27', timestamp without time zone '2000-11-28')
   OVERLAPS (timestamp without time zone '2000-11-27 12:00', interval '1 day') AS "True";
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL function "overlaps" during startup
  True 
 ------
  t
@@ -1502,6 +1516,8 @@ SELECT (timestamp without time zone '2000-11-27', timestamp without time zone '2
 
 SELECT (timestamp without time zone '2000-11-27', interval '12 hours')
   OVERLAPS (timestamp without time zone '2000-11-27 12:00', timestamp without time zone '2000-11-30') AS "False";
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL function "overlaps" during startup
  False 
 -------
  f
@@ -1509,6 +1525,8 @@ SELECT (timestamp without time zone '2000-11-27', interval '12 hours')
 
 SELECT (timestamp without time zone '2000-11-27', interval '12 hours')
   OVERLAPS (timestamp without time zone '2000-11-27', interval '12 hours') AS "True";
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL function "overlaps" during startup
  True 
 ------
  t
@@ -1516,6 +1534,8 @@ SELECT (timestamp without time zone '2000-11-27', interval '12 hours')
 
 SELECT (timestamp without time zone '2000-11-27', interval '12 hours')
   OVERLAPS (timestamp without time zone '2000-11-27 12:00', interval '12 hours') AS "False";
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL function "overlaps" during startup
  False 
 -------
  f
@@ -1531,6 +1551,8 @@ SELECT (time '00:00', time '01:00')
 
 SELECT (time '00:00', interval '1 hour')
   OVERLAPS (time '00:30', interval '1 hour') AS "True";
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL function "overlaps" during startup
  True 
 ------
  t
@@ -1538,6 +1560,8 @@ SELECT (time '00:00', interval '1 hour')
 
 SELECT (time '00:00', interval '1 hour')
   OVERLAPS (time '01:30', interval '1 hour') AS "False";
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL function "overlaps" during startup
  False 
 -------
  f
@@ -1548,12 +1572,16 @@ SELECT (time '00:00', interval '1 hour')
 -- intervals can wrap around the day boundary - thomas 2001-09-25
 SELECT (time '00:00', interval '1 hour')
   OVERLAPS (time '01:30', interval '1 day') AS "False";
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL function "overlaps" during startup
  False 
 -------
  f
 (1 row)
 
 CREATE TABLE TEMP_TIMESTAMP (f1 timestamp with time zone);
+NOTICE:  Table doesn't have 'DISTRIBUTED BY' clause -- Using column named 'f1' as the Greenplum Database data distribution key for this table.
+HINT:  The 'DISTRIBUTED BY' clause determines the distribution of data. Make sure column(s) chosen are the optimal data distribution key to minimize skew.
 -- get some candidate input values
 INSERT INTO TEMP_TIMESTAMP (f1)
   SELECT d1 FROM TIMESTAMP_HOROLOGY_TBL

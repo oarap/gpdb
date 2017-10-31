@@ -10,12 +10,16 @@ NOTICE:  merging column "a" with inherited definition
 NOTICE:  merging column "b" with inherited definition
 NOTICE:  merging column "c" with inherited definition
 insert into parent select g, g, g from generate_series(1,5) g;
+INFO:  GPORCA failed to produce a plan, falling back to planner
 insert into child select g, g, g from generate_series(6,10) g;
 insert into todelete select generate_series(3,4);
 delete from parent using todelete where parent.a = todelete.a;
+INFO:  GPORCA failed to produce a plan, falling back to planner
 insert into todelete select generate_series(5,7);
 update parent set c=c+100 from todelete where parent.a = todelete.a;
+INFO:  GPORCA failed to produce a plan, falling back to planner
 select * from parent;
+INFO:  GPORCA failed to produce a plan, falling back to planner
  a  | b  |  c  
 ----+----+-----
   1 |  1 |   1
