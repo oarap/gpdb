@@ -1,0 +1,97 @@
+-- start_ignore
+drop table if exists sourcetable cascade;
+NOTICE:  table "sourcetable" does not exist, skipping
+drop view if exists v_sourcetable cascade;
+NOTICE:  view "v_sourcetable" does not exist, skipping
+drop view if exists v_sourcetable1 cascade;
+NOTICE:  view "v_sourcetable1" does not exist, skipping
+-- end_ignore
+create table sourcetable 
+(
+        cn int not null,
+        vn int not null,
+        pn int not null,
+        dt date not null,
+        qty int not null,
+        prc float not null,
+        primary key (cn, vn, pn)
+) distributed by (cn,vn,pn);
+NOTICE:  CREATE TABLE / PRIMARY KEY will create implicit index "sourcetable_pkey" for table "sourcetable"
+insert into sourcetable values
+  ( 2, 40, 100, '1401-1-1', 1100, 2400),
+  ( 1, 10, 200, '1401-3-1', 1, 0),
+  ( 3, 40, 200, '1401-4-1', 1, 0),
+  ( 1, 20, 100, '1401-5-1', 1, 0),
+  ( 1, 30, 300, '1401-5-2', 1, 0),
+  ( 1, 50, 400, '1401-6-1', 1, 0),
+  ( 2, 50, 400, '1401-6-1', 1, 0),
+  ( 1, 30, 500, '1401-6-1', 12, 5),
+  ( 3, 30, 500, '1401-6-1', 12, 5),
+  ( 3, 30, 600, '1401-6-1', 12, 5),
+  ( 4, 40, 700, '1401-6-1', 1, 1),
+  ( 4, 40, 800, '1401-6-1', 1, 1);
+-- Check that the rows come out in order, if there's an ORDER BY in
+-- the view definition.
+--
+-- FIXME: gpdiff will unfortunately mask out any differences in the
+-- row order, so this test wouldn't catch a bug in that.
+create view  v_sourcetable as select * from sourcetable order by vn;
+select * from v_sourcetable;
+ cn | vn | pn  |     dt     | qty  | prc  
+----+----+-----+------------+------+------
+  1 | 10 | 200 | 03-01-1401 |    1 |    0
+  1 | 20 | 100 | 05-01-1401 |    1 |    0
+  3 | 30 | 600 | 06-01-1401 |   12 |    5
+  1 | 30 | 300 | 05-02-1401 |    1 |    0
+  3 | 30 | 500 | 06-01-1401 |   12 |    5
+  1 | 30 | 500 | 06-01-1401 |   12 |    5
+  3 | 40 | 200 | 04-01-1401 |    1 |    0
+  4 | 40 | 800 | 06-01-1401 |    1 |    1
+  4 | 40 | 700 | 06-01-1401 |    1 |    1
+  2 | 40 | 100 | 01-01-1401 | 1100 | 2400
+  1 | 50 | 400 | 06-01-1401 |    1 |    0
+  2 | 50 | 400 | 06-01-1401 |    1 |    0
+(12 rows)
+
+create view v_sourcetable1 as SELECT sourcetable.qty, vn, pn FROM sourcetable union select sourcetable.qty, sourcetable.vn, sourcetable.pn from sourcetable order by qty;
+select * from v_sourcetable1;
+ qty  | vn | pn  
+------+----+-----
+    1 | 20 | 100
+    1 | 10 | 200
+    1 | 40 | 700
+    1 | 40 | 800
+    1 | 40 | 200
+    1 | 50 | 400
+    1 | 30 | 300
+   12 | 30 | 600
+   12 | 30 | 500
+ 1100 | 40 | 100
+(10 rows)
+
+-- Check that the row-comparison operator is serialized and deserialized
+-- correctly, when it's used in a view. This isn't particularly interesting,
+-- compared to all the other expression types, but we happened to have a
+-- silly bug that broke this particular case.
+create view v_sourcetable2 as
+  select a.cn as cn, a.vn as a_vn, b.vn as b_vn, a.pn as a_pn, b.pn as b_pn
+  from sourcetable a, sourcetable b
+  where row(a.*) < row(b.*)
+  and a.cn = 1 and b.cn = 1;
+select * from v_sourcetable2;
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ cn | a_vn | b_vn | a_pn | b_pn 
+----+------+------+------+------
+  1 |   10 |   30 |  200 |  300
+  1 |   10 |   50 |  200 |  400
+  1 |   10 |   30 |  200 |  500
+  1 |   10 |   20 |  200 |  100
+  1 |   20 |   30 |  100 |  300
+  1 |   20 |   50 |  100 |  400
+  1 |   20 |   30 |  100 |  500
+  1 |   30 |   50 |  300 |  400
+  1 |   30 |   30 |  300 |  500
+  1 |   30 |   50 |  500 |  400
+(10 rows)
+
+drop view v_sourcetable2;

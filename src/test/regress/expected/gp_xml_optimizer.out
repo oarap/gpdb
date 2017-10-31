@@ -1,0 +1,14 @@
+SELECT XMLPARSE(CONTENT '<abc>x</abc>'::text STRIP WHITESPACE) AS "xmlparse";
+INFO:  GPORCA failed to produce a plan, falling back to planner
+   xmlparse   
+--------------
+ <abc>x</abc>
+(1 row)
+
+SELECT XMLPARSE(CONTENT '<abc>x</abc>'::text PRESERVE WHITESPACE) AS "xmlparse";
+INFO:  GPORCA failed to produce a plan, falling back to planner
+   xmlparse   
+--------------
+ <abc>x</abc>
+(1 row)
+

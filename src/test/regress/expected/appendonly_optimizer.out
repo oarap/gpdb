@@ -1,0 +1,1509 @@
+CREATE TABLE tenk_heap (
+	unique1 	int4,
+	unique2 	int4,
+	two 	 	int4,
+	four 		int4,
+	ten			int4,
+	twenty 		int4,
+	hundred 	int4,
+	thousand 	int4,
+	twothousand int4,
+	fivethous 	int4,
+	tenthous	int4,
+	odd			int4,
+	even		int4,
+	stringu1	name,
+	stringu2	name,
+	string4		name
+) with (appendonly=false) distributed by(unique1);
+--
+-- create few AO tables. test various reloptions combinations. use a sample
+-- of them (the first 4) for later testing.
+--
+-- valid
+CREATE TABLE tenk_ao1 (like tenk_heap) with (appendonly=true, checksum=true) distributed by(unique1);
+-- creating AO table should create entry in gp_fastsequence with normal xid
+SELECT CASE WHEN xmin = 2 THEN 'FrozenXid' ELSE 'NormalXid' END, objmod,
+last_sequence, gp_segment_id from gp_dist_random('gp_fastsequence') WHERE objid
+IN (SELECT segrelid FROM pg_appendonly WHERE relid IN (SELECT oid FROM pg_class
+WHERE relname='tenk_ao1'));
+INFO:  GPORCA failed to produce a plan, falling back to planner
+   case    | objmod | last_sequence | gp_segment_id 
+-----------+--------+---------------+---------------
+ NormalXid |      0 |             0 |             1
+ NormalXid |      1 |             0 |             1
+ NormalXid |      0 |             0 |             2
+ NormalXid |      1 |             0 |             2
+ NormalXid |      0 |             0 |             0
+ NormalXid |      1 |             0 |             0
+(6 rows)
+
+CREATE TABLE tenk_ao2 (like tenk_heap) with (appendonly=true, compresslevel=0, blocksize=262144) distributed by(unique1);
+CREATE TABLE tenk_ao3 (like tenk_heap) with (appendonly=true, compresslevel=6, blocksize=1048576, checksum=true) distributed by(unique1);
+CREATE TABLE tenk_ao4 (like tenk_heap) with (appendonly=true, compresslevel=1, compresstype=zlib) distributed by(unique1);
+CREATE TABLE tenk_ao5 (like tenk_heap) with (appendonly=true, compresslevel=6, compresstype=zlib, blocksize=1048576, checksum=true) distributed by(unique1);
+-- invalid
+CREATE TABLE tenk_ao6 (like tenk_heap) with (appendonly=false, compresslevel=6, checksum=true) distributed by(unique1);
+ERROR:  invalid option 'compresslevel' for base relation. Only valid for Append Only relations
+CREATE TABLE tenk_ao7 (like tenk_heap) with (appendonly=true, compresslevel=16, compresstype=zlib) distributed by(unique1);
+ERROR:  compresslevel=16 is out of range (should be between 0 and 9)
+CREATE TABLE tenk_ao8 (like tenk_heap) with (appendonly=true, blocksize=100) distributed by(unique1);
+ERROR:  block size must be between 8KB and 2MB and be an 8KB multiple. Got 100
+CREATE TABLE tenk_ao9 (like tenk_heap) with (appendonly=true, compresslevel=0, compresstype=zlib) distributed by(unique1);
+ERROR:  compresstype can't be used with compresslevel 0
+-- these should not work without appendonly=true
+CREATE TABLE tenk_ao10 (like tenk_heap) with (compresslevel=5);
+NOTICE:  Table doesn't have 'DISTRIBUTED BY' clause, defaulting to distribution columns from LIKE table
+ERROR:  invalid option 'compresslevel' for base relation. Only valid for Append Only relations
+CREATE TABLE tenk_ao11 (like tenk_heap) with (blocksize=8192);
+NOTICE:  Table doesn't have 'DISTRIBUTED BY' clause, defaulting to distribution columns from LIKE table
+ERROR:  invalid option 'blocksize' for base relation. Only valid for Append Only relations
+CREATE TABLE tenk_ao12 (like tenk_heap) with (appendonly=false,blocksize=8192);
+NOTICE:  Table doesn't have 'DISTRIBUTED BY' clause, defaulting to distribution columns from LIKE table
+ERROR:  invalid option 'blocksize' for base relation. Only valid for Append Only relations
+-------------------- 
+-- catalog checks
+--------------------
+-- check pg_appendonly
+SELECT c.relname, a.blocksize, a.compresstype, a.compresslevel, a.checksum FROM pg_class c, pg_appendonly a
+       WHERE c.relname LIKE 'tenk_ao%' AND c.oid=a.relid AND c.relname not like 'tenk_aocs%' ORDER BY c.relname;
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ relname  | blocksize | compresstype | compresslevel | checksum 
+----------+-----------+--------------+---------------+----------
+ tenk_ao1 |     32768 |              |             0 | t
+ tenk_ao2 |    262144 |              |             0 | t
+ tenk_ao3 |   1048576 | zlib         |             6 | t
+ tenk_ao4 |     32768 | zlib         |             1 | t
+ tenk_ao5 |   1048576 | zlib         |             6 | t
+(5 rows)
+
+-------------------- 
+-- fn needed later
+--------------------
+create  or replace function aototal(relname text) returns float8 as $$
+declare
+  aosegname text;
+  tupcount float8 := 0;
+  rc int := 0;
+begin
+
+  execute 'select relname from pg_class where oid=(select segrelid from pg_class, pg_appendonly where relname=''' || relname || ''' and relid = pg_class.oid)' into aosegname;
+  if aosegname is not null then
+          execute 'select tupcount from pg_aoseg.' || aosegname into tupcount;
+  end if;
+  return tupcount;
+end; $$ language plpgsql volatile READS SQL DATA;
+-------------------- 
+-- supported sql
+--------------------
+-- COPY
+COPY tenk_heap FROM '/Users/oarap/workspace/gpdb/src/test/regress/data/tenk.data';
+COPY tenk_ao1 FROM '/Users/oarap/workspace/gpdb/src/test/regress/data/tenk.data';
+COPY tenk_ao2 FROM '/Users/oarap/workspace/gpdb/src/test/regress/data/tenk.data';
+COPY tenk_ao3 FROM '/Users/oarap/workspace/gpdb/src/test/regress/data/tenk.data';
+COPY tenk_ao4 FROM '/Users/oarap/workspace/gpdb/src/test/regress/data/tenk.data';
+-- SELECT
+SELECT count(*) FROM tenk_heap;
+ count 
+-------
+ 10000
+(1 row)
+
+SELECT count(*) FROM tenk_ao1;
+ count 
+-------
+ 10000
+(1 row)
+
+SELECT count(*) FROM tenk_ao2;
+ count 
+-------
+ 10000
+(1 row)
+
+SELECT count(*) FROM tenk_ao3;
+ count 
+-------
+ 10000
+(1 row)
+
+SELECT count(*) FROM tenk_ao4;
+ count 
+-------
+ 10000
+(1 row)
+
+SELECT aototal('tenk_ao1'), aototal('tenk_ao2'), aototal('tenk_ao3'), aototal('tenk_ao4');
+INFO:  GPORCA failed to produce a plan, falling back to planner
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT  'select relname from pg_class where oid=(select segrelid from pg_class, pg_appendonly where relname=''' ||  $1  || ''' and relid = pg_class.oid)'"
+PL/pgSQL function "aototal" line 7 at EXECUTE statement
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "select relname from pg_class where oid=(select segrelid from pg_class, pg_appendonly where relname='tenk_ao1' and relid = pg_class.oid)"
+PL/pgSQL function "aototal" line 7 at EXECUTE statement
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1  is not null"
+PL/pgSQL function "aototal" line 8 at IF
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT  'select tupcount from pg_aoseg.' ||  $1 "
+PL/pgSQL function "aototal" line 9 at EXECUTE statement
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "select tupcount from pg_aoseg.pg_aoseg_392344"
+PL/pgSQL function "aototal" line 9 at EXECUTE statement
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "SELECT   $1 "
+PL/pgSQL function "aototal" line 11 at RETURN
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "select relname from pg_class where oid=(select segrelid from pg_class, pg_appendonly where relname='tenk_ao2' and relid = pg_class.oid)"
+PL/pgSQL function "aototal" line 7 at EXECUTE statement
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "select tupcount from pg_aoseg.pg_aoseg_392472"
+PL/pgSQL function "aototal" line 9 at EXECUTE statement
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "select relname from pg_class where oid=(select segrelid from pg_class, pg_appendonly where relname='tenk_ao3' and relid = pg_class.oid)"
+PL/pgSQL function "aototal" line 7 at EXECUTE statement
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "select tupcount from pg_aoseg.pg_aoseg_392542"
+PL/pgSQL function "aototal" line 9 at EXECUTE statement
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "select relname from pg_class where oid=(select segrelid from pg_class, pg_appendonly where relname='tenk_ao4' and relid = pg_class.oid)"
+PL/pgSQL function "aototal" line 7 at EXECUTE statement
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "select tupcount from pg_aoseg.pg_aoseg_392639"
+PL/pgSQL function "aototal" line 9 at EXECUTE statement
+ aototal | aototal | aototal | aototal 
+---------+---------+---------+---------
+   10000 |   10000 |   10000 |   10000
+(1 row)
+
+-- INSERT SELECT
+INSERT INTO tenk_ao1 SELECT * FROM tenk_heap;
+INSERT INTO tenk_ao2 SELECT * FROM tenk_heap;
+INSERT INTO tenk_ao3 SELECT * FROM tenk_heap;
+INSERT INTO tenk_ao4 SELECT * FROM tenk_heap;
+-- mix and match some
+INSERT INTO tenk_ao1 SELECT * FROM tenk_ao1;
+INSERT INTO tenk_ao2 SELECT * FROM tenk_ao3;
+INSERT INTO tenk_ao3 SELECT * FROM tenk_ao2;
+INSERT INTO tenk_ao4 SELECT * FROM tenk_ao3;
+SELECT aototal('tenk_ao1'), aototal('tenk_ao2'), aototal('tenk_ao3'), aototal('tenk_ao4');
+INFO:  GPORCA failed to produce a plan, falling back to planner
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  PL/pgSQL function "aototal" line 7 at EXECUTE statement
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "select relname from pg_class where oid=(select segrelid from pg_class, pg_appendonly where relname='tenk_ao1' and relid = pg_class.oid)"
+PL/pgSQL function "aototal" line 7 at EXECUTE statement
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  PL/pgSQL function "aototal" line 8 at IF
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  PL/pgSQL function "aototal" line 9 at EXECUTE statement
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "select tupcount from pg_aoseg.pg_aoseg_392344"
+PL/pgSQL function "aototal" line 9 at EXECUTE statement
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  PL/pgSQL function "aototal" line 11 at RETURN
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "select relname from pg_class where oid=(select segrelid from pg_class, pg_appendonly where relname='tenk_ao2' and relid = pg_class.oid)"
+PL/pgSQL function "aototal" line 7 at EXECUTE statement
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "select tupcount from pg_aoseg.pg_aoseg_392472"
+PL/pgSQL function "aototal" line 9 at EXECUTE statement
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "select relname from pg_class where oid=(select segrelid from pg_class, pg_appendonly where relname='tenk_ao3' and relid = pg_class.oid)"
+PL/pgSQL function "aototal" line 7 at EXECUTE statement
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "select tupcount from pg_aoseg.pg_aoseg_392542"
+PL/pgSQL function "aototal" line 9 at EXECUTE statement
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "select relname from pg_class where oid=(select segrelid from pg_class, pg_appendonly where relname='tenk_ao4' and relid = pg_class.oid)"
+PL/pgSQL function "aototal" line 7 at EXECUTE statement
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "select tupcount from pg_aoseg.pg_aoseg_392639"
+PL/pgSQL function "aototal" line 9 at EXECUTE statement
+ aototal | aototal | aototal | aototal 
+---------+---------+---------+---------
+   40000 |   40000 |   60000 |   80000
+(1 row)
+
+-- SELECT
+SELECT count(*) FROM tenk_heap;
+ count 
+-------
+ 10000
+(1 row)
+
+SELECT count(*) FROM tenk_ao1;
+ count 
+-------
+ 40000
+(1 row)
+
+SELECT count(*) FROM tenk_ao2;
+ count 
+-------
+ 40000
+(1 row)
+
+SELECT count(*) FROM tenk_ao3;
+ count 
+-------
+ 60000
+(1 row)
+
+SELECT count(*) FROM tenk_ao4;
+ count 
+-------
+ 80000
+(1 row)
+
+--
+-- Test that the catalog eof entry doesn't change even if the file gets
+-- larger due to bad data that isn't cleaned up until the next VACUUM. 
+-- make sure the SELECT stops at eof (count is the same). 
+-- The first row is good (so it grows the file), the second is bad.
+--
+COPY tenk_ao1 FROM STDIN;
+ERROR:  missing data for column "unique2"
+CONTEXT:  COPY tenk_ao1, line 2: "bad data row"
+COPY tenk_ao2 FROM STDIN;
+ERROR:  missing data for column "unique2"
+CONTEXT:  COPY tenk_ao2, line 2: "bad data row"
+COPY tenk_ao3 FROM STDIN;
+ERROR:  missing data for column "unique2"
+CONTEXT:  COPY tenk_ao3, line 2: "bad data row"
+COPY tenk_ao4 FROM STDIN;
+ERROR:  missing data for column "unique2"
+CONTEXT:  COPY tenk_ao4, line 2: "bad data row"
+SELECT count(*) FROM tenk_ao1;
+ count 
+-------
+ 40000
+(1 row)
+
+SELECT count(*) FROM tenk_ao2;
+ count 
+-------
+ 40000
+(1 row)
+
+SELECT count(*) FROM tenk_ao3;
+ count 
+-------
+ 60000
+(1 row)
+
+SELECT count(*) FROM tenk_ao4;
+ count 
+-------
+ 80000
+(1 row)
+
+SELECT aototal('tenk_ao1'), aototal('tenk_ao2'), aototal('tenk_ao3'), aototal('tenk_ao4');
+INFO:  GPORCA failed to produce a plan, falling back to planner
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "select relname from pg_class where oid=(select segrelid from pg_class, pg_appendonly where relname='tenk_ao1' and relid = pg_class.oid)"
+PL/pgSQL function "aototal" line 7 at EXECUTE statement
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "select tupcount from pg_aoseg.pg_aoseg_392344"
+PL/pgSQL function "aototal" line 9 at EXECUTE statement
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "select relname from pg_class where oid=(select segrelid from pg_class, pg_appendonly where relname='tenk_ao2' and relid = pg_class.oid)"
+PL/pgSQL function "aototal" line 7 at EXECUTE statement
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "select tupcount from pg_aoseg.pg_aoseg_392472"
+PL/pgSQL function "aototal" line 9 at EXECUTE statement
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "select relname from pg_class where oid=(select segrelid from pg_class, pg_appendonly where relname='tenk_ao3' and relid = pg_class.oid)"
+PL/pgSQL function "aototal" line 7 at EXECUTE statement
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "select tupcount from pg_aoseg.pg_aoseg_392542"
+PL/pgSQL function "aototal" line 9 at EXECUTE statement
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "select relname from pg_class where oid=(select segrelid from pg_class, pg_appendonly where relname='tenk_ao4' and relid = pg_class.oid)"
+PL/pgSQL function "aototal" line 7 at EXECUTE statement
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "select tupcount from pg_aoseg.pg_aoseg_392639"
+PL/pgSQL function "aototal" line 9 at EXECUTE statement
+ aototal | aototal | aototal | aototal 
+---------+---------+---------+---------
+   40000 |   40000 |   60000 |   80000
+(1 row)
+
+-------------------- 
+-- transactionality
+--------------------
+-- rollback
+BEGIN;
+INSERT INTO tenk_ao1 SELECT * FROM tenk_heap;
+SELECT count(*) FROM tenk_ao1; -- should show new count
+ count 
+-------
+ 50000
+(1 row)
+
+ROLLBACK;
+SELECT count(*) FROM tenk_ao1; -- should show previous count
+ count 
+-------
+ 40000
+(1 row)
+
+SELECT aototal('tenk_ao1');
+INFO:  GPORCA failed to produce a plan, falling back to planner
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "select relname from pg_class where oid=(select segrelid from pg_class, pg_appendonly where relname='tenk_ao1' and relid = pg_class.oid)"
+PL/pgSQL function "aototal" line 7 at EXECUTE statement
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "select tupcount from pg_aoseg.pg_aoseg_392344"
+PL/pgSQL function "aototal" line 9 at EXECUTE statement
+ aototal 
+---------
+   40000
+(1 row)
+
+-- gp_fastsequence should reflect bump in lastsequence, even if above
+-- transaction aborted as its tuples is in place updated.
+SELECT CASE WHEN xmin = 2 THEN 'FrozenXid' ELSE 'NormalXid' END, objmod,
+last_sequence, gp_segment_id from gp_dist_random('gp_fastsequence') WHERE objid
+IN (SELECT segrelid FROM pg_appendonly WHERE relid IN (SELECT oid FROM pg_class
+WHERE relname='tenk_ao1'));
+INFO:  GPORCA failed to produce a plan, falling back to planner
+   case    | objmod | last_sequence | gp_segment_id 
+-----------+--------+---------------+---------------
+ NormalXid |      0 |             0 |             0
+ NormalXid |      1 |         16900 |             0
+ NormalXid |      0 |             0 |             2
+ NormalXid |      1 |         17000 |             2
+ NormalXid |      0 |             0 |             1
+ NormalXid |      1 |         16900 |             1
+(6 rows)
+
+-- commit
+BEGIN;
+INSERT INTO tenk_ao1 SELECT * FROM tenk_heap;
+SELECT count(*) FROM tenk_ao1; -- should show new count
+ count 
+-------
+ 50000
+(1 row)
+
+COMMIT;
+SELECT count(*) FROM tenk_ao1; -- should show new count
+ count 
+-------
+ 50000
+(1 row)
+
+SELECT aototal('tenk_ao1');
+INFO:  GPORCA failed to produce a plan, falling back to planner
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "select relname from pg_class where oid=(select segrelid from pg_class, pg_appendonly where relname='tenk_ao1' and relid = pg_class.oid)"
+PL/pgSQL function "aototal" line 7 at EXECUTE statement
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "select tupcount from pg_aoseg.pg_aoseg_392344"
+PL/pgSQL function "aototal" line 9 at EXECUTE statement
+ aototal 
+---------
+   50000
+(1 row)
+
+-- same txn inserts
+BEGIN;
+INSERT INTO tenk_ao1(unique1) VALUES(12345678);
+INSERT INTO tenk_ao1(unique1) VALUES(12345678);
+INSERT INTO tenk_ao1(unique1) VALUES(12345678);
+INSERT INTO tenk_ao1(unique1) VALUES(12345678);
+INSERT INTO tenk_ao1(unique1) VALUES(12345678);
+ROLLBACK;
+BEGIN;
+INSERT INTO tenk_ao1(unique1) VALUES(87654321);
+INSERT INTO tenk_ao1(unique1) VALUES(87654321);
+INSERT INTO tenk_ao1(unique1) VALUES(87654321);
+INSERT INTO tenk_ao1(unique1) VALUES(87654321);
+INSERT INTO tenk_ao1(unique1) VALUES(87654321);
+COMMIT;
+SELECT count(*) FROM tenk_ao1 WHERE unique1 = 12345678; -- should be 0
+ count 
+-------
+     0
+(1 row)
+
+SELECT count(*) FROM tenk_ao1 WHERE unique1 = 87654321; -- should be 5
+ count 
+-------
+     5
+(1 row)
+
+--------------------
+-- cursors (basic)
+--------------------
+BEGIN;
+DECLARE foo1 CURSOR FOR SELECT * FROM tenk_ao1 ORDER BY 1,2,3,4;
+INFO:  GPORCA failed to produce a plan, falling back to planner
+DECLARE foo2 CURSOR FOR SELECT * FROM tenk_ao2 ORDER BY 1,2,3,4;
+INFO:  GPORCA failed to produce a plan, falling back to planner
+FETCH 1 in foo1;
+ unique1 | unique2 | two | four | ten | twenty | hundred | thousand | twothousand | fivethous | tenthous | odd | even | stringu1 | stringu2 | string4 
+---------+---------+-----+------+-----+--------+---------+----------+-------------+-----------+----------+-----+------+----------+----------+---------
+       0 |    9998 |   0 |    0 |   0 |      0 |       0 |        0 |           0 |         0 |        0 |   0 |    1 | AAAAAA   | OUOAAA   | OOOOxx
+(1 row)
+
+FETCH 2 in foo2;
+ unique1 | unique2 | two | four | ten | twenty | hundred | thousand | twothousand | fivethous | tenthous | odd | even | stringu1 | stringu2 | string4 
+---------+---------+-----+------+-----+--------+---------+----------+-------------+-----------+----------+-----+------+----------+----------+---------
+       0 |    9998 |   0 |    0 |   0 |      0 |       0 |        0 |           0 |         0 |        0 |   0 |    1 | AAAAAA   | OUOAAA   | OOOOxx
+       0 |    9998 |   0 |    0 |   0 |      0 |       0 |        0 |           0 |         0 |        0 |   0 |    1 | AAAAAA   | OUOAAA   | OOOOxx
+(2 rows)
+
+FETCH 1 in foo1;
+ unique1 | unique2 | two | four | ten | twenty | hundred | thousand | twothousand | fivethous | tenthous | odd | even | stringu1 | stringu2 | string4 
+---------+---------+-----+------+-----+--------+---------+----------+-------------+-----------+----------+-----+------+----------+----------+---------
+       0 |    9998 |   0 |    0 |   0 |      0 |       0 |        0 |           0 |         0 |        0 |   0 |    1 | AAAAAA   | OUOAAA   | OOOOxx
+(1 row)
+
+FETCH 2 in foo2;
+ unique1 | unique2 | two | four | ten | twenty | hundred | thousand | twothousand | fivethous | tenthous | odd | even | stringu1 | stringu2 | string4 
+---------+---------+-----+------+-----+--------+---------+----------+-------------+-----------+----------+-----+------+----------+----------+---------
+       0 |    9998 |   0 |    0 |   0 |      0 |       0 |        0 |           0 |         0 |        0 |   0 |    1 | AAAAAA   | OUOAAA   | OOOOxx
+       0 |    9998 |   0 |    0 |   0 |      0 |       0 |        0 |           0 |         0 |        0 |   0 |    1 | AAAAAA   | OUOAAA   | OOOOxx
+(2 rows)
+
+CLOSE foo1;
+CLOSE foo2;
+END;
+BEGIN;
+DECLARE foo3 NO SCROLL CURSOR FOR SELECT * FROM tenk_ao1 ORDER BY 1,2,3,4;
+INFO:  GPORCA failed to produce a plan, falling back to planner
+FETCH 1 FROM foo3;
+ unique1 | unique2 | two | four | ten | twenty | hundred | thousand | twothousand | fivethous | tenthous | odd | even | stringu1 | stringu2 | string4 
+---------+---------+-----+------+-----+--------+---------+----------+-------------+-----------+----------+-----+------+----------+----------+---------
+       0 |    9998 |   0 |    0 |   0 |      0 |       0 |        0 |           0 |         0 |        0 |   0 |    1 | AAAAAA   | OUOAAA   | OOOOxx
+(1 row)
+
+FETCH BACKWARD 1 FROM foo3; -- should fail
+ERROR:  backward scan is not supported in this version of Greenplum Database
+END;
+-- Cursors outside transaction blocks
+BEGIN;
+DECLARE foo4 CURSOR WITH HOLD FOR SELECT * FROM tenk_ao1 ORDER BY 1,2,3,4;
+INFO:  GPORCA failed to produce a plan, falling back to planner
+FETCH FROM foo4;
+ unique1 | unique2 | two | four | ten | twenty | hundred | thousand | twothousand | fivethous | tenthous | odd | even | stringu1 | stringu2 | string4 
+---------+---------+-----+------+-----+--------+---------+----------+-------------+-----------+----------+-----+------+----------+----------+---------
+       0 |    9998 |   0 |    0 |   0 |      0 |       0 |        0 |           0 |         0 |        0 |   0 |    1 | AAAAAA   | OUOAAA   | OOOOxx
+(1 row)
+
+FETCH FROM foo4;
+ unique1 | unique2 | two | four | ten | twenty | hundred | thousand | twothousand | fivethous | tenthous | odd | even | stringu1 | stringu2 | string4 
+---------+---------+-----+------+-----+--------+---------+----------+-------------+-----------+----------+-----+------+----------+----------+---------
+       0 |    9998 |   0 |    0 |   0 |      0 |       0 |        0 |           0 |         0 |        0 |   0 |    1 | AAAAAA   | OUOAAA   | OOOOxx
+(1 row)
+
+COMMIT;
+FETCH FROM foo4;
+ unique1 | unique2 | two | four | ten | twenty | hundred | thousand | twothousand | fivethous | tenthous | odd | even | stringu1 | stringu2 | string4 
+---------+---------+-----+------+-----+--------+---------+----------+-------------+-----------+----------+-----+------+----------+----------+---------
+       0 |    9998 |   0 |    0 |   0 |      0 |       0 |        0 |           0 |         0 |        0 |   0 |    1 | AAAAAA   | OUOAAA   | OOOOxx
+(1 row)
+
+SELECT name, statement, is_holdable, is_binary, is_scrollable FROM pg_cursors ORDER BY name;
+ name |                                 statement                                  | is_holdable | is_binary | is_scrollable 
+------+----------------------------------------------------------------------------+-------------+-----------+---------------
+ foo4 | DECLARE foo4 CURSOR WITH HOLD FOR SELECT * FROM tenk_ao1 ORDER BY 1,2,3,4; | t           | f         | f
+(1 row)
+
+CLOSE foo4;
+-- DROP
+DROP TABLE tenk_ao1;
+DROP TABLE tenk_ao2;
+DROP TABLE tenk_ao3;
+DROP TABLE tenk_ao4;
+-- CTAS
+CREATE TABLE tenk_ao1 with(appendonly=true, checksum=true) AS SELECT * FROM tenk_heap;
+NOTICE:  Table doesn't have 'DISTRIBUTED BY' clause. Creating a NULL policy entry.
+-- Incase of CTAS also, gp_fastsequence entries must get created and use segfile 0
+-- With and without ORCA last_sequence fluctuates bit and hence using >= 3300 as
+-- inserting 10k tuples to 3 node system must atleast have last_sequence >= 3300
+-- on each node.
+SELECT CASE WHEN xmin = 2 THEN 'FrozenXid' ELSE 'NormalXid' END, objmod, CASE
+WHEN objmod = 0 THEN last_sequence >= 3300 WHEN objmod = 1 THEN last_sequence =
+0 END, gp_segment_id from gp_dist_random('gp_fastsequence') WHERE objid IN (SELECT
+segrelid FROM pg_appendonly WHERE relid IN (SELECT oid FROM pg_class WHERE
+relname='tenk_ao1'));
+INFO:  GPORCA failed to produce a plan, falling back to planner
+   case    | objmod | case | gp_segment_id 
+-----------+--------+------+---------------
+ NormalXid |      0 | t    |             0
+ NormalXid |      1 | t    |             0
+ NormalXid |      0 | t    |             1
+ NormalXid |      1 | t    |             1
+ NormalXid |      0 | t    |             2
+ NormalXid |      1 | t    |             2
+(6 rows)
+
+CREATE TABLE tenk_ao2 with(appendonly=true, compresslevel=0, blocksize=262144) AS SELECT * FROM tenk_heap;
+NOTICE:  Table doesn't have 'DISTRIBUTED BY' clause. Creating a NULL policy entry.
+CREATE TABLE tenk_ao3 with(appendonly=true, compresslevel=6, blocksize=1048576, checksum=true) AS SELECT * FROM tenk_heap;
+NOTICE:  Table doesn't have 'DISTRIBUTED BY' clause. Creating a NULL policy entry.
+CREATE TABLE tenk_ao4 with(appendonly=true, compresslevel=1, compresstype=zlib) AS SELECT * FROM tenk_heap;
+NOTICE:  Table doesn't have 'DISTRIBUTED BY' clause. Creating a NULL policy entry.
+SELECT c.relname, a.blocksize, a.compresstype, a.compresslevel, a.checksum FROM pg_class c, pg_appendonly a
+       WHERE c.relname LIKE 'tenk_ao%' AND c.oid=a.relid AND c.relname not like 'tenk_aocs%' ORDER BY c.relname;
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ relname  | blocksize | compresstype | compresslevel | checksum 
+----------+-----------+--------------+---------------+----------
+ tenk_ao1 |     32768 |              |             0 | t
+ tenk_ao2 |    262144 |              |             0 | t
+ tenk_ao3 |   1048576 | zlib         |             6 | t
+ tenk_ao4 |     32768 | zlib         |             1 | t
+ tenk_ao5 |   1048576 | zlib         |             6 | t
+(5 rows)
+
+SELECT count(*) FROM tenk_ao1;
+ count 
+-------
+ 10000
+(1 row)
+
+SELECT count(*) FROM tenk_ao2;
+ count 
+-------
+ 10000
+(1 row)
+
+SELECT count(*) FROM tenk_ao3;
+ count 
+-------
+ 10000
+(1 row)
+
+SELECT count(*) FROM tenk_ao4;
+ count 
+-------
+ 10000
+(1 row)
+
+-- Perform same transaction CREATE, followed by INSERT to validate
+-- gp_fastseqeunce is using normal xid and not frozen transaction id.
+BEGIN;
+CREATE TABLE appendonly_sametxn_create_insert(a int, b int) with (appendonly=true);
+NOTICE:  Table doesn't have 'DISTRIBUTED BY' clause -- Using column named 'a' as the Greenplum Database data distribution key for this table.
+HINT:  The 'DISTRIBUTED BY' clause determines the distribution of data. Make sure column(s) chosen are the optimal data distribution key to minimize skew.
+INSERT INTO appendonly_sametxn_create_insert select * from generate_series(1, 10);
+-- Make sure insert is using segfile 1 for the insert, as part of create table itself.
+SELECT CASE WHEN xmin = 2 THEN 'FrozenXid' ELSE 'NormalXid' END, objmod,
+last_sequence, gp_segment_id from gp_dist_random('gp_fastsequence') WHERE objid
+IN (SELECT segrelid FROM pg_appendonly WHERE relid IN (SELECT oid FROM pg_class
+WHERE relname='appendonly_sametxn_create_insert'));
+INFO:  GPORCA failed to produce a plan, falling back to planner
+   case    | objmod | last_sequence | gp_segment_id 
+-----------+--------+---------------+---------------
+ NormalXid |      0 |             0 |             0
+ NormalXid |      1 |           100 |             0
+ NormalXid |      0 |             0 |             1
+ NormalXid |      1 |           100 |             1
+ NormalXid |      0 |             0 |             2
+ NormalXid |      1 |           100 |             2
+(6 rows)
+
+INSERT INTO appendonly_sametxn_create_insert select * from generate_series(1, 10);
+SELECT CASE WHEN xmin = 2 THEN 'FrozenXid' ELSE 'NormalXid' END, objmod,
+last_sequence, gp_segment_id from gp_dist_random('gp_fastsequence') WHERE objid
+IN (SELECT segrelid FROM pg_appendonly WHERE relid IN (SELECT oid FROM pg_class
+WHERE relname='appendonly_sametxn_create_insert'));
+INFO:  GPORCA failed to produce a plan, falling back to planner
+   case    | objmod | last_sequence | gp_segment_id 
+-----------+--------+---------------+---------------
+ NormalXid |      0 |             0 |             0
+ NormalXid |      1 |           200 |             0
+ NormalXid |      0 |             0 |             1
+ NormalXid |      1 |           200 |             1
+ NormalXid |      0 |             0 |             2
+ NormalXid |      1 |           200 |             2
+(6 rows)
+
+ABORT;
+-- test get_ao_compression_ratio. use uncompressed table, so result is always 1.
+SELECT get_ao_compression_ratio('tenk_ao2');
+INFO:  GPORCA failed to produce a plan, falling back to planner
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "select sum(eof), sum(eofuncompressed) from gp_dist_random('pg_aoseg.pg_aoseg_393793')"
+ get_ao_compression_ratio 
+--------------------------
+                        1
+(1 row)
+
+-- VACUUM
+VACUUM tenk_ao1;
+VACUUM tenk_ao2;
+VACUUM tenk_ao3;
+VACUUM tenk_ao4;
+VACUUM FULL tenk_ao1;
+ANALYZE tenk_ao2;
+ANALYZE tenk_ao4;
+VACUUM ANALYZE tenk_ao3;
+SELECT count(*) FROM tenk_ao1;
+ count 
+-------
+ 10000
+(1 row)
+
+SELECT count(*) FROM tenk_ao2;
+ count 
+-------
+ 10000
+(1 row)
+
+SELECT count(*) FROM tenk_ao3;
+ count 
+-------
+ 10000
+(1 row)
+
+SELECT count(*) FROM tenk_ao4;
+ count 
+-------
+ 10000
+(1 row)
+
+-- JOIN
+SELECT count(*) FROM tenk_ao1 t1, tenk_ao2 t2 where t1.unique1 = t2.unique2;
+ count 
+-------
+ 10000
+(1 row)
+
+SELECT count(*) FROM tenk_ao1 t1, tenk_heap t2 where t1.unique1 = t2.unique2;
+ count 
+-------
+ 10000
+(1 row)
+
+SELECT count(*) FROM tenk_ao1 t1 INNER JOIN tenk_ao2 t2 ON (t1.unique1 = t2.unique2);
+ count 
+-------
+ 10000
+(1 row)
+
+SELECT count(*) FROM tenk_ao1 t1 LEFT OUTER JOIN tenk_ao2 t2 ON (t1.unique1 = t2.unique2);
+ count 
+-------
+ 10000
+(1 row)
+
+SELECT count(*) FROM tenk_ao1 t1 RIGHT OUTER JOIN tenk_ao2 t2 ON (t1.unique1 = t2.unique2);
+ count 
+-------
+ 10000
+(1 row)
+
+SELECT count(*) FROM tenk_ao1 t1 FULL OUTER JOIN tenk_ao2 t2 ON (t1.unique1 = t2.unique2);
+ count 
+-------
+ 10000
+(1 row)
+
+SELECT count(*) FROM tenk_ao1 t1 INNER JOIN tenk_ao2 t2 ON (t1.unique1 = t2.unique2) where t1.unique1 = 8095;
+ count 
+-------
+     1
+(1 row)
+
+SELECT count(*) FROM tenk_ao1 t1 LEFT OUTER JOIN tenk_ao2 t2 ON (t1.unique1 = t2.unique2) where t1.unique1 = 8095;
+ count 
+-------
+     1
+(1 row)
+
+SELECT count(*) FROM tenk_ao1 t1 RIGHT OUTER JOIN tenk_ao2 t2 ON (t1.unique1 = t2.unique2) where t1.unique1 = 8095;
+ count 
+-------
+     1
+(1 row)
+
+SELECT count(*) FROM tenk_ao1 t1 FULL OUTER JOIN tenk_ao2 t2 ON (t1.unique1 = t2.unique2) where t1.unique1 = 8095;
+ count 
+-------
+     1
+(1 row)
+
+CREATE TABLE empty_ao_table_for_join (like tenk_heap) with (appendonly=true) distributed by(unique1);
+SELECT count(*) FROM tenk_ao1 t1 INNER JOIN empty_ao_table_for_join t2 ON (t1.unique1 = t2.unique2);
+ count 
+-------
+     0
+(1 row)
+
+SELECT count(*) FROM tenk_ao1 t1 LEFT OUTER JOIN empty_ao_table_for_join t2 ON (t1.unique1 = t2.unique2);
+ count 
+-------
+ 10000
+(1 row)
+
+-- EXCEPT
+SELECT unique1 FROM tenk_ao1 EXCEPT SELECT unique1 FROM tenk_ao1;
+ unique1 
+---------
+(0 rows)
+
+SELECT unique1 FROM tenk_heap EXCEPT SELECT unique1 FROM tenk_ao3;
+ unique1 
+---------
+(0 rows)
+
+-- Get gp_fastsequence details before truncate
+SELECT CASE WHEN xmin = 2 THEN 'FrozenXid' ELSE 'NormalXid' END, objmod,
+last_sequence > 0, gp_segment_id from gp_dist_random('gp_fastsequence') WHERE objid
+IN (SELECT segrelid FROM pg_appendonly WHERE relid IN (SELECT oid FROM pg_class
+WHERE relname='tenk_ao2'));
+INFO:  GPORCA failed to produce a plan, falling back to planner
+   case    | objmod | ?column? | gp_segment_id 
+-----------+--------+----------+---------------
+ NormalXid |      0 | t        |             1
+ NormalXid |      1 | t        |             1
+ NormalXid |      0 | t        |             2
+ NormalXid |      1 | t        |             2
+ NormalXid |      0 | t        |             0
+ NormalXid |      1 | t        |             0
+(6 rows)
+
+-- TRUNCATE
+TRUNCATE tenk_ao2;
+-- Truncate changes relfilnode, as a result old pg_aoseg table is truncated but
+-- gp_fastsequence remains intact.
+SELECT CASE WHEN xmin = 2 THEN 'FrozenXid' ELSE 'NormalXid' END, objmod,
+last_sequence > 0, gp_segment_id from gp_dist_random('gp_fastsequence') WHERE objid
+IN (SELECT segrelid FROM pg_appendonly WHERE relid IN (SELECT oid FROM pg_class
+WHERE relname='tenk_ao2'));
+INFO:  GPORCA failed to produce a plan, falling back to planner
+   case    | objmod | ?column? | gp_segment_id 
+-----------+--------+----------+---------------
+ NormalXid |      0 | t        |             1
+ NormalXid |      1 | t        |             1
+ NormalXid |      0 | t        |             2
+ NormalXid |      1 | t        |             2
+ NormalXid |      0 | t        |             0
+ NormalXid |      1 | t        |             0
+(6 rows)
+
+-- OIDS
+CREATE TABLE aowithoids(a int, b int) WITH (appendonly=true,oids=true);
+NOTICE:  Table doesn't have 'DISTRIBUTED BY' clause -- Using column named 'a' as the Greenplum Database data distribution key for this table.
+HINT:  The 'DISTRIBUTED BY' clause determines the distribution of data. Make sure column(s) chosen are the optimal data distribution key to minimize skew.
+NOTICE:  OIDS=TRUE is not recommended for user-created tables. Use OIDS=FALSE to prevent wrap-around of the OID counter
+COPY aowithoids FROM STDIN;
+SELECT * FROM aowithoids ORDER BY a; -- this should show a,b only
+ a | b 
+---+---
+ 1 | 1
+ 2 | 2
+(2 rows)
+
+SELECT oideq(oid,-1) FROM aowithoids; -- kind of stupid but checks that oid actually exists and is queriable. should always be 'f'
+ oideq 
+-------
+ f
+ f
+(2 rows)
+
+-- CREATE INDEX
+CREATE INDEX tenk_ao1_unique1 ON tenk_ao1 USING btree(unique1 int4_ops);
+drop table if exists ao;
+NOTICE:  table "ao" does not exist, skipping
+create table ao (i int, j int, k varchar) with(appendonly=true);
+NOTICE:  Table doesn't have 'DISTRIBUTED BY' clause -- Using column named 'i' as the Greenplum Database data distribution key for this table.
+HINT:  The 'DISTRIBUTED BY' clause determines the distribution of data. Make sure column(s) chosen are the optimal data distribution key to minimize skew.
+insert into ao values (1,1,'a'), (2,2,'aa'), (3,3,'aaa'), (4,4,'aaaa'),
+	(5,5,'aaaaa'), (6,6,'aaaaaa'), (7,7,'aaaaaaa'), (8,8,'aaaaaaaa');
+create index ao_j on ao using btree(j);
+create index ao_k on ao using btree(k);
+create index ao_jk on ao using btree((j + length(k)));
+set enable_seqscan=off;
+select * from ao where j = 2;
+ i | j | k  
+---+---+----
+ 2 | 2 | aa
+(1 row)
+
+insert into ao values (9,1,'b'), (10,2,'bb'), (11,3,'bbb'), (12,4,'bbbb'),
+	(13,5,'aaaaa'), (14,6,'aaaaaa'), (15,7,'aaaaaaa'), (16,8,'aaaaaaaa');
+select * from ao where j = 2;
+ i  | j | k  
+----+---+----
+  2 | 2 | aa
+ 10 | 2 | bb
+(2 rows)
+
+insert into ao values (9,2,'b'), (10,2,'bb'), (11,2,'bbb'), (12,2,'bbbb'),
+	(13,5,'aaaaa'), (14,6,'aaaaaa'), (15,7,'aaaaaaa'), (16,8,'aaaaaaaa');
+select * from ao where j = 2;
+ i  | j |  k   
+----+---+------
+  2 | 2 | aa
+ 10 | 2 | bb
+  9 | 2 | b
+ 10 | 2 | bb
+ 11 | 2 | bbb
+ 12 | 2 | bbbb
+(6 rows)
+
+create index ao_ij on ao (i, j) with (fillfactor=10);
+alter index ao_ij set (fillfactor=20);
+reindex index ao_ij;
+select indexname from pg_indexes where tablename = 'ao' order by indexname;
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ indexname 
+-----------
+ ao_ij
+ ao_j
+ ao_jk
+ ao_k
+(4 rows)
+
+alter table ao alter j type bigint;
+ERROR:  cannot alter indexed column
+HINT:  DROP the index first, and recreate it after the ALTER
+alter table ao rename j to j_renamed;
+alter table ao drop column j_renamed;
+select tablename, attname, avg_width, n_distinct from pg_stats where tablename = 'ao' order by attname, tablename;
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ tablename | attname | avg_width | n_distinct 
+-----------+---------+-----------+------------
+ ao        | i       |         4 |         -1
+ ao        | k       |         5 |         -1
+(2 rows)
+
+create index ao_i on ao (i) where i = 9;
+analyze ao;
+select tablename, attname, avg_width, n_distinct from pg_stats where tablename = 'ao' order by attname, tablename;
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ tablename | attname | avg_width | n_distinct 
+-----------+---------+-----------+------------
+ ao        | i       |         4 |  -0.666667
+ ao        | k       |         5 |       -0.5
+(2 rows)
+
+select indexname from pg_indexes where tablename = 'ao' order by indexname;
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ indexname 
+-----------
+ ao_i
+ ao_k
+(2 rows)
+
+select * from ao where i = 9;
+ i | k 
+---+---
+ 9 | b
+ 9 | b
+(2 rows)
+
+alter index ao_i rename to ao_i_renamed;
+select indexname from pg_indexes where tablename = 'ao' order by indexname;
+INFO:  GPORCA failed to produce a plan, falling back to planner
+  indexname   
+--------------
+ ao_i_renamed
+ ao_k
+(2 rows)
+
+drop index if exists ao_i_renamed;
+drop table if exists ao;
+create table ao (i int, j int, k varchar) with(appendonly=true);
+NOTICE:  Table doesn't have 'DISTRIBUTED BY' clause -- Using column named 'i' as the Greenplum Database data distribution key for this table.
+HINT:  The 'DISTRIBUTED BY' clause determines the distribution of data. Make sure column(s) chosen are the optimal data distribution key to minimize skew.
+insert into ao values (1,1,'a'), (2,2,'aa'), (3,3,'aaa'), (4,4,'aaaa'),
+	(5,5,'aaaaa'), (6,6,'aaaaaa'), (7,7,'aaaaaaa'), (8,8,'aaaaaaaa');
+create index ao_j on ao using bitmap(j);
+create index ao_k on ao using bitmap(k);
+create index ao_jk on ao using bitmap((j + length(k)));
+set enable_seqscan=off;
+select * from ao where j = 2;
+ i | j | k  
+---+---+----
+ 2 | 2 | aa
+(1 row)
+
+insert into ao values (9,1,'b'), (10,2,'bb'), (11,3,'bbb'), (12,4,'bbbb'),
+	(13,5,'aaaaa'), (14,6,'aaaaaa'), (15,7,'aaaaaaa'), (16,8,'aaaaaaaa');
+select * from ao where j = 2;
+ i  | j | k  
+----+---+----
+  2 | 2 | aa
+ 10 | 2 | bb
+(2 rows)
+
+insert into ao values (9,2,'b'), (10,2,'bb'), (11,2,'bbb'), (12,2,'bbbb'),
+	(13,5,'aaaaa'), (14,6,'aaaaaa'), (15,7,'aaaaaaa'), (16,8,'aaaaaaaa');
+select * from ao where j = 2;
+ i  | j |  k   
+----+---+------
+ 10 | 2 | bb
+  9 | 2 | b
+ 10 | 2 | bb
+ 11 | 2 | bbb
+ 12 | 2 | bbbb
+  2 | 2 | aa
+(6 rows)
+
+-- small test on a performance bug in bitmap indexes due to large tid gaps
+insert into ao select i, 0, 'aaaaaaa' from generate_series(1, 20) i;
+insert into ao select i, 1, 'aaa' from generate_series(1, 20) i;
+insert into ao select i, 2, 'a' from generate_series(1, 20) i;
+select distinct j from ao where j > -1 and j < 3 order by j;
+ j 
+---
+ 0
+ 1
+ 2
+(3 rows)
+
+-- TEMP TABLES w/ INDEXES
+create temp table temp_tenk_ao5 with (appendonly=true, orientation=column, compresstype=zlib, compresslevel=1)
+    as select * from tenk_ao5 distributed by (unique1);
+create index temp_even_index on temp_tenk_ao5 (even);
+select count(*) from temp_tenk_ao5;
+ count 
+-------
+     0
+(1 row)
+
+select tablename, indexname, indexdef from pg_indexes where tablename = 'temp_tenk_ao5';
+INFO:  GPORCA failed to produce a plan, falling back to planner
+   tablename   |    indexname    |                             indexdef                             
+---------------+-----------------+------------------------------------------------------------------
+ temp_tenk_ao5 | temp_even_index | CREATE INDEX temp_even_index ON temp_tenk_ao5 USING btree (even)
+(1 row)
+
+insert into temp_tenk_ao5(unique1, unique2) values (99998888, 99998888);
+update temp_tenk_ao5 set unique2 = 99998889 where unique2 = 99998888;
+delete from temp_tenk_ao5 where unique2 = 99998889;
+select count(*) from temp_tenk_ao5;
+ count 
+-------
+     0
+(1 row)
+
+truncate table temp_tenk_ao5;
+vacuum analyze temp_tenk_ao5;
+\d temp_tenk_ao5
+INFO:  GPORCA failed to produce a plan, falling back to planner
+INFO:  GPORCA failed to produce a plan, falling back to planner
+INFO:  GPORCA failed to produce a plan, falling back to planner
+INFO:  GPORCA failed to produce a plan, falling back to planner
+INFO:  GPORCA failed to produce a plan, falling back to planner
+INFO:  GPORCA failed to produce a plan, falling back to planner
+INFO:  GPORCA failed to produce a plan, falling back to planner
+INFO:  GPORCA failed to produce a plan, falling back to planner
+INFO:  GPORCA failed to produce a plan, falling back to planner
+INFO:  GPORCA failed to produce a plan, falling back to planner
+Append-Only Columnar Table "pg_temp_30.temp_tenk_ao5"
+   Column    |  Type   | Modifiers 
+-------------+---------+-----------
+ unique1     | integer | 
+ unique2     | integer | 
+ two         | integer | 
+ four        | integer | 
+ ten         | integer | 
+ twenty      | integer | 
+ hundred     | integer | 
+ thousand    | integer | 
+ twothousand | integer | 
+ fivethous   | integer | 
+ tenthous    | integer | 
+ odd         | integer | 
+ even        | integer | 
+ stringu1    | name    | 
+ stringu2    | name    | 
+ string4     | name    | 
+Checksum: t
+Indexes:
+    "temp_even_index" btree (even)
+Distributed by: (unique1)
+
+insert into temp_tenk_ao5(unique1, unique2) values (99998888, 99998888);
+select unique1 from temp_tenk_ao5;
+ unique1  
+----------
+ 99998888
+(1 row)
+
+-- TEMP TABLES w/ COMMIT DROP AND USING PREPARE
+begin;
+prepare tenk_ao5_prep(int4) as select * from tenk_ao5 where unique1 > 8000;
+create temp table tenk_ao5_temp_drop with (appendonly=true, orientation=column, compresstype=zlib, compresslevel=1)
+    on commit drop as execute tenk_ao5_prep(8095);
+NOTICE:  Table doesn't have 'DISTRIBUTED BY' clause. Creating a NULL policy entry.
+select count(*) from tenk_ao5_temp_drop;
+ count 
+-------
+     0
+(1 row)
+
+commit;
+select count(*) from tenk_ao5_temp_drop;
+ERROR:  relation "tenk_ao5_temp_drop" does not exist
+LINE 1: select count(*) from tenk_ao5_temp_drop;
+                             ^
+-- TEMP TABLES w/ COMMIT DELETE ROWS
+begin;
+create temp table tenk_ao5_temp_delete_rows with (appendonly=true, orientation=column, compresstype=zlib, compresslevel=1)
+    on commit delete rows as select * from tenk_ao5 where unique1 > 8000 distributed by (unique1);
+select count(*) from tenk_ao5_temp_delete_rows;
+ count 
+-------
+     0
+(1 row)
+
+commit;
+select count(*) from tenk_ao5_temp_delete_rows;
+ count 
+-------
+     0
+(1 row)
+
+-- TEMP TABLES w/ COMMIT PRESERVE ROWS
+begin;
+create temp table tenk_ao5_temp_pres_rows with (appendonly=true, orientation=column, compresstype=zlib, compresslevel=1)
+    on commit preserve rows as select * from tenk_ao5 where unique1 > 8000 distributed by (unique1);
+select count(*) from tenk_ao5_temp_pres_rows;
+ count 
+-------
+     0
+(1 row)
+
+commit;
+select count(*) from tenk_ao5_temp_pres_rows;
+ count 
+-------
+     0
+(1 row)
+
+-- RULES
+insert into tenk_ao5(unique1, unique2) values (1, 99998889);
+create rule ao_rule_update as on insert to tenk_ao5 do instead update tenk_ao5 set two=2;
+insert into tenk_ao5(unique1, unique2) values (2, 99998889);
+select distinct two from tenk_ao5;
+ two 
+-----
+   2
+(1 row)
+
+create rule ao_rule_delete as on update to tenk_ao5 do instead delete from tenk_ao5 where unique1=1;
+insert into tenk_ao5(unique1, unique2) values (3, 99998889); -- should go through both rules
+select * from tenk_ao5 where unique1=1;
+ unique1 | unique2 | two | four | ten | twenty | hundred | thousand | twothousand | fivethous | tenthous | odd | even | stringu1 | stringu2 | string4 
+---------+---------+-----+------+-----+--------+---------+----------+-------------+-----------+----------+-----+------+----------+----------+---------
+(0 rows)
+
+---------------------
+-- UAO
+---------------------
+-- DELETE
+select count(*) from tenk_ao1;
+ count 
+-------
+ 10000
+(1 row)
+
+select count(*) from gp_toolkit.__gp_aoseg_name('tenk_ao1') where modcount > 0;
+ count 
+-------
+     0
+(1 row)
+
+DELETE FROM tenk_ao1 WHERE unique1 = 1;
+-- modcount after DELETE must increment to flag table should be included in
+-- incremental backup
+select count(*) from gp_toolkit.__gp_aoseg_name('tenk_ao1') where modcount > 0;
+ count 
+-------
+     1
+(1 row)
+
+select count(*) from tenk_ao1;
+ count 
+-------
+  9999
+(1 row)
+
+-- UPDATE
+select count(*) from tenk_ao1 where unique2 < 0;
+ count 
+-------
+     0
+(1 row)
+
+UPDATE tenk_ao1 SET unique2 = -unique1 WHERE unique2 <= 5;
+UPDATE tenk_ao1 SET two = 2;
+-- modcount after UPDATE must increment to flag table should be included in
+-- incremental backup
+select count(*) from gp_toolkit.__gp_aoseg_name('tenk_ao1') where modcount > 1;
+ count 
+-------
+     1
+(1 row)
+
+select count(*) from tenk_ao1 where unique2 < 0;
+ count 
+-------
+     6
+(1 row)
+
+-- ALTER
+ALTER TABLE tenk_ao1 RENAME TO tenk_renamed;
+ALTER TABLE tenk_renamed ADD COLUMN newcol int default 10;
+-- Validate post alter gp_fastsequence reflects correctly
+SELECT CASE WHEN xmin = 2 THEN 'FrozenXid' ELSE 'NormalXid' END, objmod, CASE
+WHEN objmod = 0 THEN last_sequence >= 3300 WHEN objmod = 1 THEN last_sequence =
+0 END, gp_segment_id from gp_dist_random('gp_fastsequence') WHERE objid IN (SELECT
+segrelid FROM pg_appendonly WHERE relid IN (SELECT oid FROM pg_class WHERE
+relname='tenk_renamed'));
+INFO:  GPORCA failed to produce a plan, falling back to planner
+   case    | objmod | case | gp_segment_id 
+-----------+--------+------+---------------
+ NormalXid |      0 | t    |             2
+ NormalXid |      1 | t    |             2
+ NormalXid |      0 | t    |             0
+ NormalXid |      1 | t    |             0
+ NormalXid |      0 | t    |             1
+ NormalXid |      1 | t    |             1
+(6 rows)
+
+ALTER TABLE tenk_renamed ALTER COLUMN twothousand SET NOT NULL;
+ALTER TABLE tenk_renamed ADD COLUMN sercol serial; -- MPP-10015
+NOTICE:  ALTER TABLE will create implicit sequence "tenk_renamed_sercol_seq" for serial column "tenk_renamed.sercol"
+ALTER TABLE tenk_renamed ADD COLUMN newcol2 int NOT NULL; -- should fail
+ERROR:  column "newcol2" contains null values  (seg2 192.168.100.224:25434 pid=3319)
+SELECT count(*) FROM tenk_renamed;
+ count 
+-------
+  9999
+(1 row)
+
+ALTER TABLE tenk_renamed RENAME TO tenk_ao1;
+--------------------
+-- system columns
+--------------------
+CREATE TABLE syscoltest(a int) WITH (appendonly=true);
+NOTICE:  Table doesn't have 'DISTRIBUTED BY' clause -- Using column named 'a' as the Greenplum Database data distribution key for this table.
+HINT:  The 'DISTRIBUTED BY' clause determines the distribution of data. Make sure column(s) chosen are the optimal data distribution key to minimize skew.
+INSERT INTO syscoltest VALUES(1);
+SELECT ctid FROM syscoltest;
+       ctid       
+------------------
+ (33554432,32769)
+(1 row)
+
+DROP TABLE syscoltest;
+--------------------
+-- relation size tests -- make sure can execute without block directory, sanity checks on relative sizes
+--
+--
+--------------------
+CREATE TABLE aosizetest_1(a int) WITH (appendonly=true);
+NOTICE:  Table doesn't have 'DISTRIBUTED BY' clause -- Using column named 'a' as the Greenplum Database data distribution key for this table.
+HINT:  The 'DISTRIBUTED BY' clause determines the distribution of data. Make sure column(s) chosen are the optimal data distribution key to minimize skew.
+CREATE TABLE aosizetest_2(a int) WITH (appendonly=true);
+NOTICE:  Table doesn't have 'DISTRIBUTED BY' clause -- Using column named 'a' as the Greenplum Database data distribution key for this table.
+HINT:  The 'DISTRIBUTED BY' clause determines the distribution of data. Make sure column(s) chosen are the optimal data distribution key to minimize skew.
+--
+-- size will be < total size because of segrelid
+--
+SELECT pg_relation_size('aosizetest_1') < pg_total_relation_size('aosizetest_1') as total_exceeds_regular;
+INFO:  GPORCA failed to produce a plan, falling back to planner
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "select sum(pg_relation_size('aosizetest_1'))::int8 from gp_dist_random('gp_id');"
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "select sum(pg_total_relation_size('aosizetest_1'))::int8 from gp_dist_random('gp_id');"
+ total_exceeds_regular 
+-----------------------
+ t
+(1 row)
+
+--
+-- create currently build block directory, but dropping last index does not delete block directory...
+--  so we will verify that the size of _2 is greater than the size of _1 after this
+--
+CREATE INDEX aosizetest_2_idx on aosizetest_2(a);
+DROP INDEX aosizetest_2_idx;
+SELECT pg_total_relation_size('aosizetest_1') < pg_total_relation_size('aosizetest_2') as with_block_dir_exceeds_without;
+INFO:  GPORCA failed to produce a plan, falling back to planner
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "select sum(pg_total_relation_size('aosizetest_1'))::int8 from gp_dist_random('gp_id');"
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "select sum(pg_total_relation_size('aosizetest_2'))::int8 from gp_dist_random('gp_id');"
+ with_block_dir_exceeds_without 
+--------------------------------
+ t
+(1 row)
+
+DROP TABLE aosizetest_1;
+DROP TABLE aosizetest_2;
+-- These tests validate current segfile selection algorithm
+DROP TABLE IF EXISTS ao_selection;
+NOTICE:  table "ao_selection" does not exist, skipping
+CREATE TABLE ao_selection (a INT, b INT) WITH (appendonly=true);
+NOTICE:  Table doesn't have 'DISTRIBUTED BY' clause -- Using column named 'a' as the Greenplum Database data distribution key for this table.
+HINT:  The 'DISTRIBUTED BY' clause determines the distribution of data. Make sure column(s) chosen are the optimal data distribution key to minimize skew.
+INSERT INTO ao_selection VALUES (generate_series(1,100000), generate_series(1,10000));
+-- Validates insert is using single segfile to perform the insert to gp_fastsequence.
+SELECT CASE WHEN xmin = 2 THEN 'FrozenXid' ELSE 'NormalXid' END, objmod,
+last_sequence, gp_segment_id from gp_dist_random('gp_fastsequence') WHERE objid
+IN (SELECT segrelid FROM pg_appendonly WHERE relid IN (SELECT oid FROM pg_class
+WHERE relname='ao_selection'));
+INFO:  GPORCA failed to produce a plan, falling back to planner
+   case    | objmod | last_sequence | gp_segment_id 
+-----------+--------+---------------+---------------
+ NormalXid |      0 |             0 |             1
+ NormalXid |      1 |         33400 |             1
+ NormalXid |      0 |             0 |             2
+ NormalXid |      1 |         33400 |             2
+ NormalXid |      0 |             0 |             0
+ NormalXid |      1 |         33400 |             0
+(6 rows)
+
+-- Following insert without concurrency is also using same segfile as above
+INSERT INTO ao_selection values (generate_series(1,100000), generate_series(1,10000));
+SELECT CASE WHEN xmin = 2 THEN 'FrozenXid' ELSE 'NormalXid' END, objmod,
+last_sequence, gp_segment_id from gp_dist_random('gp_fastsequence') WHERE objid
+IN (SELECT segrelid FROM pg_appendonly WHERE relid IN (SELECT oid FROM pg_class
+WHERE relname='ao_selection'));
+INFO:  GPORCA failed to produce a plan, falling back to planner
+   case    | objmod | last_sequence | gp_segment_id 
+-----------+--------+---------------+---------------
+ NormalXid |      0 |             0 |             0
+ NormalXid |      1 |         66800 |             0
+ NormalXid |      0 |             0 |             1
+ NormalXid |      1 |         66800 |             1
+ NormalXid |      0 |             0 |             2
+ NormalXid |      1 |         66800 |             2
+(6 rows)
+
+-- Check compression and distribution
+create table ao_compress_table (id int, v varchar)
+    with (appendonly=true, compresstype=zlib, compresslevel=1) distributed by (id);
+create table ao_compress_results(table_size int, ao_compress_id_index_size int, ao_compress_v_index_size int) distributed randomly;
+create index ao_compress_id_index on ao_compress_table (id);
+create index ao_compress_v_index on ao_compress_table (v);
+insert into ao_compress_results values (pg_relation_size('ao_compress_table'), pg_relation_size('ao_compress_id_index'), pg_relation_size('ao_compress_v_index'));
+INFO:  GPORCA failed to produce a plan, falling back to planner
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "select sum(pg_relation_size('ao_compress_table'))::int8 from gp_dist_random('gp_id');"
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "select sum(pg_relation_size('ao_compress_id_index'))::int8 from gp_dist_random('gp_id');"
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "select sum(pg_relation_size('ao_compress_v_index'))::int8 from gp_dist_random('gp_id');"
+insert into ao_compress_table (id, v) values (1, 'ifyouwantto99knowwhatist8329histhenkeepreadingit;;untilyou]findoutyoureyeshurtandyoustil0ldontknow103kwhatitisdoyouunderstandmeyetandifyoustillwanttoknowthenyoupleasekeepreading');
+insert into ao_compress_results values (pg_relation_size('ao_compress_table'), pg_relation_size('ao_compress_id_index'), pg_relation_size('ao_compress_v_index'));
+INFO:  GPORCA failed to produce a plan, falling back to planner
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "select sum(pg_relation_size('ao_compress_table'))::int8 from gp_dist_random('gp_id');"
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "select sum(pg_relation_size('ao_compress_id_index'))::int8 from gp_dist_random('gp_id');"
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "select sum(pg_relation_size('ao_compress_v_index'))::int8 from gp_dist_random('gp_id');"
+-- compression ratio should be between 1.2 and 1.3
+select get_ao_compression_ratio('ao_compress_table') > 1.2 and get_ao_compression_ratio('ao_compress_table') < 1.3;
+INFO:  GPORCA failed to produce a plan, falling back to planner
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "select sum(eof), sum(eofuncompressed) from gp_dist_random('pg_aoseg.pg_aoseg_397784')"
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "select sum(eof), sum(eofuncompressed) from gp_dist_random('pg_aoseg.pg_aoseg_397784')"
+ ?column? 
+----------
+ t
+(1 row)
+
+select get_ao_distribution('ao_compress_table');
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "select gp_segment_id,sum(tupcount) from gp_dist_random('pg_aoseg.pg_aoseg_397784') group by (gp_segment_id)"
+ get_ao_distribution 
+---------------------
+ (0,1)
+(1 row)
+
+truncate table ao_compress_table; -- after truncate, reclaim space from the table and index
+insert into ao_compress_results values (pg_relation_size('ao_compress_table'), pg_relation_size('ao_compress_id_index'), pg_relation_size('ao_compress_v_index'));
+INFO:  GPORCA failed to produce a plan, falling back to planner
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "select sum(pg_relation_size('ao_compress_table'))::int8 from gp_dist_random('gp_id');"
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "select sum(pg_relation_size('ao_compress_id_index'))::int8 from gp_dist_random('gp_id');"
+INFO:  GPORCA failed to produce a plan, falling back to planner
+CONTEXT:  SQL statement "select sum(pg_relation_size('ao_compress_v_index'))::int8 from gp_dist_random('gp_id');"
+select count(*) from (select distinct * from ao_compress_results) temp; -- should give 2 after reclaiming space
+ count 
+-------
+     2
+(1 row)
+
+-------------------- 
+-- supported sql 
+--------------------
+DROP TABLE tenk_heap;
+DROP TABLE tenk_ao1;
+DROP TABLE tenk_ao2;
+DROP TABLE tenk_ao3;
+DROP TABLE tenk_ao4;
+DROP TABLE tenk_ao5;
+DROP TABLE aowithoids;
+DROP TABLE ao_selection;
+---------------------------------------------------------------
+-- Sub-transaction tests to validate AO behavior
+---------------------------------------------------------------
+-- create table in sub-transaction aborts but top transaction commits
+BEGIN;
+SAVEPOINT sp1;
+CREATE TABLE appendonly_subxans_test(a int, b int) WITH (appendonly=true);
+NOTICE:  Table doesn't have 'DISTRIBUTED BY' clause -- Using column named 'a' as the Greenplum Database data distribution key for this table.
+HINT:  The 'DISTRIBUTED BY' clause determines the distribution of data. Make sure column(s) chosen are the optimal data distribution key to minimize skew.
+INSERT INTO appendonly_subxans_test SELECT * FROM generate_series(1, 10);
+SELECT CASE WHEN xmin = 2 THEN 'FrozenXid' ELSE 'NormalXid' END, objmod,
+last_sequence, gp_segment_id from gp_dist_random('gp_fastsequence') WHERE objid
+IN (SELECT segrelid FROM pg_appendonly WHERE relid IN (SELECT oid FROM pg_class
+WHERE relname='appendonly_subxans_test'));
+INFO:  GPORCA failed to produce a plan, falling back to planner
+   case    | objmod | last_sequence | gp_segment_id 
+-----------+--------+---------------+---------------
+ NormalXid |      0 |             0 |             0
+ NormalXid |      1 |           100 |             0
+ NormalXid |      0 |             0 |             1
+ NormalXid |      1 |           100 |             1
+ NormalXid |      0 |             0 |             2
+ NormalXid |      1 |           100 |             2
+(6 rows)
+
+ROLLBACK TO SAVEPOINT sp1;
+COMMIT;
+-- create table and insert in nested subtransaction, to validate insert to
+-- gp_fastsequence is using NormalXid and not FrozenXid.
+BEGIN;
+SAVEPOINT sp1;
+CREATE TABLE appendonly_subxans_test(a int, b int) WITH (appendonly=true);
+NOTICE:  Table doesn't have 'DISTRIBUTED BY' clause -- Using column named 'a' as the Greenplum Database data distribution key for this table.
+HINT:  The 'DISTRIBUTED BY' clause determines the distribution of data. Make sure column(s) chosen are the optimal data distribution key to minimize skew.
+SAVEPOINT sp2;
+INSERT INTO appendonly_subxans_test SELECT * FROM generate_series(1, 10);
+SELECT CASE WHEN xmin = 2 THEN 'FrozenXid' ELSE 'NormalXid' END, objmod,
+last_sequence, gp_segment_id from gp_dist_random('gp_fastsequence') WHERE objid
+IN (SELECT segrelid FROM pg_appendonly WHERE relid IN (SELECT oid FROM pg_class
+WHERE relname='appendonly_subxans_test'));
+INFO:  GPORCA failed to produce a plan, falling back to planner
+   case    | objmod | last_sequence | gp_segment_id 
+-----------+--------+---------------+---------------
+ NormalXid |      0 |             0 |             0
+ NormalXid |      1 |           100 |             0
+ NormalXid |      0 |             0 |             1
+ NormalXid |      1 |           100 |             1
+ NormalXid |      0 |             0 |             2
+ NormalXid |      1 |           100 |             2
+(6 rows)
+
+ROLLBACK TO SAVEPOINT sp1;
+COMMIT;
+-- create table and insert in independent subtransactions, validate insert to
+-- gp_fastsequence is using NormalXid and not FrozenXid and stays despite
+-- inserting subtransaction aborting.
+BEGIN;
+SAVEPOINT sp1;
+CREATE TABLE appendonly_subxans_test1(a int, b int) WITH (appendonly=true);
+NOTICE:  Table doesn't have 'DISTRIBUTED BY' clause -- Using column named 'a' as the Greenplum Database data distribution key for this table.
+HINT:  The 'DISTRIBUTED BY' clause determines the distribution of data. Make sure column(s) chosen are the optimal data distribution key to minimize skew.
+RELEASE SAVEPOINT sp1;
+SAVEPOINT sp2;
+INSERT INTO appendonly_subxans_test1 SELECT * FROM generate_series(1, 10);
+SELECT CASE WHEN xmin = 2 THEN 'FrozenXid' ELSE 'NormalXid' END, objmod,
+last_sequence, gp_segment_id from gp_dist_random('gp_fastsequence') WHERE objid
+IN (SELECT segrelid FROM pg_appendonly WHERE relid IN (SELECT oid FROM pg_class
+WHERE relname='appendonly_subxans_test1'));
+INFO:  GPORCA failed to produce a plan, falling back to planner
+   case    | objmod | last_sequence | gp_segment_id 
+-----------+--------+---------------+---------------
+ NormalXid |      0 |             0 |             0
+ NormalXid |      1 |           100 |             0
+ NormalXid |      0 |             0 |             1
+ NormalXid |      1 |           100 |             1
+ NormalXid |      0 |             0 |             2
+ NormalXid |      1 |           100 |             2
+(6 rows)
+
+ROLLBACK TO SAVEPOINT sp2;
+COMMIT;
+ANALYZE appendonly_subxans_test1;
+SELECT * FROM appendonly_subxans_test1;
+ a | b 
+---+---
+(0 rows)
+
+SELECT CASE WHEN xmin = 2 THEN 'FrozenXid' ELSE 'NormalXid' END, objmod,
+last_sequence, gp_segment_id from gp_dist_random('gp_fastsequence') WHERE objid
+IN (SELECT segrelid FROM pg_appendonly WHERE relid IN (SELECT oid FROM pg_class
+WHERE relname='appendonly_subxans_test1'));
+INFO:  GPORCA failed to produce a plan, falling back to planner
+   case    | objmod | last_sequence | gp_segment_id 
+-----------+--------+---------------+---------------
+ NormalXid |      0 |             0 |             1
+ NormalXid |      1 |           100 |             1
+ NormalXid |      0 |             0 |             2
+ NormalXid |      1 |           100 |             2
+ NormalXid |      0 |             0 |             0
+ NormalXid |      1 |           100 |             0
+(6 rows)
+
+-- create table in top transaction but first insert in sub-transaction
+BEGIN;
+CREATE TABLE appendonly_subxans_test(a int, b int) WITH (appendonly=true);
+NOTICE:  Table doesn't have 'DISTRIBUTED BY' clause -- Using column named 'a' as the Greenplum Database data distribution key for this table.
+HINT:  The 'DISTRIBUTED BY' clause determines the distribution of data. Make sure column(s) chosen are the optimal data distribution key to minimize skew.
+create index appendonly_subxans_test_idx on appendonly_subxans_test using btree(a);
+SAVEPOINT sp1;
+insert into appendonly_subxans_test select * from generate_series(1, 10);
+ROLLBACK TO SAVEPOINT sp1;
+insert into appendonly_subxans_test select * from generate_series(11, 20);
+COMMIT;
+ANALYZE appendonly_subxans_test;
+-- Validation to make sure gp_fastsequence is not broken. If gp_fastsequence is
+-- malfunctioning then this will return wrong result.
+SELECT * FROM appendonly_subxans_test WHERE a < 10;
+ a | b 
+---+---
+(0 rows)
+
+CREATE ROLE appendony_test_user2;
+NOTICE:  resource queue required -- using default resource queue "pg_default"
+BEGIN;
+CREATE TABLE fo(a int, b int) WITH (appendonly=true);
+NOTICE:  Table doesn't have 'DISTRIBUTED BY' clause -- Using column named 'a' as the Greenplum Database data distribution key for this table.
+HINT:  The 'DISTRIBUTED BY' clause determines the distribution of data. Make sure column(s) chosen are the optimal data distribution key to minimize skew.
+CREATE INDEX foidx ON fo USING btree(a);
+SAVEPOINT sp1;
+ALTER TABLE fo OWNER TO appendony_test_user2;
+INSERT INTO fo SELECT i,i FROM generate_series(1, 10)i;
+ROLLBACK TO SAVEPOINT sp1;
+INSERT INTO fo SELECT i,i FROM generate_series(11, 20)i;
+COMMIT;
+SET enable_seqscan=off;
+SET enable_indexscan=on;
+SET enable_bitmapscan=on;
+SELECT * FROM fo WHERE a < 10;
+ a | b 
+---+---
+(0 rows)
+
+RESET enable_seqscan;
+RESET enable_indexscan;
+RESET enable_bitmapscan;
+DROP OWNED BY appendony_test_user2 CASCADE;
+DROP ROLE IF EXISTS appendony_test_user2;
+--------------------------------------------------------------------------------
+-- Finally check to detect if any dangling gp_fastsequence entries are left
+-- behind by this SQL file
+--------------------------------------------------------------------------------
+SELECT objid FROM gp_fastsequence AS gfs LEFT OUTER JOIN (SELECT oid FROM
+pg_class) AS pgc ON (gfs.objid = pgc.oid) WHERE pgc.oid IS NULL;
+INFO:  GPORCA failed to produce a plan, falling back to planner
+ objid 
+-------
+(0 rows)
+
