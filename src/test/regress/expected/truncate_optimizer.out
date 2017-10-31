@@ -255,6 +255,8 @@ SELECT * FROM trunc_trigger_log;
 (0 rows)
 
 TRUNCATE trunc_trigger_test;
+CONTEXT:  PL/pgSQL function "trunctrigger" line 3 at EXECUTE statement
+INFO:  GPORCA failed to produce a plan, falling back to planner
 INFO:  GPORCA failed to produce a plan, falling back to planner
 CONTEXT:  SQL statement "insert into trunc_trigger_log values ( $1 ,  $2 ,  $3 ,  $4 ,  $5 ,  $6 )"
 PL/pgSQL function "trunctrigger" line 4 at SQL statement
