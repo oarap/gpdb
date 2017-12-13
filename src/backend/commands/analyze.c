@@ -118,6 +118,9 @@ static int acquire_sample_rows(Relation onerel, HeapTuple *rows,
 					int targrows, double *totalrows, double *totaldeadrows);
 static int acquire_sample_rows_by_query(Relation onerel, int nattrs, VacAttrStats **attrstats, HeapTuple **rows,
 										int targrows, double *totalrows, double *totaldeadrows, BlockNumber *totalpages, bool rootonly,  RowIndexes **colLargeRowIndexes /* Maintain information if the row of a column exceeds WIDTH_THRESHOLD */);
+static void acquire_ndv_by_query(Relation onerel, int nattrs, VacAttrStats **attrstats);
+static void acquire_ndv_estimator_by_query(Relation onerel, int nattrs, VacAttrStats **attrstats);
+
 static double random_fract(void);
 static double init_selection_state(int n);
 static double get_next_S(double t, int n, double *stateptr);
@@ -523,6 +526,9 @@ analyze_rel_internal(Oid relid, VacuumStmt *vacstmt,
 			stats->rows = rows; // Reset to original rows
 			MemoryContextResetAndDeleteChildren(col_context);
 		}
+
+		acquire_ndv_estimator_by_query(onerel, attr_cnt, vacattrstats);
+		acquire_ndv_by_query(onerel, attr_cnt, vacattrstats);
 
 		/*
 		 * Datums exceeding WIDTH_THRESHOLD are masked as NULL in the sample, and
@@ -1669,6 +1675,136 @@ acquire_sample_rows_by_query(Relation onerel, int nattrs, VacAttrStats **attrsta
 	SPI_finish();
 
 	return sampleTuples;
+}
+
+static void
+acquire_ndv_by_query(Relation onerel, int nattrs, VacAttrStats **attrstats)
+{
+	StringInfoData str;
+	int			i;
+	int			ret;
+	Datum	   *vals;
+	MemoryContext oldcxt;
+
+	Oid relid = RelationGetRelid(onerel);
+
+	initStringInfo(&str);
+
+	appendStringInfo(&str, "select attnum, hyperloglog_get_estimate(hll_estimator) from pg_hll where attrelid = %d order by 1", relid);
+
+	oldcxt = CurrentMemoryContext;
+
+	if (SPI_OK_CONNECT != SPI_connect())
+		ereport(ERROR, (errcode(ERRCODE_CDB_INTERNAL_ERROR),
+						errmsg("Unable to connect to execute internal query.")));
+
+	elog(elevel, "Executing SQL: %s", str.data);
+
+	/*
+	 * Do the query. We pass readonly==false, to force SPI to take a new
+	 * snapshot. That ensures that we see all changes by our own transaction.
+	 */
+	ret = SPI_execute(str.data, false, 0);
+	Assert(ret > 0);
+
+	/* Ok, read in the tuples to *rows */
+	MemoryContextSwitchTo(oldcxt);
+	vals = (Datum *) palloc(RelationGetNumberOfAttributes(onerel) * sizeof(Datum));
+
+	for (i = 0; i < RelationGetNumberOfAttributes(onerel); i++)
+	{
+		vals[i] = (Datum) 0;
+	}
+
+
+	int			j;
+
+	for (j = 0; j < nattrs; j++)
+	{
+		HeapTuple	sampletup = SPI_tuptable->vals[j];
+		int	tupattnum = attrstats[j]->tupattnum;
+		Assert(tupattnum >= 1 && tupattnum <= RelationGetNumberOfAttributes(onerel));
+
+		vals[tupattnum - 1] = heap_getattr(sampletup, 2,
+										   SPI_tuptable->tupdesc,
+										   NULL);
+		attrstats[j]->stadistinct = DatumGetFloat8(vals[tupattnum - 1]);
+	}
+
+	SPI_finish();
+}
+
+static void
+acquire_ndv_estimator_by_query(Relation onerel, int nattrs, VacAttrStats **attrstats)
+{
+	StringInfoData str;
+	StringInfoData columnStr;
+	StringInfoData deleteStr;
+	int			i;
+	const char *schemaName = NULL;
+	const char *tableName = NULL;
+	int			ret;
+	MemoryContext oldcxt;
+
+	schemaName = get_namespace_name(RelationGetNamespace(onerel));
+	tableName = RelationGetRelationName(onerel);
+	Oid relid = RelationGetRelid(onerel);
+
+	initStringInfo(&columnStr);
+
+	if (nattrs > 0)
+	{
+		for (i = 0; i < nattrs; i++)
+		{
+			const char *attname = quote_identifier(NameStr(attrstats[i]->attr->attname));
+			appendStringInfo(&columnStr, "hyperloglog_accum(%s)", attname);
+
+
+			if (i != nattrs - 1 )
+			{
+				appendStringInfo(&columnStr, ", ");
+			}
+		}
+	}
+	else
+	{
+		appendStringInfo(&columnStr, "NULL");
+	}
+
+	/*
+	 * If table is partitioned, we create a sample over all parts.
+	 * The external partitions are skipped.
+	 */
+
+	initStringInfo(&deleteStr);
+	appendStringInfo(&deleteStr, "delete from pg_hll where attrelid = %d", relid);
+	initStringInfo(&str);
+
+	appendStringInfo(&str, "insert into pg_hll select t1.attrelid, t1.attnum, t2.a from (select attrelid, attnum, row_number() over() from pg_attribute where attrelid = %d and attstattarget=-1) t1, (select a, row_number() over () from ( select unnest(T.array) from (select array[%s] as array from %s.%s ) as T ) S(a)) t2 where t1.row_number = t2.row_number",
+					relid,
+					columnStr.data,
+					schemaName,
+					tableName);
+
+	oldcxt = CurrentMemoryContext;
+
+	if (SPI_OK_CONNECT != SPI_connect())
+		ereport(ERROR, (errcode(ERRCODE_CDB_INTERNAL_ERROR),
+						errmsg("Unable to connect to execute internal query.")));
+
+	elog(elevel, "Executing SQL: %s", str.data);
+
+	ret = SPI_execute(deleteStr.data, false, 0);
+	Assert(ret > 0);
+
+	/*
+	 * Do the query. We pass readonly==false, to force SPI to take a new
+	 * snapshot. That ensures that we see all changes by our own transaction.
+	 */
+	ret = SPI_execute(str.data, false, 0);
+	Assert(ret > 0);
+
+	SPI_finish();
 }
 
 
