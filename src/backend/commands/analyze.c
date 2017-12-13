@@ -1750,44 +1750,111 @@ acquire_ndv_estimator_by_query(Relation onerel, int nattrs, VacAttrStats **attrs
 	tableName = RelationGetRelationName(onerel);
 	Oid relid = RelationGetRelid(onerel);
 
-	initStringInfo(&columnStr);
+	PartStatus ps = rel_part_status(relid);
 
-	if (nattrs > 0)
+	if (ps != PART_STATUS_ROOT)
 	{
-		for (i = 0; i < nattrs; i++)
+		initStringInfo(&columnStr);
+
+		if (nattrs > 0)
 		{
-			const char *attname = quote_identifier(NameStr(attrstats[i]->attr->attname));
-			appendStringInfo(&columnStr, "hyperloglog_accum(%s)", attname);
-
-
-			if (i != nattrs - 1 )
+			for (i = 0; i < nattrs; i++)
 			{
-				appendStringInfo(&columnStr, ", ");
+				const char *attname = quote_identifier(NameStr(attrstats[i]->attr->attname));
+				appendStringInfo(&columnStr, "hyperloglog_accum(%s)", attname);
+
+
+				if (i != nattrs - 1 )
+				{
+					appendStringInfo(&columnStr, ", ");
+				}
 			}
 		}
+		else
+		{
+			appendStringInfo(&columnStr, "NULL");
+		}
+
+		/*
+		 * If table is partitioned, we create a sample over all parts.
+		 * The external partitions are skipped.
+		 */
+
+		initStringInfo(&deleteStr);
+		appendStringInfo(&deleteStr, "delete from pg_hll where attrelid = %d", relid);
+		initStringInfo(&str);
+
+		appendStringInfo(&str, "insert into pg_hll select t1.attrelid, t1.attnum, t2.a from (select attrelid, attnum, row_number() over() from pg_attribute where attrelid = %d and attstattarget=-1) t1, (select a, row_number() over () from ( select unnest(T.array) from (select array[%s] as array from %s.%s ) as T ) S(a)) t2 where t1.row_number = t2.row_number",
+						relid,
+						columnStr.data,
+						schemaName,
+						tableName);
 	}
 	else
 	{
-		appendStringInfo(&columnStr, "NULL");
+		StringInfoData oid_str;
+
+		PartitionNode *pn = get_parts(relid, 0 /*level*/ ,
+											  0 /*parent*/, false /* inctemplate */, true /*includesubparts*/);
+		Assert(pn);
+
+		List *oid_list = all_leaf_partition_relids(pn); /* all leaves */
+
+		int numPartitions = list_length(oid_list);
+
+		initStringInfo(&columnStr);
+		initStringInfo(&oid_str);
+
+		if (numPartitions > 1)
+		{
+			for (i = 0; i < numPartitions; i++)
+			{
+				if (i != numPartitions - 1 )
+				{
+					appendStringInfo(&columnStr, "hyperloglog_merge(T.a[%d], ", i+1);
+					appendStringInfo(&oid_str,"%d, ", list_nth_oid(oid_list, i));
+				}
+				else
+				{
+					appendStringInfo(&columnStr, "T.a[%d] ",i+1);
+					appendStringInfo(&oid_str,"%d", list_nth_oid(oid_list, i));
+				}
+
+			}
+
+			for (i = 0; i < numPartitions-1; i++)
+			{
+				appendStringInfo(&columnStr, ")");
+			}
+		}
+		else if(numPartitions == 1)
+		{
+			appendStringInfo(&columnStr, "T.a[1]");
+			appendStringInfo(&oid_str,"%d", list_nth_oid(oid_list, 0));
+		}
+		else
+		{
+			appendStringInfo(&columnStr, "NULL");
+			appendStringInfo(&oid_str, "0");
+		}
+
+		/*
+		 * If table is partitioned, we create a sample over all parts.
+		 * The external partitions are skipped.
+		 */
+
+		initStringInfo(&deleteStr);
+		appendStringInfo(&deleteStr, "delete from pg_hll where attrelid = %d", relid);
+		initStringInfo(&str);
+
+		appendStringInfo(&str, "insert into pg_hll select %d, T.attnum, %s from (select array_agg(hll_estimator) as a, attnum from pg_hll where attrelid in (%s) group by attnum) as T",
+						relid,
+						columnStr.data,
+						oid_str.data
+						);
 	}
 
-	/*
-	 * If table is partitioned, we create a sample over all parts.
-	 * The external partitions are skipped.
-	 */
-
-	initStringInfo(&deleteStr);
-	appendStringInfo(&deleteStr, "delete from pg_hll where attrelid = %d", relid);
-	initStringInfo(&str);
-
-	appendStringInfo(&str, "insert into pg_hll select t1.attrelid, t1.attnum, t2.a from (select attrelid, attnum, row_number() over() from pg_attribute where attrelid = %d and attstattarget=-1) t1, (select a, row_number() over () from ( select unnest(T.array) from (select array[%s] as array from %s.%s ) as T ) S(a)) t2 where t1.row_number = t2.row_number",
-					relid,
-					columnStr.data,
-					schemaName,
-					tableName);
-
 	oldcxt = CurrentMemoryContext;
-
 	if (SPI_OK_CONNECT != SPI_connect())
 		ereport(ERROR, (errcode(ERRCODE_CDB_INTERNAL_ERROR),
 						errmsg("Unable to connect to execute internal query.")));
