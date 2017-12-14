@@ -186,9 +186,9 @@ analyze_rel_internal(Oid relid, VacuumStmt *vacstmt,
 	AnlIndexData *indexdata;
 	int			targrows,
 				numrows;
-	double		totalrows,
-				totaldeadrows;
-	BlockNumber	totalpages;
+	double		totalrows =0.0,
+				totaldeadrows = 0.0;
+	BlockNumber	totalpages = 0;
 	HeapTuple  *rows;
 	PGRUsage	ru0;
 	TimestampTz starttime = 0;
@@ -451,12 +451,21 @@ analyze_rel_internal(Oid relid, VacuumStmt *vacstmt,
 	 */
 	colLargeRowIndexes = (RowIndexes **) palloc(sizeof(RowIndexes *) * attr_cnt);
 
+	if(optimizer_log)
+	{
+	numrows=0;
+		acquire_ndv_estimator_by_query(onerel, attr_cnt, vacattrstats);
+		acquire_ndv_by_query(onerel, attr_cnt, vacattrstats);
+				update_attstats(relid, attr_cnt, vacattrstats);
+
+	}
+else {
 	/*
 	 * Acquire the sample rows
 	 */
 	numrows = acquire_sample_rows_by_query(onerel, attr_cnt, vacattrstats, &rows, targrows,
 										   &totalrows, &totaldeadrows, &totalpages, vacstmt->rootonly, colLargeRowIndexes);
-
+}
 	/*
 	 * Compute the statistics.	Temporary results during the calculations for
 	 * each column are stored in a child context.  The calc routines are
@@ -521,14 +530,14 @@ analyze_rel_internal(Oid relid, VacuumStmt *vacstmt,
 				stats->stats_valid = true;
 				stats->stanullfrac = 0.0;
 				stats->stawidth = WIDTH_THRESHOLD;
-				stats->stadistinct = 0.0;		/* "unknown" */
+				// stats->stadistinct = 0.0;		/* "unknown" */
 			}
 			stats->rows = rows; // Reset to original rows
 			MemoryContextResetAndDeleteChildren(col_context);
 		}
 
-		acquire_ndv_estimator_by_query(onerel, attr_cnt, vacattrstats);
-		acquire_ndv_by_query(onerel, attr_cnt, vacattrstats);
+//		acquire_ndv_estimator_by_query(onerel, attr_cnt, vacattrstats);
+//		acquire_ndv_by_query(onerel, attr_cnt, vacattrstats);
 
 		/*
 		 * Datums exceeding WIDTH_THRESHOLD are masked as NULL in the sample, and
@@ -1729,6 +1738,7 @@ acquire_ndv_by_query(Relation onerel, int nattrs, VacAttrStats **attrstats)
 										   SPI_tuptable->tupdesc,
 										   NULL);
 		attrstats[j]->stadistinct = DatumGetFloat8(vals[tupattnum - 1]);
+		attrstats[j]->stats_valid = true;
 	}
 
 	SPI_finish();
@@ -2521,7 +2531,7 @@ compute_minimal_stats(VacAttrStatsP stats,
 		if (nmultiple == 0)
 		{
 			/* If we found no repeated values, assume it's a unique column */
-			stats->stadistinct = -1.0;
+			// stats->stadistinct = -1.0;
 		}
 		else if (track_cnt < track_max && toowide_cnt == 0 &&
 				 nmultiple == track_cnt)
@@ -2531,7 +2541,7 @@ compute_minimal_stats(VacAttrStatsP stats,
 			 * value appeared more than once.  Assume the column has just
 			 * these values.
 			 */
-			stats->stadistinct = track_cnt;
+			// stats->stadistinct = track_cnt;
 		}
 		else
 		{
@@ -2570,7 +2580,7 @@ compute_minimal_stats(VacAttrStatsP stats,
 				stadistinct = (double) d;
 			if (stadistinct > totalrows)
 				stadistinct = totalrows;
-			stats->stadistinct = floor(stadistinct + 0.5);
+			// stats->stadistinct = floor(stadistinct + 0.5);
 		}
 
 		/*
@@ -2579,8 +2589,8 @@ compute_minimal_stats(VacAttrStatsP stats,
 		 * stadistinct should scale with the row count rather than be a fixed
 		 * value.
 		 */
-		if (stats->stadistinct > 0.1 * totalrows)
-			stats->stadistinct = -(stats->stadistinct / totalrows);
+		// if (stats->stadistinct > 0.1 * totalrows)
+			// stats->stadistinct = -(stats->stadistinct / totalrows);
 
 		/*
 		 * Decide how many values are worth storing as most-common values. If
@@ -2666,7 +2676,7 @@ compute_minimal_stats(VacAttrStatsP stats,
 			stats->stawidth = 0;	/* "unknown" */
 		else
 			stats->stawidth = stats->attrtype->typlen;
-		stats->stadistinct = 0.0;		/* "unknown" */
+		// stats->stadistinct = 0.0;		/* "unknown" */
 	}
 
 	/* We don't need to bother cleaning up any of our temporary palloc's */
@@ -2743,7 +2753,7 @@ compute_very_minimal_stats(VacAttrStatsP stats,
 			stats->stawidth = stats->attrtype->typlen;
 
 		/* Assume it's a unique column */
-		stats->stadistinct = -1.0;
+		// stats->stadistinct = -1.0;
 	}
 	else if (null_cnt > 0)
 	{
@@ -2754,7 +2764,7 @@ compute_very_minimal_stats(VacAttrStatsP stats,
 			stats->stawidth = 0;	/* "unknown" */
 		else
 			stats->stawidth = stats->attrtype->typlen;
-		stats->stadistinct = 0.0;		/* "unknown" */
+		// stats->stadistinct = 0.0;		/* "unknown" */
 	}
 
 	/* We don't need to bother cleaning up any of our temporary palloc's */
@@ -2955,7 +2965,7 @@ compute_scalar_stats(VacAttrStatsP stats,
 		if (nmultiple == 0)
 		{
 			/* If we found no repeated values, assume it's a unique column */
-			stats->stadistinct = -1.0;
+			// stats->stadistinct = -1.0;
 		}
 		else if (toowide_cnt == 0 && nmultiple == ndistinct)
 		{
@@ -2963,7 +2973,7 @@ compute_scalar_stats(VacAttrStatsP stats,
 			 * Every value in the sample appeared more than once.  Assume the
 			 * column has just these values.
 			 */
-			stats->stadistinct = ndistinct;
+			// stats->stadistinct = ndistinct;
 		}
 		else
 		{
@@ -2998,7 +3008,7 @@ compute_scalar_stats(VacAttrStatsP stats,
 				stadistinct = (double) d;
 			if (stadistinct > totalrows)
 				stadistinct = totalrows;
-			stats->stadistinct = floor(stadistinct + 0.5);
+			// stats->stadistinct = floor(stadistinct + 0.5);
 		}
 
 		/*
@@ -3007,8 +3017,8 @@ compute_scalar_stats(VacAttrStatsP stats,
 		 * stadistinct should scale with the row count rather than be a fixed
 		 * value.
 		 */
-		if (stats->stadistinct > 0.1 * totalrows)
-			stats->stadistinct = -(stats->stadistinct / totalrows);
+		// if (stats->stadistinct > 0.1 * totalrows)
+			// stats->stadistinct = -(stats->stadistinct / totalrows);
 
 		/*
 		 * Decide how many values are worth storing as most-common values. If
@@ -3261,7 +3271,7 @@ compute_scalar_stats(VacAttrStatsP stats,
 			stats->stawidth = 0;	/* "unknown" */
 		else
 			stats->stawidth = stats->attrtype->typlen;
-		stats->stadistinct = 0.0;		/* "unknown" */
+		// stats->stadistinct = 0.0;		/* "unknown" */
 	}
 	else
 	{
@@ -3273,7 +3283,7 @@ compute_scalar_stats(VacAttrStatsP stats,
 			stats->stawidth = 0;	/* "unknown" */
 		else
 			stats->stawidth = stats->attrtype->typlen;
-		stats->stadistinct = 0.0;		/* "unknown" */
+		// stats->stadistinct = 0.0;		/* "unknown" */
 	}
 
 	/* We don't need to bother cleaning up any of our temporary palloc's */
