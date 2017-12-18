@@ -1704,7 +1704,7 @@ acquire_ndv_by_query(Relation onerel, int nattrs, VacAttrStats **attrstats)
 	oldcxt = CurrentMemoryContext;
 
 	if (SPI_OK_CONNECT != SPI_connect())
-		ereport(ERROR, (errcode(ERRCODE_CDB_INTERNAL_ERROR),
+		ereport(ERROR, (errcode(ERRCODE_INTERNAL_ERROR),
 						errmsg("Unable to connect to execute internal query.")));
 
 	elog(elevel, "Executing SQL: %s", str.data);
@@ -1866,7 +1866,7 @@ acquire_ndv_estimator_by_query(Relation onerel, int nattrs, VacAttrStats **attrs
 
 	oldcxt = CurrentMemoryContext;
 	if (SPI_OK_CONNECT != SPI_connect())
-		ereport(ERROR, (errcode(ERRCODE_CDB_INTERNAL_ERROR),
+		ereport(ERROR, (errcode(ERRCODE_INTERNAL_ERROR),
 						errmsg("Unable to connect to execute internal query.")));
 
 	elog(elevel, "Executing SQL: %s", str.data);
