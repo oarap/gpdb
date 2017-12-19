@@ -54,7 +54,7 @@ POSTGRES_BKI_SRCS := $(addprefix $(top_srcdir)/src/include/catalog/, \
 	gp_configuration_history.h gp_id.h gp_policy.h gp_version.h \
 	gp_segment_config.h \
 	pg_exttable.h pg_appendonly.h aoseg.h \
-	gp_fastsequence.h pg_extprotocol.h \
+	gp_fastsequence.h gp_hll.h pg_extprotocol.h \
 	pg_partition.h pg_partition_rule.h pg_filespace.h pg_filespace_entry.h \
 	gp_global_sequence.h gp_persistent.h \
 	pg_attribute_encoding.h \
@@ -104,6 +104,7 @@ install-data: $(BKIFILES) installdirs
 	$(INSTALL_DATA) $(call vpathsearch,cdb_schema.sql) '$(DESTDIR)$(datadir)/cdb_init.d/cdb_schema.sql'
 	$(INSTALL_DATA) $(srcdir)/sql_features.txt '$(DESTDIR)$(datadir)/sql_features.txt'
 	$(INSTALL_DATA) $(call vpathsearch,gp_toolkit.sql) '$(DESTDIR)$(datadir)/cdb_init.d/gp_toolkit.sql'
+	$(INSTALL_DATA) $(call vpathsearch,gp_hll.sql) '$(DESTDIR)$(datadir)/cdb_init.d/gp_hll.sql'
 
 installdirs:
 	$(MKDIR_P) '$(DESTDIR)$(datadir)'
