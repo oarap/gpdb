@@ -1699,7 +1699,7 @@ acquire_ndv_by_query(Relation onerel, int nattrs, VacAttrStats **attrstats)
 
 	initStringInfo(&str);
 
-	appendStringInfo(&str, "select attnum, hyperloglog_get_estimate(hll_estimator) from pg_hll where attrelid = %d order by 1", relid);
+	appendStringInfo(&str, "select hllattnum, hyperloglog_get_estimate(hllestimator::hyperloglog_estimator) from gp_hll where hllrelid = %d order by 1", relid);
 
 	oldcxt = CurrentMemoryContext;
 
@@ -1750,6 +1750,8 @@ acquire_ndv_estimator_by_query(Relation onerel, int nattrs, VacAttrStats **attrs
 	StringInfoData str;
 	StringInfoData columnStr;
 	StringInfoData deleteStr;
+	StringInfoData setGuc;
+
 	int			i;
 	const char *schemaName = NULL;
 	const char *tableName = NULL;
@@ -1761,6 +1763,7 @@ acquire_ndv_estimator_by_query(Relation onerel, int nattrs, VacAttrStats **attrs
 	Oid relid = RelationGetRelid(onerel);
 
 	PartStatus ps = rel_part_status(relid);
+
 
 	if (ps != PART_STATUS_ROOT)
 	{
@@ -1791,10 +1794,10 @@ acquire_ndv_estimator_by_query(Relation onerel, int nattrs, VacAttrStats **attrs
 		 */
 
 		initStringInfo(&deleteStr);
-		appendStringInfo(&deleteStr, "delete from pg_hll where attrelid = %d", relid);
+		appendStringInfo(&deleteStr, "delete from gp_hll where hllrelid = %d", relid);
 		initStringInfo(&str);
 
-		appendStringInfo(&str, "insert into pg_hll select t1.attrelid, t1.attnum, t2.a from (select attrelid, attnum, row_number() over() from pg_attribute where attrelid = %d and attstattarget=-1) t1, (select a, row_number() over () from ( select unnest(T.array) from (select array[%s] as array from %s.%s ) as T ) S(a)) t2 where t1.row_number = t2.row_number",
+		appendStringInfo(&str, "insert into gp_hll select t1.attrelid, t1.attnum, t2.a from (select attrelid, attnum, row_number() over() from pg_attribute where attrelid = %d and attstattarget=-1) t1, (select a, row_number() over () from ( select unnest(T.array) from (select array[%s] as array from %s.%s ) as T ) S(a)) t2 where t1.row_number = t2.row_number",
 						relid,
 						columnStr.data,
 						schemaName,
@@ -1854,15 +1857,18 @@ acquire_ndv_estimator_by_query(Relation onerel, int nattrs, VacAttrStats **attrs
 		 */
 
 		initStringInfo(&deleteStr);
-		appendStringInfo(&deleteStr, "delete from pg_hll where attrelid = %d", relid);
+		appendStringInfo(&deleteStr, "delete from gp_hll where hllrelid = %d", relid);
 		initStringInfo(&str);
 
-		appendStringInfo(&str, "insert into pg_hll select %d, T.attnum, %s from (select array_agg(hll_estimator) as a, attnum from pg_hll where attrelid in (%s) group by attnum) as T",
+		appendStringInfo(&str, "insert into gp_hll select %d, T.attnum, %s from (select array_agg(hll_estimator) as a, hllattnum from gp_hll where hllrelid in (%s) group by hllattnum) as T",
 						relid,
 						columnStr.data,
 						oid_str.data
 						);
 	}
+
+	initStringInfo(&setGuc);
+	appendStringInfo(&setGuc, "set allow_system_table_mods='dml'");
 
 	oldcxt = CurrentMemoryContext;
 	if (SPI_OK_CONNECT != SPI_connect())
@@ -1870,6 +1876,9 @@ acquire_ndv_estimator_by_query(Relation onerel, int nattrs, VacAttrStats **attrs
 						errmsg("Unable to connect to execute internal query.")));
 
 	elog(elevel, "Executing SQL: %s", str.data);
+
+	ret = SPI_execute(setGuc.data, false, 0);
+	Assert(ret > 0);
 
 	ret = SPI_execute(deleteStr.data, false, 0);
 	Assert(ret > 0);
