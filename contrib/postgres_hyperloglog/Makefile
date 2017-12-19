@@ -22,9 +22,16 @@ TESTS        = $(foreach test,$(BASE_TEST),$(SQL_DIR)/$(test).sql)
 REGRESS      = $(patsubst $(SQL_DIR)%,%,$(TESTS))
 REGRESS_OPTS = -X --echo-all -P null=NULL
 
+ifdef USE_PGXS
 PG_CONFIG = pg_config
 PGXS := $(shell $(PG_CONFIG) --pgxs)
 include $(PGXS)
+else
+subdir = contrib/postgres_hyperloglog
+top_builddir = ../..
+include $(top_builddir)/src/Makefile.global
+include $(top_srcdir)/contrib/contrib-global.mk
+endif
 
 all: hyperloglog_counter.so
 
