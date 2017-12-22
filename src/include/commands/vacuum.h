@@ -22,6 +22,7 @@
 #include "storage/lock.h"
 #include "utils/relcache.h"
 #include "utils/tqual.h"
+#include "utils/hyperloglog_counter.h"
 
 
 /*----------
@@ -94,6 +95,7 @@ typedef struct VacAttrStats
 	float4	   *stanumbers[STATISTIC_NUM_SLOTS];
 	int			numvalues[STATISTIC_NUM_SLOTS];
 	Datum	   *stavalues[STATISTIC_NUM_SLOTS];
+	HLLCounter stahll;
 
 	/*
 	 * These fields describe the stavalues[n] element types. They will be

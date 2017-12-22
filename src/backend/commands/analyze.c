@@ -51,7 +51,7 @@
 #include "utils/syscache.h"
 #include "utils/tuplesort.h"
 #include "utils/tqual.h"
-
+#include "utils/hyperloglog_counter.h"
 /*
  * To avoid consuming too much memory during analysis and/or too much space
  * in the resulting pg_statistic rows, we ignore varlena datums that are wider
@@ -2605,16 +2605,21 @@ compute_scalar_stats(VacAttrStatsP stats,
 	SelectSortFunction(mystats->ltopr, false, &cmpFn, &cmpFlags);
 	fmgr_info(cmpFn, &f_cmpfn);
 
+	if(!optimizer_log)
+		stats->stahll = hll_create(DEFAULT_NDISTINCT, DEFAULT_ERROR, 0);
 	/* Initial scan to find sortable values */
 	for (i = 0; i < samplerows; i++)
 	{
 		Datum		value;
+		
 		bool		isnull;
 
 		vacuum_delay_point();
 
 		value = fetchfunc(stats, i, &isnull);
-
+		if(!optimizer_log)
+			stats->stahll = hyperloglog_add_item(stats->stahll, value, stats->attr->attlen, stats->attr->attbyval, stats->attr->attalign);
+		
 		/* Check for null/nonnull */
 		if (isnull)
 		{
@@ -2659,6 +2664,10 @@ compute_scalar_stats(VacAttrStatsP stats,
 		tupnoLink[values_cnt] = values_cnt;
 		values_cnt++;
 	}
+
+	double estimate = 0.0;
+	if(!optimizer_log)
+		estimate = hyperloglog_get_estimate(stats->stahll);
 
 	/* We can only compute real stats if we found some sortable values. */
 	if (values_cnt > 0)
@@ -2798,6 +2807,37 @@ compute_scalar_stats(VacAttrStatsP stats,
 			stats->stadistinct = floor(stadistinct + 0.5);
 		}
 
+		if(!optimizer_log)
+		{
+			MemoryContext old_context;
+			
+//			//Datum hlldatum = DatumGetByteaP(stats->stahll);
+//			stats->stakind[slot_idx] = STATISTIC_KIND_HLL;
+//			stats->stanumbers[slot_idx] = NULL;
+//			stats->numnumbers[slot_idx] = 0;
+//			stats->stavalues[slot_idx] = DatumGetByteaP(stats->stahll);
+//			stats->numvalues[slot_idx] = 1;
+//			slot_idx++;
+			Datum *hll_values;
+			old_context = MemoryContextSwitchTo(stats->anl_context);
+			hll_values = (Datum *) palloc(2*sizeof(Datum));
+
+			hll_values[0] = datumCopy(PointerGetDatum(stats->stahll), false, hyperloglog_length(stats->stahll));
+			hll_values[1] = PointerGetDatum(stats->stahll);
+			//PG_RETURN_BYTEA_P(stats->stahll);
+			//bytea* bp = DatumGetByteaP(PG_RETURN_BYTEA_P(hyperloglog));
+			
+//			datumCopy(values[pos].value,
+//									   stats->attr->attbyval,
+//									   stats->attr->attlen);
+			MemoryContextSwitchTo(old_context);
+			stats->stakind[slot_idx] = STATISTIC_KIND_HLL;
+			stats->stanumbers[slot_idx] = NULL;
+			stats->numnumbers[slot_idx] = 0;
+			stats->stavalues[slot_idx] = hll_values;
+			stats->numvalues[slot_idx] =  2; //hyperloglog_length(stats->stahll);
+			slot_idx++;
+		}
 		/*
 		 * If we estimated the number of distinct values at more than 10% of
 		 * the total row count (a very arbitrary limit), then assume that
