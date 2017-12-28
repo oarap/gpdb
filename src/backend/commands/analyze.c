@@ -897,10 +897,20 @@ examine_attribute(Relation onerel, int attnum)
 	 */
 	for (i = 0; i < STATISTIC_NUM_SLOTS; i++)
 	{
-		stats->statypid[i] = stats->attr->atttypid;
-		stats->statyplen[i] = stats->attrtype->typlen;
-		stats->statypbyval[i] = stats->attrtype->typbyval;
-		stats->statypalign[i] = stats->attrtype->typalign;
+		if (i==0 && !optimizer_log)
+		{
+			stats->statypid[i] = 17;
+			stats->statyplen[i] = -1;
+			stats->statypbyval[i] = false;
+			stats->statypalign[i] = 'i';
+		}
+		else
+		{
+			stats->statypid[i] = stats->attr->atttypid; //17
+			stats->statyplen[i] = stats->attrtype->typlen; //-1
+			stats->statypbyval[i] = stats->attrtype->typbyval; //false
+			stats->statypalign[i] = stats->attrtype->typalign; // 'i'
+		}
 	}
 
 	/*
@@ -2606,7 +2616,7 @@ compute_scalar_stats(VacAttrStatsP stats,
 	fmgr_info(cmpFn, &f_cmpfn);
 
 	if(!optimizer_log)
-		stats->stahll = hll_create(DEFAULT_NDISTINCT, DEFAULT_ERROR, 0);
+		stats->stahll = hll_create(DEFAULT_NDISTINCT, DEFAULT_ERROR, 3);
 	/* Initial scan to find sortable values */
 	for (i = 0; i < samplerows; i++)
 	{
@@ -2810,32 +2820,21 @@ compute_scalar_stats(VacAttrStatsP stats,
 		if(!optimizer_log)
 		{
 			MemoryContext old_context;
-			
-//			//Datum hlldatum = DatumGetByteaP(stats->stahll);
-//			stats->stakind[slot_idx] = STATISTIC_KIND_HLL;
-//			stats->stanumbers[slot_idx] = NULL;
-//			stats->numnumbers[slot_idx] = 0;
-//			stats->stavalues[slot_idx] = DatumGetByteaP(stats->stahll);
-//			stats->numvalues[slot_idx] = 1;
-//			slot_idx++;
 			Datum *hll_values;
+			
 			old_context = MemoryContextSwitchTo(stats->anl_context);
-			hll_values = (Datum *) palloc(2*sizeof(Datum));
+			
+			hll_values = (Datum *) palloc(sizeof(Datum));
 
 			hll_values[0] = datumCopy(PointerGetDatum(stats->stahll), false, hyperloglog_length(stats->stahll));
-			hll_values[1] = PointerGetDatum(stats->stahll);
-			//PG_RETURN_BYTEA_P(stats->stahll);
-			//bytea* bp = DatumGetByteaP(PG_RETURN_BYTEA_P(hyperloglog));
-			
-//			datumCopy(values[pos].value,
-//									   stats->attr->attbyval,
-//									   stats->attr->attlen);
+			//hll_values[0] = PointerGetDatum(stats->stahll);
 			MemoryContextSwitchTo(old_context);
 			stats->stakind[slot_idx] = STATISTIC_KIND_HLL;
 			stats->stanumbers[slot_idx] = NULL;
 			stats->numnumbers[slot_idx] = 0;
 			stats->stavalues[slot_idx] = hll_values;
-			stats->numvalues[slot_idx] =  2; //hyperloglog_length(stats->stahll);
+			stats->numvalues[slot_idx] =  1;
+			stats->statyplen[slot_idx] = hyperloglog_length(stats->stahll);
 			slot_idx++;
 		}
 		/*

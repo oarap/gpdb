@@ -767,8 +767,8 @@ sparse_to_dense(HLLCounter hloglog)
     if (sparse_data){
         free(sparse_data);
     }
-    
-    SET_VARSIZE(hloglog,sizeof(HLLData) + (int)ceil((m * hloglog->binbits / 8.0)) );
+	int len = sizeof(HLLData) + (int)ceil((m * hloglog->binbits / 8.0));
+    SET_VARSIZE(hloglog,len );
 
     hloglog->idx = -1;
 
