@@ -134,6 +134,99 @@ static void analyzeEstimateIndexpages(Relation onerel, Relation indrel, BlockNum
 static void analyze_rel_internal(Oid relid, VacuumStmt *vacstmt,
 					 BufferAccessStrategy bstrategy);
 
+static void acquire_ndv_by_hll(Relation onerel, int nattrs, VacAttrStats **attrstats);
+
+static void
+acquire_ndv_by_hll(Relation onerel, int nattrs, VacAttrStats **attrstats)
+{
+	int j;
+	Oid relid = RelationGetRelid(onerel);
+
+	PartStatus ps = rel_part_status(relid);
+	if (ps != PART_STATUS_ROOT)
+	{
+		for (j = 0; j < nattrs; j++)
+		{
+			HeapTuple heaptupleStats = get_att_stats(relid, j+1);
+			
+			// if there is no colstats
+			if (!HeapTupleIsValid(heaptupleStats))
+			{
+				return;
+			}
+			Datum *values;
+			int nvalues;
+			double ndistinct = 0.0;
+			get_attstatsslot(heaptupleStats, InvalidOid, 0, STATISTIC_KIND_HLL, InvalidOid, &values, &nvalues, NULL, NULL);
+			if(nvalues>0)
+			{
+				HLLCounter hllcounter = (HLLCounter) DatumGetByteaP(values[0]);
+				hyperloglog_length(hllcounter);
+				ndistinct = hyperloglog_get_estimate(hllcounter);
+				if(ndistinct < 0.1)
+					return;
+			}
+			
+			attrstats[j]->stadistinct = ndistinct;
+			attrstats[j]->stats_valid = true;
+		}
+	}
+	else
+	{
+		PartitionNode *pn = get_parts(relid, 0 /*level*/ ,
+									  0 /*parent*/, false /* inctemplate */, true /*includesubparts*/);
+		Assert(pn);
+
+		List *oid_list = all_leaf_partition_relids(pn); /* all leaves */
+
+		int numPartitions = list_length(oid_list);
+		
+		for (j = 0; j < nattrs; j++)
+		{
+			HLLCounter *hllcounters = (HLLCounter *) palloc(numPartitions * sizeof(HLLCounter));
+			HLLCounter finalHLL;
+			int i;
+			double ndistinct = 0.0;
+			for (i = 0; i < numPartitions; i++)
+			{
+				HeapTuple heaptupleStats = get_att_stats(list_nth_oid(oid_list, i), j+1);
+				
+				// if there is no colstats
+				if (!HeapTupleIsValid(heaptupleStats))
+				{
+					return;
+				}
+				Datum *values;
+				int nvalues;
+				
+				get_attstatsslot(heaptupleStats, InvalidOid, 0, STATISTIC_KIND_HLL, InvalidOid, &values, &nvalues, NULL, NULL);
+				if(nvalues>0)
+				{
+					hllcounters[i] = (HLLCounter) DatumGetByteaP(values[0]);
+					hyperloglog_length(hllcounters[i]);
+					ndistinct = hyperloglog_get_estimate(hllcounters[i]);
+					if(ndistinct < 0.1)
+						return;
+				}
+				
+				if (i == 0)
+				{
+					finalHLL = hll_copy(hllcounters[0]);
+				}
+				else
+				{
+					hll_merge(finalHLL, hllcounters[i]);
+				}
+			}
+			ndistinct = hyperloglog_get_estimate(finalHLL);
+			if(ndistinct < 0.1)
+				return;
+			attrstats[j]->stadistinct = ndistinct;
+			attrstats[j]->stats_valid = true;
+		}
+	}
+}
+
 /*
  *	analyze_rel() -- analyze one relation
  */
@@ -454,6 +547,8 @@ analyze_rel_internal(Oid relid, VacuumStmt *vacstmt,
 	numrows = acquire_sample_rows_by_query(onerel, attr_cnt, vacattrstats, &rows, targrows,
 										   &totalrows, &totaldeadrows, &totalpages, vacstmt->rootonly, colLargeRowIndexes);
 
+	if(!optimizer_log)
+		acquire_ndv_by_hll(onerel, attr_cnt, vacattrstats);
 	/*
 	 * Compute the statistics.	Temporary results during the calculations for
 	 * each column are stored in a child context.  The calc routines are
