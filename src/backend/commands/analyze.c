@@ -136,97 +136,6 @@ static void analyze_rel_internal(Oid relid, VacuumStmt *vacstmt,
 
 static void acquire_ndv_by_hll(Relation onerel, int nattrs, VacAttrStats **attrstats);
 
-static void
-acquire_ndv_by_hll(Relation onerel, int nattrs, VacAttrStats **attrstats)
-{
-	int j;
-	Oid relid = RelationGetRelid(onerel);
-
-	PartStatus ps = rel_part_status(relid);
-	if (ps != PART_STATUS_ROOT)
-	{
-		for (j = 0; j < nattrs; j++)
-		{
-			HeapTuple heaptupleStats = get_att_stats(relid, j+1);
-			
-			// if there is no colstats
-			if (!HeapTupleIsValid(heaptupleStats))
-			{
-				return;
-			}
-			Datum *values;
-			int nvalues;
-			double ndistinct = 0.0;
-			get_attstatsslot(heaptupleStats, InvalidOid, 0, STATISTIC_KIND_HLL, InvalidOid, &values, &nvalues, NULL, NULL);
-			if(nvalues>0)
-			{
-				HLLCounter hllcounter = (HLLCounter) DatumGetByteaP(values[0]);
-				hyperloglog_length(hllcounter);
-				ndistinct = hyperloglog_get_estimate(hllcounter);
-				if(ndistinct < 0.1)
-					return;
-			}
-			
-			attrstats[j]->stadistinct = ndistinct;
-			attrstats[j]->stats_valid = true;
-		}
-	}
-	else
-	{
-		PartitionNode *pn = get_parts(relid, 0 /*level*/ ,
-									  0 /*parent*/, false /* inctemplate */, true /*includesubparts*/);
-		Assert(pn);
-
-		List *oid_list = all_leaf_partition_relids(pn); /* all leaves */
-
-		int numPartitions = list_length(oid_list);
-		
-		for (j = 0; j < nattrs; j++)
-		{
-			HLLCounter *hllcounters = (HLLCounter *) palloc(numPartitions * sizeof(HLLCounter));
-			HLLCounter finalHLL;
-			int i;
-			double ndistinct = 0.0;
-			for (i = 0; i < numPartitions; i++)
-			{
-				HeapTuple heaptupleStats = get_att_stats(list_nth_oid(oid_list, i), j+1);
-				
-				// if there is no colstats
-				if (!HeapTupleIsValid(heaptupleStats))
-				{
-					return;
-				}
-				Datum *values;
-				int nvalues;
-				
-				get_attstatsslot(heaptupleStats, InvalidOid, 0, STATISTIC_KIND_HLL, InvalidOid, &values, &nvalues, NULL, NULL);
-				if(nvalues>0)
-				{
-					hllcounters[i] = (HLLCounter) DatumGetByteaP(values[0]);
-					hyperloglog_length(hllcounters[i]);
-					ndistinct = hyperloglog_get_estimate(hllcounters[i]);
-					if(ndistinct < 0.1)
-						return;
-				}
-				
-				if (i == 0)
-				{
-					finalHLL = hll_copy(hllcounters[0]);
-				}
-				else
-				{
-					hll_merge(finalHLL, hllcounters[i]);
-				}
-			}
-			ndistinct = hyperloglog_get_estimate(finalHLL);
-			if(ndistinct < 0.1)
-				return;
-			attrstats[j]->stadistinct = ndistinct;
-			attrstats[j]->stats_valid = true;
-		}
-	}
-}
-
 /*
  *	analyze_rel() -- analyze one relation
  */
@@ -547,8 +456,7 @@ analyze_rel_internal(Oid relid, VacuumStmt *vacstmt,
 	numrows = acquire_sample_rows_by_query(onerel, attr_cnt, vacattrstats, &rows, targrows,
 										   &totalrows, &totaldeadrows, &totalpages, vacstmt->rootonly, colLargeRowIndexes);
 
-	if(!optimizer_log)
-		acquire_ndv_by_hll(onerel, attr_cnt, vacattrstats);
+
 	/*
 	 * Compute the statistics.	Temporary results during the calculations for
 	 * each column are stored in a child context.  The calc routines are
@@ -619,6 +527,8 @@ analyze_rel_internal(Oid relid, VacuumStmt *vacstmt,
 			MemoryContextResetAndDeleteChildren(col_context);
 		}
 
+		if(!optimizer_log)
+			acquire_ndv_by_hll(onerel, attr_cnt, vacattrstats);
 		/*
 		 * Datums exceeding WIDTH_THRESHOLD are masked as NULL in the sample, and
 		 * are used as is to evaluate index statistics. It is less likely to have
@@ -3249,6 +3159,38 @@ compare_scalars(const void *a, const void *b, void *arg)
 }
 
 /*
+ * qsort_arg comparator for sorting ScalarItems
+ *
+ * Aside from sorting the items, we update the tupnoLink[] array
+ * whenever two ScalarItems are found to contain equal datums.	The array
+ * is indexed by tupno; for each ScalarItem, it contains the highest
+ * tupno that that item's datum has been found to be equal to.  This allows
+ * us to avoid additional comparisons in compute_scalar_stats().
+ */
+static int
+compare_scalars_mcv(const void *a, const void *b, void *arg)
+{
+	Datum		da = ((ScalarItem *) a)->value;
+	Datum		db = ((ScalarItem *) b)->value;
+	CompareScalarsContext *cxt = (CompareScalarsContext *) arg;
+	int32		compare;
+
+	compare = ApplySortFunction(cxt->cmpFn, cxt->cmpFlags,
+								da, false, db, false);
+	
+	return compare;
+}
+
+static int
+compare_scalars_mcv_rowcount (const void *a, const void *b)
+{
+	int		da = ((ScalarItem *) a)->tupno;
+	int		db = ((ScalarItem *) b)->tupno;
+
+	return db-da;
+}
+
+/*
  * qsort comparator for sorting ScalarMCVItems by position
  */
 static int
@@ -3258,4 +3200,294 @@ compare_mcvs(const void *a, const void *b)
 	int			db = ((ScalarMCVItem *) b)->first;
 
 	return da - db;
+}
+
+/*
+ * Insert the given tuple in the list of tuples according to
+ * increasing OID value.
+ */
+static List *
+sorted_insert_list_mcv(List *list, ScalarItem *newSclrItem, CompareScalarsContext *cxt)
+{
+	ListCell   *lc;
+	ListCell   *lc_prev = NULL;
+	ScalarItem	*scalar_item;
+	List	   *ret_list = list;
+
+	foreach(lc, ret_list)
+	{
+		scalar_item = (ScalarItem *)lfirst(lc);
+		if (compare_scalars_mcv(newSclrItem, scalar_item, cxt) <= 0)
+		{
+			break;
+		}
+		lc_prev = lc;
+	}
+	if (lc_prev == NULL)
+	{
+		ret_list = lcons(newSclrItem, ret_list);
+	}
+	else
+	{
+		lappend_cell(ret_list, lc_prev, newSclrItem);
+	}
+	return ret_list;
+}
+
+static List *
+sorted_insert_list_mcv_by_rowcount(List *list, ScalarItem *newSclrItem)
+{
+	ListCell   *lc;
+	ListCell   *lc_prev = NULL;
+	ScalarItem	*scalar_item;
+	List	   *ret_list = list;
+	
+	foreach(lc, ret_list)
+	{
+		scalar_item = (ScalarItem *)lfirst(lc);
+		if (compare_scalars_mcv_rowcount(newSclrItem, scalar_item) <= 0)
+		{
+			break;
+		}
+		lc_prev = lc;
+	}
+	if (lc_prev == NULL)
+	{
+		ret_list = lcons(newSclrItem, ret_list);
+	}
+	else
+	{
+		lappend_cell(ret_list, lc_prev, newSclrItem);
+	}
+	return ret_list;
+}
+
+static void
+acquire_ndv_by_hll(Relation onerel, int nattrs, VacAttrStats **attrstats)
+{
+	int j;
+	Oid relid = RelationGetRelid(onerel);
+
+	PartStatus ps = rel_part_status(relid);
+	if (ps != PART_STATUS_ROOT)
+	{
+		for (j = 0; j < nattrs; j++)
+		{
+			HeapTuple heaptupleStats = get_att_stats(relid, j+1);
+
+			// if there is no colstats
+			if (!HeapTupleIsValid(heaptupleStats))
+			{
+				return;
+			}
+			Datum *values;
+			int nvalues;
+			double ndistinct = 0.0;
+			get_attstatsslot(heaptupleStats, InvalidOid, 0, STATISTIC_KIND_HLL, InvalidOid, &values, &nvalues, NULL, NULL);
+			if(nvalues>0)
+			{
+				HLLCounter hllcounter = (HLLCounter) DatumGetByteaP(values[0]);
+				hyperloglog_length(hllcounter);
+				ndistinct = hyperloglog_get_estimate(hllcounter);
+				if(ndistinct < 0.1)
+					return;
+			}
+
+			attrstats[j]->stadistinct = ndistinct;
+			attrstats[j]->stats_valid = true;
+		}
+	}
+	else
+	{
+		PartitionNode *pn = get_parts(relid, 0 /*level*/ ,
+									  0 /*parent*/, false /* inctemplate */, true /*includesubparts*/);
+		Assert(pn);
+
+		List *oid_list = all_leaf_partition_relids(pn); /* all leaves */
+
+		int numPartitions = list_length(oid_list);
+
+		for (j = 0; j < nattrs; j++)
+		{
+			// NDV calculations
+			HLLCounter *hllcounters = (HLLCounter *) palloc(numPartitions * sizeof(HLLCounter));
+			HLLCounter finalHLL;
+			int i;
+			double ndistinct = 0.0;
+			for (i = 0; i < numPartitions; i++)
+			{
+				HeapTuple heaptupleStats = get_att_stats(list_nth_oid(oid_list, i), j+1);
+
+				// if there is no colstats
+				if (!HeapTupleIsValid(heaptupleStats))
+				{
+					return;
+				}
+				Datum *values;
+				int nvalues;
+
+				get_attstatsslot(heaptupleStats, InvalidOid, 0, STATISTIC_KIND_HLL, InvalidOid, &values, &nvalues, NULL, NULL);
+				if(nvalues>0)
+				{
+					hllcounters[i] = (HLLCounter) DatumGetByteaP(values[0]);
+					hyperloglog_length(hllcounters[i]);
+					ndistinct = hyperloglog_get_estimate(hllcounters[i]);
+					if(ndistinct < 0.1)
+						return;
+				}
+
+				if (i == 0)
+				{
+					finalHLL = hll_copy(hllcounters[0]);
+				}
+				else
+				{
+					hll_merge(finalHLL, hllcounters[i]);
+				}
+			}
+
+			// finalize NDV calculation
+			ndistinct = hyperloglog_get_estimate(finalHLL);
+			if(ndistinct < 0.1)
+				return;
+			attrstats[j]->stadistinct = ndistinct;
+			attrstats[j]->stats_valid = true;
+
+			///-------------------------------------------------------------------------------------
+			// MCV calculations
+			ScalarItem *mcvvalues= (ScalarItem *) palloc(100 * sizeof(ScalarItem) * numPartitions);
+			
+			float4		*relTuples = (float4 *) palloc(numPartitions * sizeof(float4));
+			float4		*relPages = (float4 *) palloc(numPartitions * sizeof(float4));
+			List	   *mcv_scalar_vals = NIL;
+			CompareScalarsContext cxt;
+			Oid			cmpFn;
+			FmgrInfo	f_cmpfn;
+			int			cmpFlags;
+			
+			StdAnalyzeData *mystats = (StdAnalyzeData *) (*attrstats)->extra_data;
+			SelectSortFunction(mystats->ltopr, false, &cmpFn, &cmpFlags);
+			fmgr_info(cmpFn, &f_cmpfn);
+
+			cxt.cmpFn = &f_cmpfn;
+			cxt.cmpFlags = cmpFlags;
+			cxt.tupnoLink = NULL;
+			float8 totalTuples = 0;
+			for (i = 0; i < numPartitions; i++)
+			{
+
+				// case 1: we already have relpages and reltuples in pg_class
+				// case 2: doing it first time
+				
+				// TODO: Do it only once per table (not per column per table)
+				analyzeEstimateReltuplesRelpages(list_nth_oid(oid_list, i), &relTuples[i], &relPages[i],false);
+
+				HeapTuple heaptupleStats = get_att_stats(list_nth_oid(oid_list, i), j+1);
+
+				// if there is no colstats
+				if (!HeapTupleIsValid(heaptupleStats))
+				{
+					return;
+				}
+				Datum *values;
+				int nvalues;
+				float4 *numbers;
+				int nnumbers;
+				get_attstatsslot(heaptupleStats, InvalidOid, 0, STATISTIC_KIND_MCV, InvalidOid, &values, &nvalues, &numbers, &nnumbers);
+				if(nvalues>0)
+				{
+					int h;
+					for (h = 0; h < nvalues; h++)
+					{
+						ScalarItem *newScalarItem = (ScalarItem *) palloc(sizeof(ScalarItem));
+						newScalarItem->value = values[h];
+						newScalarItem->tupno = (int)(numbers[h]*relTuples[i]);
+						mcv_scalar_vals = sorted_insert_list_mcv(mcv_scalar_vals, newScalarItem, &cxt);
+					}
+				}
+				totalTuples += relTuples[i];
+			}
+			ListCell *lc;
+			ScalarItem *scalarItemPrev = NIL;
+			List *finalMcvList = NIL;
+			foreach(lc, mcv_scalar_vals)
+			{
+				ScalarItem *scalarItemCur = (ScalarItem *)lfirst(lc);
+				if (NIL == scalarItemPrev)
+				{
+					scalarItemPrev = scalarItemCur;
+					continue;
+				}
+				if (compare_scalars_mcv(scalarItemCur, scalarItemPrev, &cxt) == 0)
+				{
+					scalarItemPrev->tupno += scalarItemCur->tupno;
+				}
+				else
+				{
+					finalMcvList = sorted_insert_list_mcv_by_rowcount(finalMcvList, scalarItemPrev);
+					scalarItemPrev = scalarItemCur;
+				}
+			}
+			
+			/* Generate MCV slot entry */
+			if (list_length(finalMcvList) > 0)
+			{
+				MemoryContext old_context;
+				Datum	   *mcv_values;
+				float4	   *mcv_freqs;
+				
+				/* Must copy the target values into anl_context */
+				old_context = MemoryContextSwitchTo(attrstats[j]->anl_context);
+				int num_mcvs = list_length(finalMcvList);
+				if (num_mcvs > default_statistics_target)
+					num_mcvs = default_statistics_target;
+				mcv_values = (Datum *) palloc(num_mcvs * sizeof(Datum));
+				mcv_freqs = (float4 *) palloc(num_mcvs * sizeof(float4));
+				i = 0;
+				ListCell *lc;
+				
+				double		avgcount,mincount,maxmincount;
+				
+				if (ndistinct < 0)
+					ndistinct = -ndistinct * totalTuples;
+				/* estimate # of occurrences in sample of a typical value */
+				avgcount = (double) totalTuples / ndistinct;
+				/* set minimum threshold count to store a value */
+				mincount = avgcount * 1.25;
+				if (mincount < 2)
+					mincount = 2;
+				/* don't let threshold exceed 1/K, however */
+				maxmincount = (double) totalTuples / (double) attrstats[j]->attr->attstattarget;
+				if (mincount > maxmincount)
+					mincount = maxmincount;
+				
+				
+				foreach(lc, finalMcvList)
+				{
+					ScalarItem *curScalarItem = (ScalarItem *)lfirst(lc);
+					if (curScalarItem->tupno < mincount)
+					{
+						num_mcvs = i;
+						break;
+					}
+					mcv_values[i] = datumCopy(curScalarItem->value,
+											  attrstats[j]->attr->attbyval,
+											  attrstats[j]->attr->attlen);
+					mcv_freqs[i] = (double) curScalarItem->tupno / (double) totalTuples;
+					i++;
+					
+					if (default_statistics_target == i)
+						break;
+				}
+				MemoryContextSwitchTo(old_context);
+				
+				attrstats[j]->stakind[1] = STATISTIC_KIND_MCV;
+				attrstats[j]->staop[1] = mystats->eqopr;
+				attrstats[j]->stanumbers[1] = mcv_freqs;
+				attrstats[j]->numnumbers[1] = num_mcvs;
+				attrstats[j]->stavalues[1] = mcv_values;
+				attrstats[j]->numvalues[1] = num_mcvs;
+			}
+		}
+	}
 }
