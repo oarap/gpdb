@@ -52,6 +52,9 @@
 #include "utils/tuplesort.h"
 #include "utils/tqual.h"
 #include "utils/hyperloglog_counter.h"
+
+#include "commands/analyzeutils.h"
+
 /*
  * To avoid consuming too much memory during analysis and/or too much space
  * in the resulting pg_statistic rows, we ignore varlena datums that are wider
@@ -2621,7 +2624,7 @@ compute_scalar_stats(VacAttrStatsP stats,
 	fmgr_info(cmpFn, &f_cmpfn);
 
 	if(!optimizer_log)
-		stats->stahll = hll_create(DEFAULT_NDISTINCT, DEFAULT_ERROR, 3);
+		stats->stahll = hll_create(DEFAULT_NDISTINCT, DEFAULT_ERROR, 1);
 	/* Initial scan to find sortable values */
 	for (i = 0; i < samplerows; i++)
 	{
@@ -3353,141 +3356,18 @@ acquire_ndv_by_hll(Relation onerel, int nattrs, VacAttrStats **attrstats)
 			attrstats[j]->stadistinct = ndistinct;
 			attrstats[j]->stats_valid = true;
 
+
+				ArrayType *result[2];
+				int stupid = aggregate_leaf_partition_MCVs(relid, j+1, 100, result);
+				attrstats[j]->stakind[1] = STATISTIC_KIND_MCV;
+				//attrstats[j]->staop[1] = mystats->eqopr;
+				attrstats[j]->stanumbers[1] = PointerGetDatum(result[1]);
+				attrstats[j]->numnumbers[1] = stupid;
+				attrstats[j]->stavalues[1] = PointerGetDatum(result[0]);
+				attrstats[j]->numvalues[1] = stupid;
+
 			///-------------------------------------------------------------------------------------
 			// MCV calculations
-			ScalarItem *mcvvalues= (ScalarItem *) palloc(100 * sizeof(ScalarItem) * numPartitions);
-			
-			float4		*relTuples = (float4 *) palloc(numPartitions * sizeof(float4));
-			float4		*relPages = (float4 *) palloc(numPartitions * sizeof(float4));
-			List	   *mcv_scalar_vals = NIL;
-			CompareScalarsContext cxt;
-			Oid			cmpFn;
-			FmgrInfo	f_cmpfn;
-			int			cmpFlags;
-			
-			StdAnalyzeData *mystats = (StdAnalyzeData *) (*attrstats)->extra_data;
-			SelectSortFunction(mystats->ltopr, false, &cmpFn, &cmpFlags);
-			fmgr_info(cmpFn, &f_cmpfn);
-
-			cxt.cmpFn = &f_cmpfn;
-			cxt.cmpFlags = cmpFlags;
-			cxt.tupnoLink = NULL;
-			float8 totalTuples = 0;
-			for (i = 0; i < numPartitions; i++)
-			{
-
-				// case 1: we already have relpages and reltuples in pg_class
-				// case 2: doing it first time
-				
-				// TODO: Do it only once per table (not per column per table)
-				analyzeEstimateReltuplesRelpages(list_nth_oid(oid_list, i), &relTuples[i], &relPages[i],false);
-
-				HeapTuple heaptupleStats = get_att_stats(list_nth_oid(oid_list, i), j+1);
-
-				// if there is no colstats
-				if (!HeapTupleIsValid(heaptupleStats))
-				{
-					return;
-				}
-				Datum *values;
-				int nvalues;
-				float4 *numbers;
-				int nnumbers;
-				get_attstatsslot(heaptupleStats, InvalidOid, 0, STATISTIC_KIND_MCV, InvalidOid, &values, &nvalues, &numbers, &nnumbers);
-				if(nvalues>0)
-				{
-					int h;
-					for (h = 0; h < nvalues; h++)
-					{
-						ScalarItem *newScalarItem = (ScalarItem *) palloc(sizeof(ScalarItem));
-						newScalarItem->value = values[h];
-						newScalarItem->tupno = (int)(numbers[h]*relTuples[i]);
-						mcv_scalar_vals = sorted_insert_list_mcv(mcv_scalar_vals, newScalarItem, &cxt);
-					}
-				}
-				totalTuples += relTuples[i];
-			}
-			ListCell *lc;
-			ScalarItem *scalarItemPrev = NIL;
-			List *finalMcvList = NIL;
-			foreach(lc, mcv_scalar_vals)
-			{
-				ScalarItem *scalarItemCur = (ScalarItem *)lfirst(lc);
-				if (NIL == scalarItemPrev)
-				{
-					scalarItemPrev = scalarItemCur;
-					continue;
-				}
-				if (compare_scalars_mcv(scalarItemCur, scalarItemPrev, &cxt) == 0)
-				{
-					scalarItemPrev->tupno += scalarItemCur->tupno;
-				}
-				else
-				{
-					finalMcvList = sorted_insert_list_mcv_by_rowcount(finalMcvList, scalarItemPrev);
-					scalarItemPrev = scalarItemCur;
-				}
-			}
-			
-			/* Generate MCV slot entry */
-			if (list_length(finalMcvList) > 0)
-			{
-				MemoryContext old_context;
-				Datum	   *mcv_values;
-				float4	   *mcv_freqs;
-				
-				/* Must copy the target values into anl_context */
-				old_context = MemoryContextSwitchTo(attrstats[j]->anl_context);
-				int num_mcvs = list_length(finalMcvList);
-				if (num_mcvs > default_statistics_target)
-					num_mcvs = default_statistics_target;
-				mcv_values = (Datum *) palloc(num_mcvs * sizeof(Datum));
-				mcv_freqs = (float4 *) palloc(num_mcvs * sizeof(float4));
-				i = 0;
-				ListCell *lc;
-				
-				double		avgcount,mincount,maxmincount;
-				
-				if (ndistinct < 0)
-					ndistinct = -ndistinct * totalTuples;
-				/* estimate # of occurrences in sample of a typical value */
-				avgcount = (double) totalTuples / ndistinct;
-				/* set minimum threshold count to store a value */
-				mincount = avgcount * 1.25;
-				if (mincount < 2)
-					mincount = 2;
-				/* don't let threshold exceed 1/K, however */
-				maxmincount = (double) totalTuples / (double) attrstats[j]->attr->attstattarget;
-				if (mincount > maxmincount)
-					mincount = maxmincount;
-				
-				
-				foreach(lc, finalMcvList)
-				{
-					ScalarItem *curScalarItem = (ScalarItem *)lfirst(lc);
-					if (curScalarItem->tupno < mincount)
-					{
-						num_mcvs = i;
-						break;
-					}
-					mcv_values[i] = datumCopy(curScalarItem->value,
-											  attrstats[j]->attr->attbyval,
-											  attrstats[j]->attr->attlen);
-					mcv_freqs[i] = (double) curScalarItem->tupno / (double) totalTuples;
-					i++;
-					
-					if (default_statistics_target == i)
-						break;
-				}
-				MemoryContextSwitchTo(old_context);
-				
-				attrstats[j]->stakind[1] = STATISTIC_KIND_MCV;
-				attrstats[j]->staop[1] = mystats->eqopr;
-				attrstats[j]->stanumbers[1] = mcv_freqs;
-				attrstats[j]->numnumbers[1] = num_mcvs;
-				attrstats[j]->stavalues[1] = mcv_values;
-				attrstats[j]->numvalues[1] = num_mcvs;
-			}
-		}
+	}
 	}
 }
