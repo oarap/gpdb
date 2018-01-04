@@ -3356,14 +3356,21 @@ acquire_ndv_by_hll(Relation onerel, int nattrs, VacAttrStats **attrstats)
 			attrstats[j]->stadistinct = ndistinct;
 			attrstats[j]->stats_valid = true;
 
+			MemoryContext old_context;
+			
+			old_context = MemoryContextSwitchTo(attrstats[j]->anl_context);
 
-				ArrayType *result[2];
+			ArrayType *result[2];
+			
+			
 				int stupid = aggregate_leaf_partition_MCVs(relid, j+1, 100, result);
+				MemoryContextSwitchTo(old_context);
+			
 				attrstats[j]->stakind[1] = STATISTIC_KIND_MCV;
 				//attrstats[j]->staop[1] = mystats->eqopr;
-				attrstats[j]->stanumbers[1] = PointerGetDatum(result[1]);
+				attrstats[j]->stanumbers[1] = result[1];
 				attrstats[j]->numnumbers[1] = stupid;
-				attrstats[j]->stavalues[1] = PointerGetDatum(result[0]);
+				attrstats[j]->stavalues[1] = result[0];
 				attrstats[j]->numvalues[1] = stupid;
 
 			///-------------------------------------------------------------------------------------

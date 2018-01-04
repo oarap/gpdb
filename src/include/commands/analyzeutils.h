@@ -16,7 +16,7 @@
 extern int aggregate_leaf_partition_MCVs(Oid relationOid,
 		AttrNumber attnum,
 		unsigned int nEntries,
-		ArrayType **result);
+		void **result);
 extern bool datumCompare(Datum d1, Datum d2, Oid opFuncOid);
 
 #endif  /* ANALYZEUTILS_H */

@@ -87,8 +87,8 @@ typedef struct PartDatum
 	Datum datum;
 } PartDatum;
 
-static ArrayType* buildMCVArrayForStatsEntry(MCVFreqPair** mcvpairArray, int nEntries, Oid typoid);
-static ArrayType* buildFreqArrayForStatsEntry(MCVFreqPair** mcvpairArray, int nEntries, float4 reltuples);
+static Datum* buildMCVArrayForStatsEntry(MCVFreqPair** mcvpairArray, int nEntries, Oid typoid);
+static float4* buildFreqArrayForStatsEntry(MCVFreqPair** mcvpairArray, int nEntries, float4 reltuples);
 static int datumHashTableMatch(const void*keyPtr1, const void *keyPtr2, Size keysize);
 static uint32 datumHashTableHash(const void *keyPtr, Size keysize);
 static void calculateHashWithHashAny(void *clientData, void *buf, size_t len);
@@ -268,7 +268,7 @@ aggregate_leaf_partition_MCVs
 	Oid relationOid,
 	AttrNumber attnum,
 	unsigned int nEntries,
-	ArrayType **result
+	void **result
 	)
 {
 	List *lRelOids = rel_get_leaf_children_relids(relationOid); /* list of OIDs of leaf partitions */
@@ -319,10 +319,10 @@ aggregate_leaf_partition_MCVs
 	qsort(mcvpairArray, i, sizeof(MCVFreqPair *), mcvpair_cmp);
 
 	/* prepare returning MCV and Freq arrays */
-	*result = buildMCVArrayForStatsEntry(mcvpairArray, Min(i, nEntries), typoid);
+	*result = (void *)buildMCVArrayForStatsEntry(mcvpairArray, Min(i, nEntries), typoid);
 	Assert(*result);
 	result++; /* now switch to frequency array (result[1]) */
-	*result = buildFreqArrayForStatsEntry(mcvpairArray, Min(i, nEntries), sumReltuples);
+	*result = (void *)buildFreqArrayForStatsEntry(mcvpairArray, Min(i, nEntries), sumReltuples);
 
 	hash_destroy(datumHash);
 	pfree(typInfo);
@@ -338,7 +338,7 @@ aggregate_leaf_partition_MCVs
  * 	- nEntries: number of MCVs to be returned
  * 	- typoid: type oid of the MCV datum
  */
-static ArrayType *
+static Datum *
 buildMCVArrayForStatsEntry
 	(
 	MCVFreqPair** mcvpairArray,
@@ -346,22 +346,15 @@ buildMCVArrayForStatsEntry
 	Oid typoid
 	)
 {
-	ArrayType *out = NULL;
-
 	Assert(mcvpairArray);
 	Assert(nEntries > 0);
 
-	ArrayBuildState *astate = NULL;
+	Datum *out = palloc(sizeof(Datum)*nEntries);
 
 	for (int i = 0; i < nEntries; i++)
 	{
 		Datum mcv = (mcvpairArray[i])->mcv;
-		astate = accumArrayResult(astate, mcv, false, typoid, CurrentMemoryContext);
-	}
-
-	if (astate)
-	{
-		out = DatumGetArrayTypeP(makeArrayResult(astate, CurrentMemoryContext));
+		out[i] = mcv;
 	}
 
 	return out;
@@ -374,7 +367,7 @@ buildMCVArrayForStatsEntry
  * 	- nEntries: number of frequencies to be returned
  * 	- reltuples: number of tuples of the root or interior partition (all leaf partitions combined)
  */
-static ArrayType *
+static float4 *
 buildFreqArrayForStatsEntry
 	(
 	MCVFreqPair** mcvpairArray,
@@ -386,18 +379,11 @@ buildFreqArrayForStatsEntry
 	Assert(nEntries > 0);
 	Assert(reltuples > 0); /* otherwise ANALYZE will not collect stats */
 
-	ArrayType *out = NULL;
-	ArrayBuildState *astate = NULL;
-
+	float4 *out = (float *)palloc(sizeof(float4)*nEntries);
 	for (int i = 0; i < nEntries; i++)
 	{
 		float4 freq = mcvpairArray[i]->count / reltuples;
-		astate = accumArrayResult(astate, Float4GetDatum(freq), false, FLOAT4OID, CurrentMemoryContext);
-	}
-
-	if (astate)
-	{
-		out = DatumGetArrayTypeP(makeArrayResult(astate, CurrentMemoryContext));
+		out[i] = freq;
 	}
 
 	return out;
