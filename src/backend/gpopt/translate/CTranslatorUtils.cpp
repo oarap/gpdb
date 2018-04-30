@@ -2825,4 +2825,23 @@ CTranslatorUtils::FCreateStatsBucket
 	return false;
 }
 
+
+
+DrgPul *
+CTranslatorUtils::PdrgpulColCollations
+	(
+	IMemoryPool *pmp,
+	const DrgPdxlcd *pdrgpdxlcd
+	)
+{
+	DrgPul *pdrgulColCollations = GPOS_NEW(pmp) DrgPul(pmp);
+	ULONG ulNumCollations = pdrgpdxlcd->UlLength();
+
+	for (ULONG ul = 0; ul < ulNumCollations; ul++)
+	{
+		CDXLColDescr *pdxlcd = (*pdrgpdxlcd)[ul];
+		pdrgulColCollations->Append(GPOS_NEW(pmp) ULONG(pdxlcd->OidCollation()));
+	}
+	return pdrgulColCollations;
+}
 // EOF

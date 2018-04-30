@@ -2281,13 +2281,15 @@ CTranslatorQueryToDXL::PdxlnUnionAllForGroupingSets
 			GPOS_ASSERT(NULL != pdrgpulColIdsInner);
 			DrgPdxlcd *pdrgpdxlcd = CTranslatorUtils::Pdrgpdxlcd(m_pmp, plTargetList, pdrgpulColIdsOuter, true /* fKeepResjunked */);
 
+			DrgPul *pdrgulColCollations = CTranslatorUtils::PdrgpulColCollations(m_pmp, pdrgpdxlcd);
+
 			pdrgpulColIdsOuter->AddRef();
 
 			DrgPdrgPul *pdrgpdrgulInputColIds = GPOS_NEW(m_pmp) DrgPdrgPul(m_pmp);
 			pdrgpdrgulInputColIds->Append(pdrgpulColIdsOuter);
 			pdrgpdrgulInputColIds->Append(pdrgpulColIdsInner);
 
-			CDXLLogicalSetOp *pdxlopSetop = GPOS_NEW(m_pmp) CDXLLogicalSetOp(m_pmp, EdxlsetopUnionAll, pdrgpdxlcd, pdrgpdrgulInputColIds, false);
+			CDXLLogicalSetOp *pdxlopSetop = GPOS_NEW(m_pmp) CDXLLogicalSetOp(m_pmp, EdxlsetopUnionAll, pdrgpdxlcd, pdrgpdrgulInputColIds, false, pdrgulColCollations);
 			pdxlnUnionAll = GPOS_NEW(m_pmp) CDXLNode(m_pmp, pdxlopSetop, pdxlnProject, pdxlnUnionAll);
 		}
 		else
@@ -2487,7 +2489,8 @@ CTranslatorQueryToDXL::PdxlnFromSetOp
 						pdrgpdrgulInputColIds,
 						pdrgpdxlnChildren,
 						fCastAcrossInput,
-						false /* fKeepResjunked */
+						false, /* fKeepResjunked */
+						psetopstmt->colCollations
 						);
 
 	CDXLLogicalSetOp *pdxlop = CDXLLogicalSetOp::PdxlopConvert(pdxln->Pdxlop());
@@ -2535,7 +2538,8 @@ CTranslatorQueryToDXL::PdxlnSetOp
 	DrgPdrgPul *pdrgpdrgulInputColIds,
 	DrgPdxln *pdrgpdxlnChildren,
 	BOOL fCastAcrossInput,
-	BOOL fKeepResjunked
+	BOOL fKeepResjunked,
+	List *colCollations
 	)
 	const
 {
@@ -2621,13 +2625,21 @@ CTranslatorQueryToDXL::PdxlnSetOp
 		pdxlnNewChildScPrL->Release();
 	}
 
+	DrgPul *pdrgColCollations = GPOS_NEW(m_pmp) DrgPul (m_pmp);
+
+	for (ULONG ul = 0; ul < ulCols; ul++)
+	{
+		pdrgColCollations->Append(GPOS_NEW(m_pmp) ULONG(gpdb::OidListNth(colCollations, ul)));
+	}
+
 	CDXLLogicalSetOp *pdxlop = GPOS_NEW(m_pmp) CDXLLogicalSetOp
 											(
 											m_pmp,
 											edxlsetop,
 											pdrgpdxlcdOutput,
 											pdrgpdrgulInputColIds,
-											fCastAcrossInput
+											fCastAcrossInput,
+											pdrgColCollations
 											);
 	CDXLNode *pdxln = GPOS_NEW(m_pmp) CDXLNode(m_pmp, pdxlop, pdrgpdxlnChildren);
 
@@ -3196,8 +3208,9 @@ CTranslatorQueryToDXL::PdxlnFromValues
 	}
 	else if (1 < ulValues)
 	{
+		DrgPul *pdrgulColCollations = CTranslatorUtils::PdrgpulColCollations(m_pmp, pdrgpdxlcd);
 		// create a UNION ALL operator
-		CDXLLogicalSetOp *pdxlop = GPOS_NEW(m_pmp) CDXLLogicalSetOp(m_pmp, EdxlsetopUnionAll, pdrgpdxlcd, pdrgpdrgulInputColIds, false);
+		CDXLLogicalSetOp *pdxlop = GPOS_NEW(m_pmp) CDXLLogicalSetOp(m_pmp, EdxlsetopUnionAll, pdrgpdxlcd, pdrgpdrgulInputColIds, false, pdrgulColCollations);
 		CDXLNode *pdxln = GPOS_NEW(m_pmp) CDXLNode(m_pmp, pdxlop, pdrgpdxln);
 
 		// make note of new columns from UNION ALL

@@ -413,6 +413,9 @@ namespace gpdxl
 			// check if we need to create stats buckets in DXL for the column attribute
 			static
 			BOOL FCreateStatsBucket(OID oidAttType);
+
+			static
+			DrgPul *PdrgpulColCollations(IMemoryPool *pmp, const DrgPdxlcd *pdrgpdxlcd);
 	};
 }
 

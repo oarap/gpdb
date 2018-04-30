@@ -186,7 +186,8 @@ namespace gpdxl
 				DrgPdrgPul *pdrgpdrgulInputColIds,
 				DrgPdxln *pdrgpdxlnChildren,
 				BOOL fCastAcrossInput,
-				BOOL fKeepResjunked
+				BOOL fKeepResjunked,
+				List *colCollations
 				)
 				const;
 
