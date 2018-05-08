@@ -345,7 +345,6 @@ typedef struct LOCK
 	int			nRequested;		/* total of requested[] array */
 	int			granted[MAX_LOCKMODES]; /* counts of granted locks */
 	int			nGranted;		/* total of granted[] array */
-	bool		persistent;
 } LOCK;
 
 #define LOCK_LOCKMETHOD(lock) ((LOCKMETHODID) (lock).tag.locktag_lockmethodid)
@@ -546,7 +545,6 @@ extern LockAcquireResult LockAcquireExtended(const LOCKTAG *locktag,
 					bool report_memory_error);
 extern bool LockRelease(const LOCKTAG *locktag,
 			LOCKMODE lockmode, bool sessionLock);
-extern void LockSetPersistent(const LOCKTAG *locktag);
 extern void LockReleaseAll(LOCKMETHODID lockmethodid, bool allLocks);
 // TODO why are we missing extern void LockReleaseSession(LOCKMETHODID lockmethodid); ?
 extern void LockReleaseCurrentOwner(LOCALLOCK **locallocks, int nlocks);
