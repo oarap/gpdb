@@ -820,13 +820,10 @@ AcquireExecutorLocks(List *stmt_list, bool acquire)
 				 * parity with CdbTryOpenRelation().  Catalog tables are
 				 * replicated across cluster and don't suffer from the
 				 * deadlock.
-				 * Since we have introduced Global Deadlock Detector, only for ao
-				 * table should we upgrade the lock.
 				 */
 				if (rte->relid > FirstNormalObjectId &&
 					(plannedstmt->commandType == CMD_UPDATE ||
-					 plannedstmt->commandType == CMD_DELETE) &&
-					CondUpgradeRelLock(rte->relid))
+					 plannedstmt->commandType == CMD_DELETE))
 					lockmode = ExclusiveLock;
 				else
 					lockmode = RowExclusiveLock;
@@ -918,8 +915,7 @@ ScanQueryForLocks(Query *parsetree, bool acquire)
 					 */
 					if (rte->relid > FirstNormalObjectId &&
 						(parsetree->commandType == CMD_UPDATE ||
-						 parsetree->commandType == CMD_DELETE) &&
-						CondUpgradeRelLock(rte->relid))
+						 parsetree->commandType == CMD_DELETE))
 						lockmode = ExclusiveLock;
 					else
 						lockmode = RowExclusiveLock;
