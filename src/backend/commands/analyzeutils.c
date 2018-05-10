@@ -126,6 +126,25 @@ get_rel_reltuples(Oid relid)
 	return relTuples;
 }
 
+int4
+get_rel_relpages(Oid relid)
+{
+	int4 relPages = 0.0;
+
+	HeapTuple	tp;
+
+	tp = SearchSysCache1(RELOID, ObjectIdGetDatum(relid));
+	if (HeapTupleIsValid(tp))
+	{
+		Form_pg_class reltup = (Form_pg_class) GETSTRUCT(tp);
+
+		relPages = reltup->relpages;
+		ReleaseSysCache(tp);
+	}
+
+	return relPages;
+}
+
 /*
  * Given column stats of an attribute, build an MCVFreqPair and add it to the hash table.
  * If the MCV to be added already exist in the hash table, we increment its count value.
@@ -1063,12 +1082,21 @@ needs_sample(VacAttrStats **vacattrstats, int attr_cnt)
 }
 
 /*
- *	leaf_parts_analyzed() -- checks if all the leaf partitions analyzed
+ *	leaf_parts_analyzed() -- checks if all the leaf partitions are analyzed
  *
  *	We use this to determine if all the leaf partitions are analyzed and
  *	the statistics are in place to be able to merge and generate meaningful
- *	statistics for the root partition. If one partition is analyzed but the
- *	other is not, root statistics will be bogus if we continue merging.
+ *	statistics for the root partition. If any partition is analyzed and the
+ *	attstattarget is set to collect stats, but there are no statistics for
+ *  the partition in pg_statistics, root statistics will be bogus if we continue
+ *  merging.
+ *  0. A single partition is not analyzed - return FALSE
+ *  1. All partitions are analyzed
+ *	  1.1. All partitions are empty - return FALSE
+ *    1.2. Some empty & rest have stats - return TRUE
+ *    1.3. Some empty & at least one don't have stats - return FALSE
+ *    1.4. None empty & at least one don't have stats - return FALSE
+ *    1.5. None empty & all have stats - return TRUE
  */
 bool
 leaf_parts_analyzed(VacAttrStats *stats)
@@ -1084,8 +1112,17 @@ leaf_parts_analyzed(VacAttrStats *stats)
 	{
 		Oid partRelid = lfirst_oid(lc);
 		float4 relTuples = get_rel_reltuples(partRelid);
-		if (relTuples == 0.0)
+		int4 relpages = get_rel_relpages(partRelid);
+
+		// A partition is not analyzed, so return false and fallback
+		// to sample based calculation
+		if (relpages == 0)
+			return false;
+
+		// Partition is analyzed and we detect it is empty
+		if (relTuples == 0.0 && relpages == 1)
 			continue;
+
 		HeapTuple heaptupleStats = get_att_stats(partRelid, stats->attr->attnum);
 		all_parts_empty = false;
 
@@ -1096,8 +1133,6 @@ leaf_parts_analyzed(VacAttrStats *stats)
 		}
 		heap_freetuple(heaptupleStats);
 	}
-	if (all_parts_empty)
-		return false;
 
-	return true;
+	return !all_parts_empty;
 }
