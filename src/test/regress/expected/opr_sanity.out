@@ -934,7 +934,6 @@ ORDER BY 1;
                                oid                               |                               oid                               
 -----------------------------------------------------------------+-----------------------------------------------------------------
  count("any")                                                    | count()
- string_agg(text)                                                | string_agg(text,text)
  hyperloglog_distinct(anyelement,real,double precision)          | hyperloglog_distinct(anyelement,real)
  hyperloglog_distinct(anyelement,real,double precision)          | hyperloglog_distinct(anyelement)
  hyperloglog_distinct(anyelement,real)                           | hyperloglog_distinct(anyelement)
@@ -964,7 +963,7 @@ ORDER BY 1;
  hyperloglog_accum_unsafe(anyelement,real,text)                  | hyperloglog_accum_unsafe(anyelement,text)
  hyperloglog_accum(anyelement)                                   | hyperloglog_accum(anyelement,text)
  hyperloglog_accum_unsafe(anyelement)                            | hyperloglog_accum_unsafe(anyelement,text)
-(31 rows)
+(30 rows)
 
 -- For the same reason, aggregates with default arguments are no good.
 SELECT oid, proname
