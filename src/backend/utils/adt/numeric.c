@@ -596,6 +596,17 @@ numeric_is_nan(Numeric num)
 }
 
 /*
+ * numeric_is_short() -
+ *
+ *	Is Numeric value Short?
+ */
+bool
+numeric_is_short(Numeric num)
+{
+	return NUMERIC_IS_SHORT(num);
+}
+
+/*
  * numeric_maximum_size() -
  *
  *	Maximum size of a numeric with given typmod, or -1 if unlimited/unknown.

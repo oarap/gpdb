@@ -300,11 +300,19 @@ hashDatum(Datum datum, Oid type, datumHashFunction hashFn, void *clientData)
 				buf = &nanbuf;
 				len = sizeof(nanbuf);
 			}
-			else
+			else if (numeric_is_short(num))
 				/* not a nan */
 			{
-				/* GPDB_91_MERGE_FIXME: This doesn't know about the new
+				/* GPDB_91_MERGE_FIXME: First pass to make things work for
 				 * "short" representation of numerics. */
+#define NUMERIC_HDRSZ_SHORT (VARHDRSZ + sizeof(uint16))
+				buf = VARDATA(num);
+				len = (VARSIZE(num) - NUMERIC_HDRSZ_SHORT);
+			}
+			else
+			{
+				/* GPDB_91_MERGE_FIXME: First pass to make things work for
+				 * "long" representation of numerics. */
 #define NUMERIC_HDRSZ	(VARHDRSZ + sizeof(uint16) + sizeof(int16))
 				buf = VARDATA(num);
 				len = (VARSIZE(num) - NUMERIC_HDRSZ);
