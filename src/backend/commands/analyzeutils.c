@@ -76,16 +76,16 @@ static int datumHashTableMatch(const void*keyPtr1, const void *keyPtr2, Size key
 static uint32 datumHashTableHash(const void *keyPtr, Size keysize);
 static void calculateHashWithHashAny(void *clientData, void *buf, size_t len);
 static HTAB* createDatumHashTable(unsigned int nEntries);
-static MCVFreqPair* MCVFreqPairCopy(MCVFreqPair* mfp);
-static bool containsDatum(HTAB *datumHash, MCVFreqPair *mfp);
-static void addAllMCVsToHashTable
+static MCVFreqPair* MCVFreqPairCopy(MCVFreqPair* mcvFreqPair);
+static bool containsDatum(HTAB *datumHash, MCVFreqPair *mcvFreqPair);
+static void addLeafPartitionMCVsToHashTable
 	(
 	HTAB *datumHash,
 	HeapTuple heaptupleStats,
 	float4 partReltuples,
 	TypInfo *typInfo
 	);
-static void addMCVToHashTable(HTAB* datumHash, MCVFreqPair *mfp);
+static void addMCVToHashTable(HTAB* datumHash, MCVFreqPair *mcvFreqPair);
 static int mcvpair_cmp(const void *a, const void *b);
 
 static void initTypInfo(TypInfo *typInfo, Oid typOid);
@@ -151,12 +151,13 @@ get_rel_relpages(Oid relid)
  * Input:
  * 	- datumHash: hash table
  * 	- partOid: Oid of current partition
+ *  - partReltuples: Number of tuples in that partition
  * 	- typInfo: type information
  * Output:
  *  - partReltuples: the number of tuples in this partition
  */
 static void
-addAllMCVsToHashTable
+addLeafPartitionMCVsToHashTable
 	(
 	HTAB *datumHash,
 	HeapTuple heaptupleStats,
@@ -172,12 +173,12 @@ addAllMCVsToHashTable
 	{
 		Datum mcv = mcvSlot.values[i];
 		float4 count = partReltuples * mcvSlot.numbers[i];
-		MCVFreqPair *mfp = (MCVFreqPair *) palloc(sizeof(MCVFreqPair));
-		mfp->mcv = mcv;
-		mfp->count = count;
-		mfp->typinfo = typInfo;
-		addMCVToHashTable(datumHash, mfp);
-		pfree(mfp);
+		MCVFreqPair *mcvFreqPair = (MCVFreqPair *) palloc(sizeof(MCVFreqPair));
+		mcvFreqPair->mcv = mcv;
+		mcvFreqPair->count = count;
+		mcvFreqPair->typinfo = typInfo;
+		addMCVToHashTable(datumHash, mcvFreqPair);
+		pfree(mcvFreqPair);
 	}
 	free_attstatsslot(&mcvSlot);
 }
@@ -226,7 +227,7 @@ aggregate_leaf_partition_MCVs
 			continue;
 		}
 
-		addAllMCVsToHashTable(datumHash, heaptupleStats[i], relTuples[i],
+		addLeafPartitionMCVsToHashTable(datumHash, heaptupleStats[i], relTuples[i],
 							  typInfo);
 		sumReltuples += relTuples[i];
 	}
@@ -382,11 +383,11 @@ mcvpair_cmp(const void *a, const void *b)
 	Assert(a);
 	Assert(b);
 
-	MCVFreqPair *mfp1 = *(MCVFreqPair **)a;
-	MCVFreqPair *mfp2 = *(MCVFreqPair **)b;
-	if (mfp1->count > mfp2->count)
+	MCVFreqPair *mcvFreqPair1 = *(MCVFreqPair **)a;
+	MCVFreqPair *mcvFreqPair2 = *(MCVFreqPair **)b;
+	if (mcvFreqPair1->count > mcvFreqPair2->count)
 		return -1;
-	if (mfp1->count < mfp2->count)
+	if (mcvFreqPair1->count < mcvFreqPair2->count)
 		return 1;
 	else
 		return 0;
@@ -397,23 +398,23 @@ mcvpair_cmp(const void *a, const void *b)
  * in the hash table, update its count
  * Input:
  * 	datumHash - hash table
- * 	mfp - MCVFreqPair to be added
+ * 	mcvFreqPair - MCVFreqPair to be added
  * 	typbyval - whether the datum inside is passed by value
  * 	typlen - pg_type.typlen of the datum type
  */
 static void
-addMCVToHashTable(HTAB* datumHash, MCVFreqPair *mfp)
+addMCVToHashTable(HTAB* datumHash, MCVFreqPair *mcvFreqPair)
 {
 	Assert(datumHash);
-	Assert(mfp);
+	Assert(mcvFreqPair);
 
 	MCVFreqEntry *mcvfreq;
 	bool found = false; /* required by hash_search */
 
-	if (!containsDatum(datumHash, mfp))
+	if (!containsDatum(datumHash, mcvFreqPair))
 	{
 		/* create a deep copy of MCVFreqPair and put it in the hash table */
-		MCVFreqPair *key = MCVFreqPairCopy(mfp);
+		MCVFreqPair *key = MCVFreqPairCopy(mcvFreqPair);
 		mcvfreq = hash_search(datumHash, &key, HASH_ENTER, &found);
 		if (mcvfreq == NULL)
 		{
@@ -424,9 +425,9 @@ addMCVToHashTable(HTAB* datumHash, MCVFreqPair *mfp)
 
 	else
 	{
-		mcvfreq = hash_search(datumHash, &mfp, HASH_FIND, &found);
+		mcvfreq = hash_search(datumHash, &mcvFreqPair, HASH_FIND, &found);
 		Assert(mcvfreq);
-		mcvfreq->entry->count += mfp->count;
+		mcvfreq->entry->count += mcvFreqPair->count;
 	}
 
 	return;
@@ -435,19 +436,19 @@ addMCVToHashTable(HTAB* datumHash, MCVFreqPair *mfp)
 /**
  * Copy function for MCVFreqPair
  * Input:
- * 	mfp - input MCVFreqPair
+ * 	mcvFreqPair - input MCVFreqPair
  * 	typbyval - whether the datum inside is passed by value
  * 	typlen - pg_type.typlen of the datum type
  * Output:
  * 	result - a deep copy of input MCVFreqPair
  */
 static MCVFreqPair *
-MCVFreqPairCopy(MCVFreqPair* mfp)
+MCVFreqPairCopy(MCVFreqPair* mcvFreqPair)
 {
 	MCVFreqPair *result = (MCVFreqPair*) palloc(sizeof(MCVFreqPair));
-	result->count = mfp->count;
-	result->typinfo = mfp->typinfo;
-	result->mcv = datumCopy(mfp->mcv, mfp->typinfo->typbyval, mfp->typinfo->typlen);
+	result->count = mcvFreqPair->count;
+	result->typinfo = mcvFreqPair->typinfo;
+	result->mcv = datumCopy(mcvFreqPair->mcv, mcvFreqPair->typinfo->typbyval, mcvFreqPair->typinfo->typlen);
 
 	return result;
 }
@@ -456,16 +457,16 @@ MCVFreqPairCopy(MCVFreqPair* mfp)
  * Test whether an MCVFreqPair is in the hash table
  * Input:
  * 	datumHash - hash table
- * 	mfp - pointer to an MCVFreqPair
+ * 	mcvFreqPair - pointer to an MCVFreqPair
  * Output:
  * 	found - whether the MCVFreqPair is found
  */
 static bool
-containsDatum(HTAB *datumHash, MCVFreqPair *mfp)
+containsDatum(HTAB *datumHash, MCVFreqPair *mcvFreqPair)
 {
 	bool found = false;
 	if (datumHash != NULL)
-		hash_search(datumHash, &mfp, HASH_FIND, &found);
+		hash_search(datumHash, &mcvFreqPair, HASH_FIND, &found);
 
 	return found;
 }
@@ -520,9 +521,9 @@ static uint32
 datumHashTableHash(const void *keyPtr, Size keysize)
 {
 	uint32 result = 0;
-	MCVFreqPair *mfp = *((MCVFreqPair **)keyPtr);
+	MCVFreqPair *mcvFreqPair = *((MCVFreqPair **)keyPtr);
 
-	hashDatum(mfp->mcv, mfp->typinfo->typOid, calculateHashWithHashAny, &result);
+	hashDatum(mcvFreqPair->mcv, mcvFreqPair->typinfo->typOid, calculateHashWithHashAny, &result);
 
 	return result;
 }

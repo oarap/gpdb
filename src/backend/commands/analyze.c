@@ -3708,12 +3708,8 @@ merge_leaf_stats(VacAttrStatsP stats,
 	bool allDistinct = false;
 	int slot_idx = 0;
 	samplerows = 0;
-	Oid ltopr;
-	Oid eqopr;
-
-	/* Look for default "<" and "=" operators for column's type */
-	get_sort_group_operators(stats->attr->atttypid, false, false, false, &ltopr,
-							 &eqopr, NULL, NULL);
+	Oid ltopr = mystats->ltopr;
+	Oid eqopr = mystats->eqopr;
 
 	foreach (lc, oid_list)
 	{
