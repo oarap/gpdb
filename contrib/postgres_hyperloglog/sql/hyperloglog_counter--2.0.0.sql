@@ -1,6 +1,8 @@
 -- HyperLogLog 
 
-SET search_path = public, pg_catalog;
+create schema hyperloglog;
+
+SET search_path = hyperloglog, public, pg_catalog;
 
 -- HyperLogLog counter (shell type)
 CREATE TYPE hyperloglog_estimator;
