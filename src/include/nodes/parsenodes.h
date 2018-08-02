@@ -2544,6 +2544,7 @@ typedef struct VacuumStmt
 	bool		analyze;		/* do ANALYZE step */
 	bool		verbose;		/* print progress info */
 	bool		rootonly;		/* only ANALYZE root partition tables */
+	bool		merge;			/* merge stats */
 	int			freeze_min_age; /* min freeze age, or -1 to use default */
 	RangeVar   *relation;		/* single table to process, or NULL */
 	List	   *va_cols;		/* list of column names, or NIL for all */

@@ -1504,12 +1504,18 @@ get_rel_oids(List *relids, VacuumStmt *vacstmt, bool isVacuum)
 						(errmsg("skipping \"%s\" --- cannot analyze a non-root partition using ANALYZE ROOTPARTITION",
 								get_rel_name(relationOid))));
 			}
+			else if (ps != PART_STATUS_ROOT && (vacstmt->merge))
+			{
+				ereport(WARNING,
+						(errmsg("skipping \"%s\" --- cannot analyze a non-root partition using ANALYZE MERGESTATS",
+								get_rel_name(relationOid))));
+			}
 			else if (ps == PART_STATUS_ROOT)
 			{
 				PartitionNode *pn = get_parts(relationOid, 0 /*level*/ ,
 											  0 /*parent*/, false /* inctemplate */, true /*includesubparts*/);
 				Assert(pn);
-				if (!vacstmt->rootonly)
+				if (!vacstmt->rootonly && !vacstmt->merge)
 				{
 					oid_list = all_leaf_partition_relids(pn); /* all leaves */
 

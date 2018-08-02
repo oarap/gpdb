@@ -600,7 +600,7 @@ static Node *makeIsNotDistinctFromNode(Node *expr, int position);
 
 	LIST LOG_P
 
-	MASTER MEDIAN MERGE MISSING MODIFIES MODIFY
+	MASTER MEDIAN MERGE MERGESTATS MISSING MODIFIES MODIFY
 
 	NEWLINE NOCREATEEXTTABLE NOOVERCOMMIT
 
@@ -799,6 +799,7 @@ static Node *makeIsNotDistinctFromNode(Node *expr, int position);
 			%nonassoc MEMORY_SHARED_QUOTA
 			%nonassoc MEMORY_SPILL_RATIO
 			%nonassoc MERGE
+			%nonassoc MERGESTATS
 			%nonassoc MINUTE_P
 			%nonassoc MINVALUE
 			%nonassoc MISSING
@@ -8886,6 +8887,18 @@ AnalyzeStmt:
 					n->va_cols = $4;
 					$$ = (Node *)n;
 				}
+			| analyze_keyword opt_verbose MERGESTATS qualified_name opt_name_list
+				{
+					VacuumStmt *n = makeNode(VacuumStmt);
+					n->analyze = true;
+					if ($2)
+						n->verbose = $2;
+					n->merge = true;
+					n->freeze_min_age = -1;
+					n->relation = $4;
+					n->va_cols = $5;
+					$$ = (Node *)n;
+				}
 			| analyze_keyword opt_verbose ROOTPARTITION qualified_name opt_name_list
 				{
 					VacuumStmt *n = makeNode(VacuumStmt);
@@ -13175,6 +13188,7 @@ unreserved_keyword:
 			| MEMORY_SHARED_QUOTA
 			| MEMORY_SPILL_RATIO
 			| MERGE
+			| MERGESTATS
 			| MINUTE_P
 			| MINVALUE
 			| MISSING
@@ -13475,6 +13489,7 @@ PartitionIdentKeyword: ABORT_P
 			| MEMORY_SHARED_QUOTA
 			| MEMORY_SPILL_RATIO
 			| MERGE
+			| MERGESTATS
 			| MINVALUE
 			| MISSING
 			| MODE
