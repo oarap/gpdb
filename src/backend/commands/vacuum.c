@@ -44,6 +44,7 @@
 #include "catalog/indexing.h"
 #include "catalog/pg_namespace.h"
 #include "commands/dbcommands.h"
+#include "commands/analyzeutils.h"
 #include "commands/tablecmds.h"
 #include "commands/vacuum.h"
 #include "cdb/cdbdisp_query.h"
@@ -1504,18 +1505,12 @@ get_rel_oids(List *relids, VacuumStmt *vacstmt, bool isVacuum)
 						(errmsg("skipping \"%s\" --- cannot analyze a non-root partition using ANALYZE ROOTPARTITION",
 								get_rel_name(relationOid))));
 			}
-			else if (ps != PART_STATUS_ROOT && (vacstmt->merge))
-			{
-				ereport(WARNING,
-						(errmsg("skipping \"%s\" --- cannot analyze a non-root partition using ANALYZE MERGESTATS",
-								get_rel_name(relationOid))));
-			}
 			else if (ps == PART_STATUS_ROOT)
 			{
 				PartitionNode *pn = get_parts(relationOid, 0 /*level*/ ,
 											  0 /*parent*/, false /* inctemplate */, true /*includesubparts*/);
 				Assert(pn);
-				if (!vacstmt->rootonly && !vacstmt->merge)
+				if (!vacstmt->rootonly)
 				{
 					oid_list = all_leaf_partition_relids(pn); /* all leaves */
 
@@ -1525,6 +1520,31 @@ get_rel_oids(List *relids, VacuumStmt *vacstmt, bool isVacuum)
 					}
 				}
 				oid_list = lappend_oid(oid_list, relationOid); /* root partition */
+			}
+			else if (ps == PART_STATUS_LEAF)
+			{
+				Oid root_rel_oid = rel_partition_get_master(relationOid);
+				oid_list = list_make1_oid(relationOid);
+				List *va_cols = NIL;
+				if (vacstmt->va_cols != NIL)
+				{
+					va_cols = vacstmt->va_cols;
+				}
+				else
+				{
+					Relation onerel = RelationIdGetRelation(relationOid);
+					int attr_cnt = onerel->rd_att->natts;
+					for (int i = 1; i <= attr_cnt; i++)
+					{
+						Form_pg_attribute attr = onerel->rd_att->attrs[i-1];
+						if (attr->attisdropped)
+							continue;
+						va_cols = lappend_int(va_cols, i);
+					}
+					RelationClose(onerel);
+				}
+				if(leaf_parts_analyzed(root_rel_oid, relationOid, va_cols))
+					oid_list = lappend_oid(oid_list, root_rel_oid);
 			}
 			else if (ps == PART_STATUS_INTERIOR) /* analyze an interior partition directly */
 			{

@@ -472,13 +472,12 @@ CREATE TABLE foo (a int, b int, c text) PARTITION BY RANGE (b) (START (0) END (6
 INSERT INTO foo select i, i%6, repeat('aaaa', 100000) FROM generate_series(1, 100)i;
 ANALYZE foo;
 SELECT * FROM pg_stats WHERE tablename like 'foo%' and attname = 'c' ORDER BY attname,tablename;
--- Test ANLYZE MERGESTATS behavior
--- Merge stats from only one partition
+-- Test ANALYZE auto merge behavior
+-- Do not merge stats from only one partition while other partitions have not been analyzed yet
 DROP TABLE IF EXISTS foo;
 CREATE TABLE foo (a int, b int, c int) PARTITION BY RANGE (b) (START (0) END (6) EVERY (3));
 INSERT INTO foo SELECT i, i%6, i%6 FROM generate_series(1,100)i; 
 ANALYZE foo_1_prt_1;
-ANALYZE MERGESTATS foo;
 SELECT tablename, attname, null_frac, n_distinct, most_common_vals, most_common_freqs, histogram_bounds FROM pg_stats WHERE tablename like 'foo%' ORDER BY attname,tablename;
 
 -- Merge stats from both partitions
@@ -487,15 +486,13 @@ CREATE TABLE foo (a int, b int, c int) PARTITION BY RANGE (b) (START (0) END (6)
 INSERT INTO foo SELECT i, i%6, i%6 FROM generate_series(1,100)i; 
 ANALYZE foo_1_prt_1;
 ANALYZE foo_1_prt_2;
-ANALYZE MERGESTATS foo;
 SELECT tablename, attname, null_frac, n_distinct, most_common_vals, most_common_freqs, histogram_bounds FROM pg_stats WHERE tablename like 'foo%' ORDER BY attname,tablename;
 
--- No stats after MERGESTATS
+-- No stats after merging 
 DROP TABLE IF EXISTS foo;
 CREATE TABLE foo (a int, b int, c int) PARTITION BY RANGE (b) (START (0) END (6) EVERY (3));
 ANALYZE foo_1_prt_1;
 ANALYZE foo_1_prt_2;
-ANALYZE MERGESTATS foo;
 SELECT tablename, attname, null_frac, n_distinct, most_common_vals, most_common_freqs, histogram_bounds FROM pg_stats WHERE tablename like 'foo%' ORDER BY attname,tablename;
 
 -- Merge stats from only one partition
@@ -506,7 +503,6 @@ SET allow_system_table_mods = 'DML';
 UPDATE pg_attribute SET attstattarget=0 WHERE attrelid = 'foo_1_prt_1'::regclass and ATTNAME in ('a','b','c');
 ANALYZE foo_1_prt_1;
 ANALYZE foo_1_prt_2;
-ANALYZE MERGESTATS foo;
 SELECT tablename, attname, null_frac, n_distinct, most_common_vals, most_common_freqs, histogram_bounds FROM pg_stats WHERE tablename like 'foo%' ORDER BY attname,tablename;
 
 -- Merge stats from only one partition one column
@@ -514,25 +510,7 @@ DROP TABLE IF EXISTS foo;
 CREATE TABLE foo (a int, b int, c int) PARTITION BY RANGE (b) (START (0) END (6) EVERY (3));
 INSERT INTO foo SELECT i, i%6, i%6 FROM generate_series(1,100)i; 
 ANALYZE foo_1_prt_1(c);
-ANALYZE MERGESTATS foo(c);
 SELECT tablename, attname, null_frac, n_distinct, most_common_vals, most_common_freqs, histogram_bounds FROM pg_stats WHERE tablename like 'foo%' ORDER BY attname,tablename;
-
--- Merge fails as all partitions are not analyzed
-DROP TABLE IF EXISTS foo;
-CREATE TABLE foo (a int, b int, c int) PARTITION BY RANGE (b) (START (0) END (6) EVERY (3));
-INSERT INTO foo SELECT i, i%6, i%6 FROM generate_series(1,100)i; 
-ANALYZE MERGESTATS foo;
-
--- Merge fails as all partitions are empty and are not analyzed
-DROP TABLE IF EXISTS foo;
-CREATE TABLE foo (a int, b int, c int) PARTITION BY RANGE (b) (START (0) END (6) EVERY (3));
-ANALYZE MERGESTATS foo;
-
--- Merge errors on partition of a table
-DROP TABLE IF EXISTS foo;
-CREATE TABLE foo (a int, b int, c int) PARTITION BY RANGE (b) (START (0) END (6) EVERY (3));
-INSERT INTO foo select i, i%6, i%100 FROM generate_series(1,2000)i;
-ANALYZE MERGESTATS foo_1_prt_1;
 
 -- Test merging of stats for a newly added partition
 -- Do not collect samples while merging stats
@@ -545,7 +523,6 @@ ALTER TABLE foo ADD partition new_part START (6) INCLUSIVE END (9) EXCLUSIVE;
 INSERT INTO foo SELECT i, i%3+6 FROM generate_series(1,500)i;
 ANALYZE foo_1_prt_new_part;
 SET client_min_messages = 'log';
-ANALYZE MERGESTATS foo;
 -- Insert a new column that is not analyzed in the leaf partitions.
 -- Analyzing root partition will use merging statistics for the first 2 columns, 
 -- will create a sample for the root to analyze the newly added columns since 
