@@ -1111,34 +1111,41 @@ leaf_parts_analyzed(Oid attrelid, Oid relid_exclude, List *va_cols)
 	List *oid_list = all_leaf_partition_relids(pn); /* all leaves */
 	bool all_parts_empty = true;
 	ListCell *lc, *lc_col;
-	forboth(lc_col, va_cols, lc, oid_list)
+	foreach(lc_col, va_cols)
 	{
 		AttrNumber attnum = lfirst_int(lc_col);
-		Oid partRelid = lfirst_oid(lc);
-		if (partRelid == relid_exclude)
-			continue;
+		const char *attname = get_relid_attribute_name(attrelid, attnum);
 
-		float4 relTuples = get_rel_reltuples(partRelid);
-		int4 relpages = get_rel_relpages(partRelid);
-
-		// A partition is not analyzed, so return false and fallback
-		// to sample based calculation
-		if (relpages == 0)
-			return false;
-
-		// Partition is analyzed and we detect it is empty
-		if (relTuples == 0.0 && relpages == 1)
-			continue;
-
-		HeapTuple heaptupleStats = get_att_stats(partRelid, attnum);
-		all_parts_empty = false;
-
-		// if there is no colstats
-		if (!HeapTupleIsValid(heaptupleStats))
+		foreach(lc, oid_list)
 		{
-			return false;
+			Oid partRelid = lfirst_oid(lc);
+			if (partRelid == relid_exclude)
+				continue;
+
+			AttrNumber child_attno = get_attnum(partRelid, attname);
+
+			float4 relTuples = get_rel_reltuples(partRelid);
+			int4 relpages = get_rel_relpages(partRelid);
+
+			// A partition is not analyzed, so return false and fallback
+			// to sample based calculation
+			if (relpages == 0)
+				return false;
+
+			// Partition is analyzed and we detect it is empty
+			if (relTuples == 0.0 && relpages == 1)
+				continue;
+
+			HeapTuple heaptupleStats = get_att_stats(partRelid, child_attno);
+			all_parts_empty = false;
+
+			// if there is no colstats
+			if (!HeapTupleIsValid(heaptupleStats))
+			{
+				return false;
+			}
+			heap_freetuple(heaptupleStats);
 		}
-		heap_freetuple(heaptupleStats);
 	}
 
 	return !all_parts_empty;
