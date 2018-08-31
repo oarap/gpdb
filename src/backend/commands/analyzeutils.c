@@ -1100,14 +1100,13 @@ needs_sample(VacAttrStats **vacattrstats, int attr_cnt)
  *
  *  attrelid - the relation id of the root table
  *  relid_exclude - it is the relid that is excluded to check for the stats.
- *                  It is used when we are asked to auto merge statistics
- *                  when analyzing a single leaf partition. As we are going to
- *                  produce stats for that specific leaf partition, we should
- *                  not check its stats availibility.
+ *  It is used when we are asked to auto merge statistics when analyzing a
+ *  single leaf partition. As we are going to produce stats for that
+ *  specific leaf partition, we should not check its stats availibility.
  *  va_cols - column attnum list to be analyzed from root table's perspective.
- *            These attnum's needs to be translated for each leaf table as the
- *            attnums for different columns might be different due to the
- *            dropped columns and split partitions.
+ *  These attnum's needs to be translated for each leaf table as the attnums
+ *  for different columns might be different due to the dropped columns and
+ *  split partitions.
  */
 bool
 leaf_parts_analyzed(Oid attrelid, Oid relid_exclude, List *va_cols)
@@ -1119,34 +1118,35 @@ leaf_parts_analyzed(Oid attrelid, Oid relid_exclude, List *va_cols)
 	List *oid_list = all_leaf_partition_relids(pn); /* all leaves */
 	bool all_parts_empty = true;
 	ListCell *lc, *lc_col;
-	foreach(lc_col, va_cols)
+
+	foreach(lc, oid_list)
 	{
-		// Check stats availibility for each column that asked to be analyzed.
-		AttrNumber attnum = lfirst_int(lc_col);
-		const char *attname = get_relid_attribute_name(attrelid, attnum);
+		Oid partRelid = lfirst_oid(lc);
+		if (partRelid == relid_exclude)
+			continue;
 
-		foreach(lc, oid_list)
+		float4 relTuples = get_rel_reltuples(partRelid);
+		int4 relpages = get_rel_relpages(partRelid);
+
+		// A partition is not analyzed, so return false and fallback
+		// to sample based calculation
+		if (relpages == 0)
+			return false;
+
+		// Partition is analyzed and we detect it is empty
+		if (relTuples == 0.0 && relpages == 1)
+			continue;
+
+		all_parts_empty = false;
+
+		foreach(lc_col, va_cols)
 		{
-			Oid partRelid = lfirst_oid(lc);
-			if (partRelid == relid_exclude)
-				continue;
-
+			// Check stats availibility for each column that asked to be analyzed.
+			AttrNumber attnum = lfirst_int(lc_col);
+			const char *attname = get_relid_attribute_name(attrelid, attnum);
 			AttrNumber child_attno = get_attnum(partRelid, attname);
 
-			float4 relTuples = get_rel_reltuples(partRelid);
-			int4 relpages = get_rel_relpages(partRelid);
-
-			// A partition is not analyzed, so return false and fallback
-			// to sample based calculation
-			if (relpages == 0)
-				return false;
-
-			// Partition is analyzed and we detect it is empty
-			if (relTuples == 0.0 && relpages == 1)
-				continue;
-
 			HeapTuple heaptupleStats = get_att_stats(partRelid, child_attno);
-			all_parts_empty = false;
 
 			// if there is no colstats
 			if (!HeapTupleIsValid(heaptupleStats))
