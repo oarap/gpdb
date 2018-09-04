@@ -49,6 +49,7 @@
 #include "utils/acl.h"
 #include "utils/builtins.h"
 #include "utils/datum.h"
+#include "utils/elog.h"
 #include "utils/guc.h"
 #include "utils/lsyscache.h"
 #include "utils/memutils.h"
@@ -1136,7 +1137,13 @@ leaf_parts_analyzed(Oid attrelid, Oid relid_exclude, List *va_cols)
 		// A partition is not analyzed, so return false and fallback
 		// to sample based calculation
 		if (relpages == 0)
+		{
+			if(relid_exclude == InvalidOid)
+				elog(NOTICE, "partition %d is not analyzed, so falling back to sample based approach", partRelid);
+			else
+				elog(NOTICE, "Cannot auto merge root partition statistics because partition %d is not analyzed", partRelid);
 			return false;
+		}
 
 		// Partition is analyzed and we detect it is empty
 		if (relTuples == 0.0 && relpages == 1)
@@ -1156,6 +1163,10 @@ leaf_parts_analyzed(Oid attrelid, Oid relid_exclude, List *va_cols)
 			// if there is no colstats
 			if (!HeapTupleIsValid(heaptupleStats))
 			{
+				if(relid_exclude == InvalidOid)
+					elog(NOTICE, "partition %d column %sis not analyzed, so falling back to sample based approach", partRelid, attname);
+				else
+					elog(NOTICE, "Cannot auto merge root partition statistics because partition %d column %s is not analyzed", partRelid, attname);
 				return false;
 			}
 			heap_freetuple(heaptupleStats);
