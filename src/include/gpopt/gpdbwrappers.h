@@ -440,7 +440,7 @@ namespace gpdb {
 	double ConvertNetworkToScalar(Datum datum, Oid typid);
 
 	// convert text-related datums to double for stats purpose
-	double ConvertTextToScalar(Datum datum, Oid typid);
+	long long ConvertTextToScalar(Datum datum, Oid typid);
 
 	// is the given operator hash-joinable
 	bool IsOpHashJoinable(Oid opno);

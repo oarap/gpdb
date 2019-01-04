@@ -2003,7 +2003,7 @@ gpdb::ConvertNetworkToScalar
 	return 0.0;
 }
 
-double
+long long
 gpdb::ConvertTextToScalar
 	(
 	Datum datum,
@@ -2039,7 +2039,7 @@ gpdb::ConvertTextToScalar
 		valuelen = VARSIZE(dptr) - VARHDRSZ;
 
 		if (valuelen <= 0)
-			return 0.0;				/* empty string has scalar value 0 */
+			return 0;				/* empty string has scalar value 0 */
 
 		// Consider only the first N bytes
 		if (valuelen > N)
@@ -2055,11 +2055,12 @@ gpdb::ConvertTextToScalar
 			num += ((double) ch) / denom;
 			denom *= base;
 		}
-
-		return num;
+		long long *ret=(long long *)malloc(sizeof(long long));
+		memcpy(ret, &num, sizeof(long long));
+		return *ret;
 	}
 	GP_WRAP_END;
-	return 0.0;
+	return 0;
 }
 
 bool

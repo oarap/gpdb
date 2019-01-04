@@ -2378,10 +2378,6 @@ CTranslatorScalarToDXL::ExtractDoubleValueFromDatum
 			d = GPOS_FP_ABS_MAX;
 		}
 	}
-	else if (CMDTypeGenericGPDB::IsTextRelatedType(mdid))
-	{
-		d = gpdb::ConvertTextToScalar(datum, CMDIdGPDB::CastMdid(mdid)->Oid());
-	}
 	else if (CMDTypeGenericGPDB::IsTimeRelatedType(mdid))
 	{
 		d = gpdb::ConvertTimeValueToScalar(datum, CMDIdGPDB::CastMdid(mdid)->Oid());
@@ -2462,7 +2458,6 @@ CTranslatorScalarToDXL::ExtractLintValueFromDatum
 	{
 		return lint_value;
 	}
-
 	if (mdid->Equals(&CMDIdGPDB::m_mdid_cash))
 	{
 		// cash is a pass-by-ref type
@@ -2471,6 +2466,12 @@ CTranslatorScalarToDXL::ExtractLintValueFromDatum
 		// Date is internally represented as an int32
 		lint_value = (LINT) (gpdb::Int32FromDatum(datumConstVal));
 
+	}
+	else if (CMDTypeGenericGPDB::IsTextRelatedType(mdid))
+	{
+		Datum datum = (Datum) 0;
+		clib::Memcpy(&datum, bytes, length);
+		lint_value = gpdb::ConvertTextToScalar(datum, CMDIdGPDB::CastMdid(mdid)->Oid());
 	}
 	else
 	{
